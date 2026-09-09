@@ -272,7 +272,7 @@ body::after {
 <div style="flex:1;min-width:240px;">
 <p><i class="fas fa-map-marker-alt" style="color:var(--eq-gold);width:28px;"></i> Rīga, Meža iela 4, LV-1048</p>
 <p><i class="fas fa-phone" style="color:var(--eq-gold);width:28px;"></i> +371 29117081</p>
-<p><i class="fas fa-envelope" style="color:var(--eq-gold);width:28px;"></i> ometrium@inbox.lv</p>
+<p><i class="fas fa-envelope" style="color:var(--eq-gold);width:28px;"></i> omterum@inbox.lv</p>
 </div>
 <div style="flex:2;min-width:240px;">
 <form id="contactForm" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
@@ -289,6 +289,12 @@ body::after {
 <h2><i class="fas fa-user-shield" style="color:var(--eq-gold);"></i> Administrācija</h2>
 <p class="sub">Pārvaldi produktus, krāsu variantus un cenas.</p>
 <button class="btn btn-danger btn-sm" id="adminLogoutBtn" style="margin-bottom:16px;"><i class="fas fa-sign-out-alt"></i> Iziet no admin</button>
+<div class="category-tabs" id="adminCategoryTabs" style="justify-content:flex-start;margin:4px 0 14px;">
+<button class="category-tab active" type="button" data-admin-category="paneli">Paneļi</button>
+<button class="category-tab" type="button" data-admin-category="flizes">Flīzes</button>
+<button class="category-tab" type="button" data-admin-category="apaks">Apakškonstrukcija</button>
+</div>
+<p class="sub" id="adminCategoryInfo" style="margin-bottom:16px;"></p>
 <div style="overflow-x:auto;">
 <table class="admin-table" id="adminTable">
 <thead><tr><th>ID</th><th>Nosaukums</th><th>Kategorija</th><th>Izmēri</th><th>Krāsas</th><th>Cena (1.izm.)</th><th>Cena (2.izm.)</th><th>Darbības</th></tr></thead>
@@ -951,7 +957,7 @@ document.getElementById('checkoutForm').addEventListener('submit', function(e) {
         Mērķis: Maksājums par pasūtījumu
         Summa: €${totalPrice.toFixed(2)}
         
-        Pēc pārskaitījuma veikšanas, lūdzu, nosūtiet maksājuma apstiprinājumu uz e-pastu ometrium@inbox.lv
+        Pēc pārskaitījuma veikšanas, lūdzu, nosūtiet maksājuma apstiprinājumu uz e-pastu omterum@inbox.lv
     `;
 
     const message = `Paldies, ${name}! Jūsu pasūtījums ir reģistrēts.\n\n` +
@@ -987,7 +993,7 @@ document.getElementById('loginSubmit').addEventListener('click', function() {
     if (pass === ADMIN_PASSWORD) {
         document.getElementById('loginOverlay').classList.remove('open');
         document.getElementById('adminPanel').classList.add('visible');
-        renderAdminTable();
+        setAdminCategory(currentCategory || 'paneli');
         showToast('🔓 Pieslēgts admin panelim.');
     } else {
         document.getElementById('loginError').style.display = 'block';
@@ -1015,9 +1021,38 @@ document.getElementById('contactForm').addEventListener('submit', function(e) {
     this.reset();
 });
 
+let adminCategory = 'paneli';
+
+function adminCategoryName(category) {
+    return category === 'paneli' ? 'Paneļi' : category === 'flizes' ? 'Flīzes' : 'Apakškonstrukcija';
+}
+
+function setAdminCategory(category) {
+    if (!['paneli', 'flizes', 'apaks'].includes(category)) category = 'paneli';
+    adminCategory = category;
+    document.querySelectorAll('[data-admin-category]').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.adminCategory === adminCategory);
+    });
+    const addCategory = document.getElementById('addCategory');
+    if (addCategory) addCategory.value = adminCategory;
+    const variantEditor = document.getElementById('variantEditContainer');
+    if (variantEditor) variantEditor.innerHTML = '';
+    renderAdminTable();
+    populateVariantSelect();
+}
+
+document.querySelectorAll('[data-admin-category]').forEach(btn => {
+    btn.addEventListener('click', function() {
+        setAdminCategory(this.dataset.adminCategory);
+    });
+});
+
 function renderAdminTable() {
     const tbody = document.getElementById('adminTableBody');
-    tbody.innerHTML = allProducts.map(p => {
+    const adminProducts = allProducts.filter(p => p.category === adminCategory);
+    const info = document.getElementById('adminCategoryInfo');
+    if (info) info.textContent = `${adminCategoryName(adminCategory)} — ${adminProducts.length} produkti. Zemāk redzami tikai šīs kategorijas produkti.`;
+    tbody.innerHTML = adminProducts.map(p => {
         const first = p.variants && p.variants.length > 0 ? p.variants[0] : null;
         const sizeLabels = p.sizeLabels || ['Mazais', 'Lielais'];
         const catName = p.category === 'paneli' ? 'Paneļi' : p.category === 'flizes' ? 'Flīzes' : 'Apakškonstrukcija';
@@ -1069,12 +1104,13 @@ function renderAdminTable() {
                     allProducts[idx].name = document.getElementById('addProdName').value.trim();
                     allProducts[idx].code = document.getElementById('addProdCode').value.trim();
                     allProducts[idx].category = document.getElementById('addCategory').value;
+                    adminCategory = allProducts[idx].category;
                     allProducts[idx].desc = document.getElementById('addProdDesc').value.trim();
                     allProducts[idx].sizeLabels = [size1, size2];
                     allProducts[idx].variants.forEach(v => { v.priceSmall = ps; v.priceLarge = pl; });
                     products = allProducts.filter(p => p.category === currentCategory);
                     renderProducts();
-                    renderAdminTable();
+                    setAdminCategory(adminCategory);
                     showToast('✅ Produkts atjaunināts!');
                     form.reset();
                     submitBtn.innerHTML = '<i class="fas fa-save"></i> Pievienot produktu';
@@ -1094,6 +1130,7 @@ function renderAdminTable() {
                 products = allProducts.filter(p => p.category === currentCategory);
                 renderProducts();
                 renderAdminTable();
+                populateVariantSelect();
                 showToast('🗑️ Produkts dzēsts.');
             }
         });
@@ -1188,27 +1225,30 @@ function handleAddProduct(e) {
     allProducts.push({ id: newId, category, name, code, desc, sizeLabels: [size1, size2], variants: [{ color: 'Noklusējums', image: '', code: code + '-DEFAULT', priceSmall: ps, priceLarge: pl }] });
     products = allProducts.filter(p => p.category === currentCategory);
     renderProducts();
-    renderAdminTable();
+    adminCategory = category;
+    setAdminCategory(category);
     showToast('✅ Produkts pievienots!');
     document.getElementById('adminAddProductForm').reset();
     const submitBtn = document.getElementById('adminAddProductForm').querySelector('button[type="submit"]');
     submitBtn.innerHTML = '<i class="fas fa-save"></i> Pievienot produktu';
     delete submitBtn.dataset.editId;
     document.getElementById('adminAddProductForm').onsubmit = handleAddProduct;
+    document.getElementById('addCategory').value = adminCategory;
 }
 document.getElementById('adminAddProductForm').onsubmit = handleAddProduct;
 
 function populateVariantSelect() {
     const select = document.getElementById('variantProductId');
+    if (!select) return;
     select.innerHTML = '<option value="">Izvēlies produktu</option>';
-    allProducts.forEach(p => {
+    allProducts.filter(p => p.category === adminCategory).forEach(p => {
         const opt = document.createElement('option');
         opt.value = p.id;
         opt.textContent = `${p.name} (${p.code})`;
         select.appendChild(opt);
     });
 }
-populateVariantSelect();
+setAdminCategory(currentCategory || 'paneli');
 
 document.getElementById('variantFileInput').addEventListener('change', function(e) {
     const file = e.target.files[0];
