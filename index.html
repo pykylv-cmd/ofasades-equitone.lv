@@ -11,46 +11,10 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
-:root {
-    --eq-green: #006b3e; --eq-green-light: #008a50; --eq-gold: #c9a84c;
-    --eq-gold-light: #e0c06a; --eq-dark: #1a1a1a; --eq-gray: #f5f3f0;
-    --eq-gray-dark: #d1cdc5; --eq-text: #2c2c2c; --eq-white: #ffffff;
-    --shadow: 0 12px 40px rgba(0,0,0,0.08); --radius: 20px;
-    --transition: all 0.25s ease; --font: 'Inter', sans-serif;
-}
-body {
-    font-family: var(--font);
-    background: #1a1e24;
-    color: #e8e0d0;
-    line-height: 1.5;
-    min-height: 100vh;
-    position: relative;
-}
-body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -2;
-    background-image: url('https://media.istockphoto.com/id/1205474316/photo/panorama-and-aerial-view-of-riga-city.jpg?s=170667a&w=0&k=20&c=_1i85RkCaI8X6KJicsy_E5NHbhzNlXUae-IQAxHfeq4=');
-    background-size: cover;
-    background-position: center;
-    opacity: 0.60;
-    filter: blur(2px);
-    transition: background-image 1.5s ease-in-out;
-}
-body::after {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    background: linear-gradient(145deg, rgba(30,35,42,0.50) 0%, rgba(45,50,58,0.60) 100%);
-}
+:root { --eq-green: #006b3e; --eq-green-light: #008a50; --eq-gold: #c9a84c; --eq-gold-light: #e0c06a; --eq-dark: #1a1a1a; --eq-gray: #f5f3f0; --eq-gray-dark: #d1cdc5; --eq-text: #2c2c2c; --eq-white: #ffffff; --shadow: 0 12px 40px rgba(0,0,0,0.08); --radius: 20px; --transition: all 0.25s ease; --font: 'Inter', sans-serif; }
+body { font-family: var(--font); background: #1a1e24; color: #e8e0d0; line-height: 1.5; min-height: 100vh; position: relative; }
+body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; background-image: url('https://media.istockphoto.com/id/1205474316/photo/panorama-and-aerial-view-of-riga-city.jpg?s=170667a&w=0&k=20&c=_1i85RkCaI8X6KJicsy_E5NHbhzNlXUae-IQAxHfeq4='); background-size: cover; background-position: center; opacity: 0.60; filter: blur(2px); transition: background-image 1.5s ease-in-out; }
+body::after { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: linear-gradient(145deg, rgba(30,35,42,0.50) 0%, rgba(45,50,58,0.60) 100%); }
 .container { max-width: 1400px; margin: 0 auto; padding: 0 24px; }
 .btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 28px; border: none; border-radius: 60px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: var(--transition); background: rgba(255,255,255,0.08); backdrop-filter: blur(8px); color: #fff; border: 1px solid rgba(255,255,255,0.10); box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
 .btn-primary { background: var(--eq-green); color: #fff; border: none; }
@@ -62,1163 +26,132 @@ body::after {
 .btn-danger { background: #c0392b; color: #fff; border: none; }
 .btn-danger:hover { background: #e74c3c; }
 .btn-sm { padding: 8px 18px; font-size: 0.85rem; }
-.btn-xs { padding: 4px 12px; font-size: 0.7rem; border-radius: 30px; }
 .header { background: rgba(10,10,10,0.6); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(255,255,255,0.06); position: sticky; top:0; z-index:100; padding:12px 0; }
 .header .container { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
-.logo-wrapper { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
-.logo-main { font-size: 2rem; font-weight: 700; letter-spacing: -0.02em; color: #fff; }
+.logo-main { font-size: 2rem; font-weight: 700; color: #fff; }
 .logo-main span { color: var(--eq-gold); }
-.logo-equitone { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; font-weight: 600; color: #ccc; background: rgba(255,255,255,0.06); padding: 6px 16px 6px 12px; border-radius: 40px; border: 1px solid rgba(255,255,255,0.08); white-space: nowrap; backdrop-filter: blur(4px); }
-.logo-equitone img { height: 28px; width: auto; display: block; filter: brightness(0) invert(1); }
-.logo-equitone .diler-text { font-size: 0.7rem; font-weight: 400; color: #aaa; line-height: 1.2; white-space: nowrap; }
-.logo-equitone .diler-text strong { color: var(--eq-gold); font-weight: 600; }
-@media (max-width:700px){ .logo-wrapper { flex-direction:column; align-items:flex-start; gap:8px; } .logo-equitone { font-size:0.75rem; padding:4px 12px 4px 8px; } .logo-equitone img { height:22px; } .logo-main { font-size:1.6rem; } }
-@media (max-width:480px){ .logo-main { font-size:1.3rem; } .logo-equitone .diler-text { font-size:0.6rem; } }
-.nav-links { display: flex; align-items: center; gap: 24px; font-weight: 500; flex-wrap: wrap; }
-.nav-links a { transition: var(--transition); color: #ccc; font-size: 0.95rem; text-decoration: none; }
+.logo-equitone { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; font-weight: 600; color: #ccc; background: rgba(255,255,255,0.06); padding: 6px 16px; border-radius: 40px; }
+.nav-links { display: flex; gap: 24px; font-weight: 500; }
+.nav-links a { color: #ccc; text-decoration: none; }
 .nav-links a:hover { color: var(--eq-gold); }
-.header-actions { display: flex; align-items: center; gap: 16px; }
-.cart-btn { position: relative; font-size: 1.4rem; background: none; border: none; cursor: pointer; color: #ccc; transition: var(--transition); }
-.cart-btn:hover { color: var(--eq-gold); }
-.cart-badge { position: absolute; top: -10px; right: -12px; background: var(--eq-gold); color: #1a1a1a; font-size: 0.7rem; font-weight: 700; padding: 3px 8px; border-radius: 30px; min-width: 22px; text-align: center; }
-.hero { padding: 60px 0 40px; position: relative; }
-.hero .container { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
-.small-tagline { font-size: 0.8rem; color: var(--eq-gold); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; font-weight: 600; }
-.hero-content h1 { font-size: 3.2rem; font-weight: 700; line-height: 1.1; letter-spacing: -0.03em; color: #fff; margin-bottom: 20px; }
-.hero-content h1 span { color: var(--eq-gold); }
-.hero-content p { font-size: 1.2rem; color: #bbb; max-width: 480px; margin-bottom: 32px; }
-.hero-actions { display: flex; flex-wrap: wrap; gap: 16px; }
-.hero-image { display: flex; justify-content: center; }
-.hero-image .mockup { width: 100%; max-width: 400px; aspect-ratio: 4/3; background: rgba(255,255,255,0.04); border-radius: var(--radius); box-shadow: 0 30px 60px rgba(0,0,0,0.4); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center; font-size: 4rem; color: var(--eq-gold); }
-.section-title { font-size: 2.4rem; font-weight: 700; color: #fff; margin-bottom: 8px; letter-spacing: -0.02em; }
-.section-sub { color: #aaa; margin-bottom: 32px; font-size: 1.1rem; }
-.category-tabs { display: flex; gap: 16px; margin-bottom: 32px; flex-wrap: wrap; justify-content: center; }
-.category-tab { padding: 12px 32px; border-radius: 40px; border: 1px solid rgba(255,255,255,0.10); background: rgba(255,255,255,0.04); backdrop-filter: blur(8px); font-weight: 600; cursor: pointer; transition: var(--transition); font-size: 1.1rem; color: #ccc; }
-.category-tab.active { background: var(--eq-gold); color: #1a1a1a; border-color: var(--eq-gold); box-shadow: 0 8px 32px rgba(201,168,76,0.25); }
-.category-tab:hover:not(.active) { border-color: var(--eq-gold); background: rgba(255,255,255,0.08); }
-.product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 32px; margin-bottom: 40px; }
-.product-card { background: rgba(18,22,28,0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius); padding: 24px 20px 28px; box-shadow: 0 8px 40px rgba(0,0,0,0.5); transition: var(--transition); display: flex; flex-direction: column; }
-.product-card:hover { transform: translateY(-8px); box-shadow: 0 20px 60px rgba(0,0,0,0.6); border-color: rgba(201,168,76,0.25); }
-.product-image { width: 100%; aspect-ratio: 1/1; background: rgba(255,255,255,0.04); border-radius: 12px; margin-bottom: 16px; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; cursor: pointer; transition: var(--transition); }
-.product-image:hover { opacity: 0.9; transform: scale(1.01); }
-.product-image img { width: 100%; height: 100%; object-fit: cover; transition: var(--transition); }
-.product-image .no-image { font-size: 3rem; opacity: 0.3; text-align: center; padding: 10px; color: #888; }
-.product-image .zoom-hint { position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.7); color: #fff; font-size: 0.7rem; padding: 4px 10px; border-radius: 20px; opacity: 0; transition: var(--transition); pointer-events: none; }
-.product-image:hover .zoom-hint { opacity: 1; }
-.product-card h3 { font-size: 1.2rem; font-weight: 600; color: #fff; }
-.product-code { font-size: 0.8rem; color: #999; margin-bottom: 6px; }
-.product-desc { font-size: 0.95rem; color: #ccc; margin-bottom: 12px; flex: 1; }
-.size-selector { display: flex; gap: 8px; margin-bottom: 12px; align-items: center; flex-wrap: wrap; }
-.size-selector .label { font-size: 0.8rem; font-weight: 600; color: #aaa; margin-right: 4px; }
-.size-btn { padding: 4px 14px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.04); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: var(--transition); color: #ccc; }
-.size-btn.active { border-color: var(--eq-gold); background: var(--eq-gold); color: #1a1a1a; }
-.size-btn:hover:not(.active) { border-color: var(--eq-gold); background: rgba(255,255,255,0.08); }
-.color-variants { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; align-items: center; min-height: 36px; }
-.color-variants .label { font-size: 0.8rem; font-weight: 600; color: #aaa; margin-right: 4px; }
-.color-btn { width: 36px; height: 36px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.15); cursor: pointer; transition: var(--transition); background-size: cover; background-position: center; display: inline-flex; align-items: center; justify-content: center; font-size: 0; position: relative; box-shadow: 0 2px 8px rgba(0,0,0,0.2); flex-shrink: 0; }
-.color-btn.active { border-color: var(--eq-gold); transform: scale(1.15); box-shadow: 0 0 0 3px rgba(201,168,76,0.3); }
-.color-btn:hover { transform: scale(1.1); }
-.color-btn .tooltip { display: none; position: absolute; bottom: -28px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.85); color: #fff; padding: 2px 10px; border-radius: 10px; font-size: 0.7rem; white-space: nowrap; font-weight: 500; }
-.color-btn:hover .tooltip { display: block; }
-.product-bottom { display: flex; align-items: center; justify-content: space-between; margin-top: auto; gap: 12px; flex-wrap: wrap; }
+.cart-btn { position: relative; font-size: 1.4rem; background: none; border: none; cursor: pointer; color: #ccc; }
+.cart-badge { position: absolute; top: -10px; right: -12px; background: var(--eq-gold); color: #1a1a1a; font-size: 0.7rem; padding: 3px 8px; border-radius: 30px; }
+.hero { padding: 60px 0 40px; }
+.hero .container { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
+.small-tagline { font-size: 0.8rem; color: var(--eq-gold); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
+.hero-content h1 { font-size: 3.2rem; color: #fff; }
+.hero-content p { color: #bbb; margin-bottom: 32px; }
+.section-title { font-size: 2.4rem; color: #fff; margin-bottom: 8px; }
+.section-sub { color: #aaa; margin-bottom: 32px; }
+.category-tabs { display: flex; gap: 16px; margin-bottom: 32px; }
+.category-tab { padding: 12px 32px; border-radius: 40px; border: 1px solid rgba(255,255,255,0.10); background: rgba(255,255,255,0.04); color: #ccc; font-weight: 600; cursor: pointer; }
+.category-tab.active { background: var(--eq-gold); color: #1a1a1a; }
+.product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 32px; }
+.product-card { background: rgba(18,22,28,0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 24px; }
+.product-image { width: 100%; aspect-ratio: 1/1; background: rgba(255,255,255,0.04); border-radius: 12px; margin-bottom: 16px; }
+.product-image img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; }
+.product-card h3 { color: #fff; font-size: 1.2rem; }
+.product-code { color: #999; font-size: 0.8rem; }
+.product-desc { color: #ccc; margin-bottom: 12px; }
+.size-btn { padding: 4px 14px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.04); color: #ccc; cursor: pointer; }
 .price { font-weight: 700; font-size: 1.3rem; color: #fff; }
-.price small { font-weight: 400; font-size: 0.8rem; color: #aaa; }
-.lightbox { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); z-index: 1000; justify-content: center; align-items: center; padding: 40px; cursor: pointer; opacity: 0; transition: opacity 0.3s ease; }
-.lightbox.open { display: flex; opacity: 1; }
-.lightbox-content { max-width: 90%; max-height: 90%; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.6); object-fit: contain; background: #1a1a1a; padding: 4px; }
-.lightbox-close { position: absolute; top: 24px; right: 32px; font-size: 2.4rem; color: #fff; background: none; border: none; cursor: pointer; transition: var(--transition); z-index: 1001; }
-.lightbox-close:hover { color: var(--eq-gold); transform: rotate(90deg); }
-.cart-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(12px); z-index: 200; opacity: 0; visibility: hidden; transition: var(--transition); }
-.cart-overlay.open { opacity: 1; visibility: visible; }
-.cart-sidebar { position: fixed; top: 0; right: -480px; width: 100%; max-width: 460px; height: 100%; background: rgba(18,22,28,0.96); backdrop-filter: blur(20px); box-shadow: -8px 0 40px rgba(0,0,0,0.5); z-index: 300; padding: 32px 28px; transition: right 0.35s cubic-bezier(0.22,1,0.36,1); display: flex; flex-direction: column; overflow-y: auto; border-left: 1px solid rgba(255,255,255,0.06); }
-.cart-sidebar.open { right: 0; }
-.cart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.08); }
-.cart-header h2 { font-size: 1.6rem; color: #fff; }
-.cart-close { background: none; border: none; font-size: 1.8rem; cursor: pointer; color: #888; }
-.cart-close:hover { color: #fff; }
-.cart-items { flex: 1; margin-bottom: 20px; }
-.cart-item { display: flex; align-items: center; gap: 16px; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
-.cart-item-info { flex: 1; }
-.cart-item-info h4 { font-size: 1rem; font-weight: 600; color: #fff; }
-.cart-item-info .item-price { color: var(--eq-gold); font-weight: 600; }
-.cart-item-qty { display: flex; align-items: center; gap: 8px; }
-.cart-item-qty button { background: rgba(255,255,255,0.08); border: none; width: 30px; height: 30px; border-radius: 30px; font-weight: 700; cursor: pointer; color: #fff; }
-.cart-item-qty button:hover { background: rgba(255,255,255,0.15); }
-.cart-item-remove { background: none; border: none; color: #c0392b; cursor: pointer; }
-.cart-total { padding: 20px 0; border-top: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: 700; color: #fff; }
-.cart-total span:last-child { color: var(--eq-gold); }
-.cart-empty { text-align: center; color: #888; padding: 40px 0; }
-.cart-empty i { font-size: 3rem; margin-bottom: 12px; opacity: 0.4; }
-.checkout-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(16px); z-index: 400; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: var(--transition); padding: 20px; }
-.checkout-modal.open { opacity: 1; visibility: visible; }
-.checkout-box { background: rgba(18,22,28,0.96); backdrop-filter: blur(20px); max-width: 540px; width: 100%; border-radius: var(--radius); padding: 25px 30px; box-shadow: 0 40px 80px rgba(0,0,0,0.5); transform: scale(0.96); transition: var(--transition); border: 1px solid rgba(255,255,255,0.06); max-height: 90vh; overflow-y: auto; }
-.checkout-modal.open .checkout-box { transform: scale(1); }
-.checkout-box h2 { font-size: 1.5rem; color: #fff; margin-bottom: 5px; }
-.checkout-box .sub { color: #aaa; margin-bottom: 15px; }
-.checkout-box label { font-weight: 600; font-size: 0.9rem; color: #ccc; display: block; margin-bottom: 6px; }
-.checkout-box input, .checkout-box textarea, .checkout-box select { width: 100%; padding: 10px 14px; border: 1px solid rgba(255,255,255,0.10); border-radius: 12px; font-size: 0.95rem; margin-bottom: 10px; font-family: var(--font); background: rgba(255,255,255,0.04); color: #fff; }
-.checkout-box input:focus, .checkout-box textarea:focus, .checkout-box select:focus { outline: none; border-color: var(--eq-gold); }
-.checkout-box select option { background: #1a1e24; color: #fff; }
-.payment-options { display: flex; gap: 15px; margin-bottom: 18px; flex-wrap: wrap; }
-.payment-options label { display: flex; align-items: center; gap: 8px; font-weight: 400; font-size: 0.95rem; color: #ccc; cursor: pointer; }
-.checkout-actions { display: flex; gap: 12px; margin-top: 8px; }
-.checkout-actions .btn { flex: 1; justify-content: center; }
-.admin-panel { background: rgba(18,22,28,0.92); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.06); border-radius: var(--radius); padding: 32px; box-shadow: 0 8px 40px rgba(0,0,0,0.3); margin: 40px 0; display: none; }
-.admin-panel.visible { display: block; }
-.admin-panel h2 { font-size: 1.8rem; color: #fff; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
-.admin-panel .sub { color: #aaa; margin-bottom: 24px; }
-.admin-table { width: 100%; border-collapse: collapse; margin-top: 16px; color: #ddd; }
-.admin-table th, .admin-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.06); }
-.admin-table th { background: rgba(255,255,255,0.04); font-weight: 600; color: #fff; }
-.admin-table .actions { display: flex; gap: 8px; flex-wrap: wrap; }
-.admin-table .btn { padding: 6px 14px; font-size: 0.8rem; }
-.admin-table .product-thumb { width: 50px; height: 50px; object-fit: cover; border-radius: 8px; background: rgba(255,255,255,0.04); cursor: pointer; }
-.admin-add-form { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; background: rgba(255,255,255,0.04); padding: 24px; border-radius: var(--radius); margin-top: 24px; border: 1px solid rgba(255,255,255,0.06); }
-.admin-add-form input, .admin-add-form textarea, .admin-add-form select { padding: 12px 16px; border: 1px solid rgba(255,255,255,0.10); border-radius: 12px; font-size: 1rem; font-family: var(--font); background: rgba(255,255,255,0.04); color: #fff; }
-.admin-add-form input:focus, .admin-add-form textarea:focus, .admin-add-form select:focus { outline: none; border-color: var(--eq-gold); }
-.admin-add-form .full-width { grid-column: 1 / -1; }
-.admin-add-form .btn { grid-column: 1 / -1; justify-content: center; }
-.file-upload-wrapper { grid-column: 1 / -1; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-.file-upload-wrapper input[type="file"] { flex: 1; padding: 10px; border: 1px dashed rgba(255,255,255,0.15); border-radius: 12px; background: rgba(255,255,255,0.02); cursor: pointer; color: #ccc; }
-.file-upload-wrapper .preview { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; border: 1px solid rgba(255,255,255,0.10); background: rgba(255,255,255,0.04); display: none; }
-.login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(16px); z-index: 500; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: var(--transition); padding: 20px; }
-.login-overlay.open { opacity: 1; visibility: visible; }
-.login-box { background: rgba(18,22,28,0.96); backdrop-filter: blur(20px); max-width: 400px; width: 100%; border-radius: var(--radius); padding: 40px 36px; box-shadow: 0 40px 80px rgba(0,0,0,0.5); transform: scale(0.96); transition: var(--transition); border: 1px solid rgba(255,255,255,0.06); }
-.login-overlay.open .login-box { transform: scale(1); }
-.login-box h2 { font-size: 1.8rem; color: #fff; margin-bottom: 8px; }
-.login-box p { color: #aaa; margin-bottom: 24px; }
-.login-box input { width: 100%; padding: 12px 16px; border: 1px solid rgba(255,255,255,0.10); border-radius: 12px; font-size: 1rem; margin-bottom: 18px; background: rgba(255,255,255,0.04); color: #fff; }
-.login-box input:focus { outline: none; border-color: var(--eq-gold); }
-.login-box .btn { width: 100%; justify-content: center; }
-.login-error { color: #c0392b; font-size: 0.9rem; margin-top: -10px; margin-bottom: 16px; display: none; }
-.toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(80px); background: rgba(18,22,28,0.96); backdrop-filter: blur(20px); color: #fff; padding: 14px 32px; border-radius: 60px; font-weight: 500; box-shadow: 0 12px 40px rgba(0,0,0,0.4); opacity: 0; transition: all 0.4s ease; z-index: 600; pointer-events: none; border: 1px solid rgba(255,255,255,0.06); }
-.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-.footer { background: rgba(10,10,10,0.8); backdrop-filter: blur(16px); border-top: 1px solid rgba(255,255,255,0.04); color: #aaa; padding: 48px 0 32px; margin-top: 60px; border-radius: 40px 40px 0 0; }
-.footer .container { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; }
-.footer h4 { color: #fff; font-weight: 600; margin-bottom: 16px; }
-.footer a { display: block; margin-bottom: 8px; transition: var(--transition); color: #aaa; text-decoration: none; }
-.footer a:hover { color: var(--eq-gold); }
-.footer .copy { grid-column: 1/-1; text-align: center; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.04); font-size: 0.9rem; color: #666; }
-@media (max-width:992px){ .hero .container { grid-template-columns:1fr; text-align:center; } .hero-content p { margin-left:auto; margin-right:auto; } .hero-actions { justify-content:center; } .footer .container { grid-template-columns:1fr 1fr; } }
-@media (max-width:700px){ .header .container { flex-wrap:wrap; } .nav-links { order:3; width:100%; justify-content:center; gap:16px; flex-wrap:wrap; } .hero-content h1 { font-size:2.2rem; } .product-grid { grid-template-columns:1fr 1fr; gap:16px; } .admin-add-form { grid-template-columns:1fr; } .admin-add-form .full-width { grid-column:1; } .file-upload-wrapper { grid-column:1; } .cart-sidebar { max-width:100%; padding:24px 18px; } .footer .container { grid-template-columns:1fr; gap:24px; } .checkout-box { padding:28px 20px; } .lightbox-content { max-width:95%; max-height:80%; } }
-@media (max-width:480px){ .product-grid { grid-template-columns:1fr; } .hero-content h1 { font-size:1.8rem; } .admin-table { font-size:0.8rem; } .admin-table th, .admin-table td { padding:8px 8px; } .color-btn { width:30px; height:30px; } .size-btn { font-size:0.7rem; padding:2px 10px; } }
-.variant-edit-row { background: rgba(255,255,255,0.04); border-radius: 12px; padding: 16px; margin-top: 12px; display: grid; grid-template-columns: 140px 1fr 1fr 1fr auto auto; gap: 10px; align-items: center; border: 1px solid rgba(255,255,255,0.06); }
-.variant-edit-row .v-preview { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; border: 1px solid rgba(255,255,255,0.10); background: rgba(255,255,255,0.04); }
-.variant-edit-row input[type="text"], .variant-edit-row input[type="number"] { padding: 6px 10px; border: 1px solid rgba(255,255,255,0.10); border-radius: 8px; font-size: 0.85rem; width: 100%; background: rgba(255,255,255,0.04); color: #fff; }
-.variant-edit-row .btn { padding: 6px 14px; font-size: 0.75rem; white-space: nowrap; }
-@media (max-width:700px){ .variant-edit-row { grid-template-columns: 1fr 1fr; } .variant-edit-row .v-preview { grid-column:1/2; } }
-.variant-editor-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 16px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.06); }
-.variant-editor-header h4 { font-size: 1.2rem; color: #fff; }
+.footer { background: rgba(10,10,10,0.8); color: #aaa; padding: 48px 0 32px; margin-top: 60px; }
+.footer .container { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px; }
+@media (max-width:700px){ .hero .container { grid-template-columns:1fr; } .product-grid { grid-template-columns:1fr; } }
 </style>
 </head>
 <body>
 <header class="header">
 <div class="container">
-<div class="logo-wrapper">
 <div class="logo-main">O <span>FASADES</span></div>
-<div class="logo-equitone">
-<img src="https://www.equitone.com/themes/custom/equitone/logo.svg" alt="EQUITONE" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';" />
-<span style="display:none;">EQUITONE</span>
-<span class="diler-text"><strong>Oficiālais dīleris</strong> Latvijā</span>
-</div>
-</div>
-<nav class="nav-links">
-<a href="#products">Produkti</a>
-<a href="#about">Par mums</a>
-<a href="#contact">Kontakti</a>
-<a href="#" id="adminLoginBtn" style="color:var(--eq-gold);"><i class="fas fa-lock"></i> Admin</a>
-</nav>
-<div class="header-actions">
-<button class="cart-btn" id="cartToggle">
-<i class="fas fa-shopping-bag"></i>
-<span class="cart-badge" id="cartBadge">0</span>
-</button>
-</div>
+<div class="logo-equitone">EQUITONE <span style="color:var(--eq-gold);">Oficiālais dīleris Latvijā</span></div>
+<nav class="nav-links"><a href="#products">Produkti</a><a href="#contact">Kontakti</a><a href="#" id="adminLoginBtn">Admin</a></nav>
+<button class="cart-btn" id="cartToggle"><i class="fas fa-shopping-bag"></i><span class="cart-badge">0</span></button>
 </div>
 </header>
 <section class="hero">
 <div class="container">
 <div class="hero-content">
 <p class="small-tagline">VENTILĒJAMO FASĀŽU RISINĀJUMI</p>
-<h1>Pilns <span>EQUITONE</span> katalogs</h1>
-<p>Izvēlies kategoriju: paneļi, flīzes vai apakškonstrukcija. Visi produkti ar izmēriem un cenām!</p>
-<div class="hero-actions">
-<a href="#products" class="btn btn-primary"><i class="fas fa-arrow-right"></i> Skatīt produktus</a>
-<a href="#contact" class="btn btn-outline"><i class="fas fa-phone"></i> Sazināties</a>
-</div>
-</div>
-<div class="hero-image">
-<div class="mockup"><i class="fas fa-building"></i></div>
+<h1>Pilns <span style="color:var(--eq-gold);">EQUITONE</span> katalogs</h1>
+<p>Izvēlies kategoriju: paneļi, flīzes vai apakškonstrukcija.</p>
+<a href="#products" class="btn btn-primary">Skatīt produktus</a>
 </div>
 </div>
 </section>
 <section class="container" id="products">
 <h2 class="section-title">Mūsu kolekcija</h2>
-<div class="category-tabs">
-<button class="category-tab active" data-category="paneli">Paneļi</button>
-<button class="category-tab" data-category="flizes">Flīzes</button>
-<button class="category-tab" data-category="apaks">Apakškonstrukcija</button>
-</div>
-<p class="section-sub" id="productCount"></p>
+<div class="category-tabs"><button class="category-tab active" data-category="paneli">Paneļi</button><button class="category-tab" data-category="apaks">Apakškonstrukcija</button></div>
 <div class="product-grid" id="productGrid"></div>
 </section>
-<section class="container" id="about" style="padding:20px 0 40px;">
-<h2 class="section-title">Par O FASADES</h2>
-<p class="section-sub" style="max-width:700px;">Mēs esam sertificēts EQUITONE dīleris Latvijā. Piedāvājam pilnu servisu – no konsultācijām līdz piegādei.</p>
-</section>
-<section class="container" id="contact" style="padding:20px 0 40px;">
-<h2 class="section-title">Sazinieties ar mums</h2>
-<div style="display:flex;flex-wrap:wrap;gap:32px;background:rgba(255,255,255,0.04);backdrop-filter:blur(12px);padding:32px 36px;border-radius:var(--radius);border:1px solid rgba(255,255,255,0.06);">
-<div style="flex:1;min-width:240px;">
-<p><i class="fas fa-map-marker-alt" style="color:var(--eq-gold);width:28px;"></i> Rīga, Meža iela 4, LV-1048</p>
-<p><i class="fas fa-phone" style="color:var(--eq-gold);width:28px;"></i> +371 29117081</p>
-<p><i class="fas fa-envelope" style="color:var(--eq-gold);width:28px;"></i> ometrium@inbox.lv</p>
-</div>
-<div style="flex:2;min-width:240px;">
-<form id="contactForm" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-<input type="text" placeholder="Vārds" required style="grid-column:1/2;padding:12px 16px;border:1px solid rgba(255,255,255,0.10);border-radius:12px;background:rgba(255,255,255,0.04);color:#fff;font-size:1rem;">
-<input type="email" placeholder="E-pasts" required style="grid-column:2/3;padding:12px 16px;border:1px solid rgba(255,255,255,0.10);border-radius:12px;background:rgba(255,255,255,0.04);color:#fff;font-size:1rem;">
-<textarea placeholder="Jūsu jautājums..." style="grid-column:1/3;padding:12px 16px;border:1px solid rgba(255,255,255,0.10);border-radius:12px;background:rgba(255,255,255,0.04);color:#fff;font-size:1rem;min-height:80px;"></textarea>
-<button type="submit" class="btn btn-primary" style="grid-column:1/3;justify-content:center;"><i class="fas fa-paper-plane"></i> Nosūtīt</button>
-</form>
-</div>
-</div>
-</section>
-<div class="container">
-<div class="admin-panel" id="adminPanel">
-<h2><i class="fas fa-user-shield" style="color:var(--eq-gold);"></i> Administrācija</h2>
-<p class="sub">Pārvaldi produktus, krāsu variantus un cenas.</p>
-<button class="btn btn-danger btn-sm" id="adminLogoutBtn" style="margin-bottom:16px;"><i class="fas fa-sign-out-alt"></i> Iziet no admin</button>
-<div style="overflow-x:auto;">
-<table class="admin-table" id="adminTable">
-<thead><tr><th>ID</th><th>Nosaukums</th><th>Kategorija</th><th>Izmēri</th><th>Krāsas</th><th>Cena (1.izm.)</th><th>Cena (2.izm.)</th><th>Darbības</th></tr></thead>
-<tbody id="adminTableBody"></tbody>
-</table>
-</div>
-<h3 style="margin-top:32px;margin-bottom:12px;color:#fff;"><i class="fas fa-plus-circle" style="color:var(--eq-green);"></i> Pievienot jaunu produktu</h3>
-<form class="admin-add-form" id="adminAddProductForm">
-<input type="text" id="addProdName" placeholder="Nosaukums *" required />
-<input type="text" id="addProdCode" placeholder="Kods *" required />
-<select id="addCategory" required style="grid-column:1/2;">
-<option value="paneli">Paneļi</option>
-<option value="flizes">Flīzes</option>
-<option value="apaks">Apakškonstrukcija</option>
-</select>
-<textarea id="addProdDesc" placeholder="Apraksts" class="full-width" style="grid-column:1/2;"></textarea>
-<input type="text" id="addSize1" placeholder="1. izmērs (piem., 2520x1240x8mm) *" required />
-<input type="text" id="addSize2" placeholder="2. izmērs (piem., 3070x1240x8mm) *" required />
-<input type="number" id="addProdPriceSmall" placeholder="Cena (1. izm.) *" step="0.01" required />
-<input type="number" id="addProdPriceLarge" placeholder="Cena (2. izm.) *" step="0.01" required />
-<button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Pievienot produktu</button>
-</form>
-<h3 style="margin-top:32px;margin-bottom:12px;color:#fff;"><i class="fas fa-palette" style="color:var(--eq-gold);"></i> Pievienot krāsu variantu</h3>
-<form class="admin-add-form" id="adminAddVariantForm">
-<select id="variantProductId" required style="padding:12px 16px;border:1px solid rgba(255,255,255,0.10);border-radius:12px;font-size:1rem;grid-column:1/2;background:rgba(255,255,255,0.04);color:#fff;">
-<option value="">Izvēlies produktu</option>
-</select>
-<input type="text" id="variantColorName" placeholder="Krāsas nosaukums *" required style="grid-column:2/3;" />
-<div class="file-upload-wrapper">
-<input type="file" id="variantFileInput" accept="image/*" />
-<img id="variantPreview" class="preview" alt="priekšskats" />
-<span style="font-size:0.85rem;color:#888;">vai ieliec URL</span>
-</div>
-<input type="text" id="variantImage" placeholder="Attēla URL" class="full-width" />
-<input type="text" id="variantCode" placeholder="Krāsas kods" class="full-width" />
-<button type="submit" class="btn btn-gold"><i class="fas fa-plus"></i> Pievienot krāsu</button>
-</form>
-<div id="variantEditContainer" style="margin-top:24px;"></div>
-</div>
-</div>
-<div class="lightbox" id="lightbox" onclick="closeLightbox()">
-<button class="lightbox-close" onclick="closeLightbox()"><i class="fas fa-times"></i></button>
-<img class="lightbox-content" id="lightboxImg" src="" alt="palielināts attēls" />
-</div>
-<footer class="footer">
-<div class="container">
-<div><h4>O FASADES</h4><p style="color:#999;">Oficiālais EQUITONE dīleris Latvijā.</p></div>
-<div><h4>Produkti</h4><a href="#products">Katalogs</a></div>
-<div><h4>Atbalsts</h4><a href="#contact">Kontakti</a></div>
-<div><h4>Uzņēmuma mājaslapa</h4><a href="https://ofasadesmarmoroc.lv/" target="_blank">ofasadesmarmoroc.lv</a></div>
-<div class="copy">&copy; 2026 O FASADES. Visas tiesības aizsargātas.</div>
-</div>
-</footer>
-<div class="cart-overlay" id="cartOverlay"></div>
-<div class="cart-sidebar" id="cartSidebar">
-<div class="cart-header"><h2><i class="fas fa-shopping-bag" style="color:var(--eq-gold);"></i> Grozs</h2><button class="cart-close" id="cartClose"><i class="fas fa-times"></i></button></div>
-<div class="cart-items" id="cartItems"><div class="cart-empty"><i class="fas fa-box-open"></i><p>Grozs ir tukšs</p></div></div>
-<div class="cart-total"><span>Kopā:</span><span id="cartTotal">€0.00</span></div>
-<div class="cart-actions"><button class="btn btn-primary" id="checkoutBtn" style="justify-content:center;width:100%;"><i class="fas fa-lock"></i> Noformēt pasūtījumu</button></div>
-</div>
-<div class="checkout-modal" id="checkoutModal">
-<div class="checkout-box">
-<h2>Pasūtījuma noformēšana</h2>
-<p class="sub">Aizpildiet informāciju. Pēc apstiprināšanas Jūs redzēsiet maksājuma uzdevumu.</p>
-<form id="checkoutForm">
-<label>Vārds, uzvārds</label><input type="text" id="checkoutName" required placeholder="Jānis Bērziņš" />
-<label>E-pasts</label><input type="email" id="checkoutEmail" required placeholder="janis@berzins.lv" />
-<label>Telefons</label><input type="tel" id="checkoutPhone" required placeholder="+371 2 123 4567" />
-<label>Pilsēta</label><input type="text" id="checkoutCity" required placeholder="Rīga" />
-<label>Iela un mājas numurs</label><input type="text" id="checkoutAddress" required placeholder="Meža iela 4" />
-<label>Pasta indekss</label><input type="text" id="checkoutZip" required placeholder="LV-1048" />
-<div id="shippingSection"></div>
-<label>Apmaksas veids</label>
-<div class="payment-options">
-    <label><input type="radio" name="payment" value="transfer" checked> Pārskaitījums (maksājuma uzdevums)</label>
-    <label><input type="radio" name="payment" value="card"> Maksājums ar karti</label>
-</div>
-<label>Piezīmes</label><textarea id="checkoutNote" placeholder="Īpašas vēlmes..."></textarea>
-<div class="checkout-actions"><button type="button" class="btn btn-outline" id="checkoutCancel">Atcelt</button><button type="submit" class="btn btn-gold"><i class="fas fa-check"></i> Apstiprināt pasūtījumu</button></div>
-</form>
-</div>
-</div>
-<div class="login-overlay" id="loginOverlay">
-<div class="login-box">
-<h2><i class="fas fa-lock" style="color:var(--eq-gold);"></i> Admin pieslēgšanās</h2>
-<p>Ievadiet paroli.</p>
-<input type="password" id="adminPassword" placeholder="Parole" />
-<div class="login-error" id="loginError">Nepareiza parole!</div>
-<button class="btn btn-primary" id="loginSubmit"><i class="fas fa-sign-in-alt"></i> Ienākt</button>
-</div>
-</div>
 <div class="toast" id="toast"></div>
 <script>
-// PRODUKTU DATI (AR JAUNĀM CENĀM)
 const allProducts = [
-    // PANEĻI
     { id: 1, category: 'paneli', name: 'TECTIVA', code: 'EQ-TEC', desc: 'Gluda, moderna apdare.', sizeLabels: ['2520x1240x8mm', '3070x1240x8mm'], variants: [{ color: 'TE10', image: '', code: 'EQ-TEC-10', priceSmall: 124.20, priceLarge: 148.91 }, { color: 'TE40', image: '', code: 'EQ-TEC-40', priceSmall: 124.20, priceLarge: 148.91 }, { color: 'TE15', image: '', code: 'EQ-TEC-15', priceSmall: 124.20, priceLarge: 148.91 }, { color: 'TE90', image: '', code: 'EQ-TEC-90', priceSmall: 124.20, priceLarge: 148.91 }, { color: 'TE20', image: '', code: 'EQ-TEC-20', priceSmall: 137.05, priceLarge: 161.97 }, { color: 'TE30', image: '', code: 'EQ-TEC-30', priceSmall: 149.89, priceLarge: 177.62 }, { color: 'TE60', image: '', code: 'EQ-TEC-60', priceSmall: 153.33, priceLarge: 187.03 }, { color: 'TE00', image: '', code: 'EQ-TEC-00', priceSmall: 153.33, priceLarge: 187.03 }, { color: 'TE85', image: '', code: 'EQ-TEC-85', priceSmall: 179.03, priceLarge: 215.80 }] },
-    { id: 2, category: 'paneli', name: 'PICTURA', code: 'EQ-PIC', desc: 'Augstas izšķirtspējas druka.', sizeLabels: ['2530x1280x8mm', '3130x1280x8mm'], variants: [{ color: 'PA041', image: '', code: 'EQ-PIC-041', priceSmall: 138.50, priceLarge: 171.76 }, { color: 'PG341', image: '', code: 'EQ-PIC-341', priceSmall: 162.11, priceLarge: 201.02 }, { color: 'PW841', image: '', code: 'EQ-PIC-841', priceSmall: 162.11, priceLarge: 201.02 }, { color: 'PW141', image: '', code: 'EQ-PIC-141', priceSmall: 162.11, priceLarge: 201.02 }, { color: 'PG241', image: '', code: 'EQ-PIC-241', priceSmall: 174.60, priceLarge: 207.84 }, { color: 'PG243', image: '', code: 'EQ-PIC-243', priceSmall: 174.60, priceLarge: 207.84 }, { color: 'PG742', image: '', code: 'EQ-PIC-742', priceSmall: 174.60, priceLarge: 207.84 }, { color: 'PG342', image: '', code: 'EQ-PIC-342', priceSmall: 202.41, priceLarge: 244.04 }, { color: 'PG442', image: '', code: 'EQ-PIC-442', priceSmall: 202.41, priceLarge: 244.04 }, { color: 'PG443', image: '', code: 'EQ-PIC-443', priceSmall: 202.41, priceLarge: 244.04 }, { color: 'PG444', image: '', code: 'EQ-PIC-444', priceSmall: 202.41, priceLarge: 244.04 }, { color: 'PG544', image: '', code: 'EQ-PIC-544', priceSmall: 202.41, priceLarge: 244.04 }, { color: 'PG545', image: '', code: 'EQ-PIC-545', priceSmall: 202.41, priceLarge: 244.04 }, { color: 'PG546', image: '', code: 'EQ-PIC-546', priceSmall: 202.41, priceLarge: 244.04 }, { color: 'PG642', image: '', code: 'EQ-PIC-642', priceSmall: 202.41, priceLarge: 244.04 }, { color: 'PG843', image: '', code: 'EQ-PIC-843', priceSmall: 202.41, priceLarge: 244.04 }, { color: 'PG844', image: '', code: 'EQ-PIC-844', priceSmall: 202.41, priceLarge: 244.04 }, { color: 'PG542', image: '', code: 'EQ-PIC-542', priceSmall: 202.41, priceLarge: 244.04 }, { color: 'PG641', image: '', code: 'EQ-PIC-641', priceSmall: 202.41, priceLarge: 244.04 }, { color: 'PA944', image: '', code: 'EQ-PIC-944', priceSmall: 202.41, priceLarge: 244.04 }] },
-    { id: 3, category: 'paneli', name: 'Natura', code: 'EQ-NAT', desc: 'Dabīga šķiedru cementa virsma.', sizeLabels: ['2530x1280x8mm', '3130x1280x8mm'], variants: [{ color: 'N891', image: '', code: 'EQ-NAT-891', priceSmall: 167.55, priceLarge: 202.74 }, { color: 'N892', image: '', code: 'EQ-NAT-892', priceSmall: 167.55, priceLarge: 202.74 }, { color: 'N991', image: '', code: 'EQ-NAT-991', priceSmall: 167.55, priceLarge: 202.74 }, { color: 'N294', image: '', code: 'EQ-NAT-294', priceSmall: 167.55, priceLarge: 202.74 }, { color: 'N593', image: '', code: 'EQ-NAT-593', priceSmall: 167.55, priceLarge: 202.74 }, { color: 'N594', image: '', code: 'EQ-NAT-594', priceSmall: 167.55, priceLarge: 202.74 }, { color: 'N250', image: '', code: 'EQ-NAT-250', priceSmall: 167.55, priceLarge: 202.74 }, { color: 'N251', image: '', code: 'EQ-NAT-251', priceSmall: 197.10, priceLarge: 238.74 }, { color: 'N281', image: '', code: 'EQ-NAT-281', priceSmall: 197.10, priceLarge: 238.74 }, { color: 'N331', image: '', code: 'EQ-NAT-331', priceSmall: 197.10, priceLarge: 238.74 }, { color: 'N359', image: '', code: 'EQ-NAT-359', priceSmall: 197.10, priceLarge: 238.74 }, { color: 'N073', image: '', code: 'EQ-NAT-073', priceSmall: 197.10, priceLarge: 238.74 }, { color: 'N074', image: '', code: 'EQ-NAT-074', priceSmall: 197.10, priceLarge: 238.74 }, { color: 'N972', image: '', code: 'EQ-NAT-972', priceSmall: 197.10, priceLarge: 238.74 }, { color: 'N861', image: '', code: 'EQ-NAT-861', priceSmall: 187.79, priceLarge: 228.69 }, { color: 'N411', image: '', code: 'EQ-NAT-411', priceSmall: 206.57, priceLarge: 251.56 }, { color: 'N412', image: '', code: 'EQ-NAT-412', priceSmall: 206.57, priceLarge: 251.56 }, { color: 'N961', image: '', code: 'EQ-NAT-961', priceSmall: 187.79, priceLarge: 228.69 }, { color: 'N154', image: '', code: 'EQ-NAT-154', priceSmall: 187.79, priceLarge: 228.69 }, { color: 'N661', image: '', code: 'EQ-NAT-661', priceSmall: 187.79, priceLarge: 228.69 }, { color: 'N662', image: '', code: 'EQ-NAT-662', priceSmall: 187.79, priceLarge: 228.69 }, { color: 'N211', image: '', code: 'EQ-NAT-211', priceSmall: 206.57, priceLarge: 251.56 }, { color: 'N252', image: '', code: 'EQ-NAT-252', priceSmall: 206.57, priceLarge: 251.56 }, { color: 'N161', image: '', code: 'EQ-NAT-161', priceSmall: 187.79, priceLarge: 228.69 }, { color: 'N162', image: '', code: 'EQ-NAT-162', priceSmall: 187.79, priceLarge: 228.69 }, { color: 'N163', image: '', code: 'EQ-NAT-163', priceSmall: 187.79, priceLarge: 228.69 }, { color: 'N164', image: '', code: 'EQ-NAT-164', priceSmall: 273.91, priceLarge: 323.42 }] },
-    { id: 4, category: 'paneli', name: 'Natura PRO', code: 'EQ-NPR', desc: 'Pastiprināta pretvandālisma aizsardzība.', sizeLabels: ['2530x1280x8mm', '3130x1280x8mm'], variants: [{ color: 'NU891', image: '', code: 'EQ-NPR-891', priceSmall: 196.09, priceLarge: 236.39 }, { color: 'NU892', image: '', code: 'EQ-NPR-892', priceSmall: 196.09, priceLarge: 236.39 }, { color: 'NU991', image: '', code: 'EQ-NPR-991', priceSmall: 196.09, priceLarge: 236.39 }, { color: 'NU294', image: '', code: 'EQ-NPR-294', priceSmall: 196.09, priceLarge: 236.39 }, { color: 'NU593', image: '', code: 'EQ-NPR-593', priceSmall: 196.09, priceLarge: 236.39 }, { color: 'NU594', image: '', code: 'EQ-NPR-594', priceSmall: 196.09, priceLarge: 236.39 }, { color: 'NU250', image: '', code: 'EQ-NPR-250', priceSmall: 196.09, priceLarge: 236.39 }, { color: 'NU251', image: '', code: 'EQ-NPR-251', priceSmall: 226.98, priceLarge: 270.37 }, { color: 'NU972', image: '', code: 'EQ-NPR-972', priceSmall: 226.98, priceLarge: 270.37 }, { color: 'NU281', image: '', code: 'EQ-NPR-281', priceSmall: 226.98, priceLarge: 270.37 }, { color: 'NU331', image: '', code: 'EQ-NPR-331', priceSmall: 226.98, priceLarge: 270.37 }, { color: 'NU359', image: '', code: 'EQ-NPR-359', priceSmall: 226.98, priceLarge: 270.37 }, { color: 'NU073', image: '', code: 'EQ-NPR-073', priceSmall: 226.98, priceLarge: 270.37 }, { color: 'NU074', image: '', code: 'EQ-NPR-074', priceSmall: 226.98, priceLarge: 270.37 }, { color: 'NU154', image: '', code: 'EQ-NPR-154', priceSmall: 215.51, priceLarge: 262.39 }, { color: 'NU661', image: '', code: 'EQ-NPR-661', priceSmall: 215.51, priceLarge: 262.39 }, { color: 'NU662', image: '', code: 'EQ-NPR-662', priceSmall: 215.51, priceLarge: 262.39 }, { color: 'NU211', image: '', code: 'EQ-NPR-211', priceSmall: 237.06, priceLarge: 262.39 }, { color: 'NU861', image: '', code: 'EQ-NPR-861', priceSmall: 215.51, priceLarge: 262.39 }, { color: 'NU411', image: '', code: 'EQ-NPR-411', priceSmall: 237.06, priceLarge: 262.39 }, { color: 'NU412', image: '', code: 'EQ-NPR-412', priceSmall: 237.06, priceLarge: 262.39 }, { color: 'NU961', image: '', code: 'EQ-NPR-961', priceSmall: 215.51, priceLarge: 262.39 }, { color: 'NU252', image: '', code: 'EQ-NPR-252', priceSmall: 237.06, priceLarge: 262.39 }, { color: 'NU161', image: '', code: 'EQ-NPR-161', priceSmall: 215.51, priceLarge: 262.39 }, { color: 'NU162', image: '', code: 'EQ-NPR-162', priceSmall: 215.51, priceLarge: 262.39 }, { color: 'NU163', image: '', code: 'EQ-NPR-163', priceSmall: 215.51, priceLarge: 262.39 }, { color: 'NU164', image: '', code: 'EQ-NPR-164', priceSmall: 287.00, priceLarge: 343.08 }] },
-    { id: 5, category: 'paneli', name: 'TEXTURA', code: 'EQ-TEX', desc: 'Poraina virsma ar izcilu akustiku.', sizeLabels: ['2530x1280x8mm', '3130x1280x8mm'], variants: [{ color: 'TA304', image: '', code: 'EQ-TEX-304', priceSmall: 169.11, priceLarge: 271.44 }, { color: 'TA001', image: '', code: 'EQ-TEX-001', priceSmall: 155.83, priceLarge: 229.67 }, { color: 'TA003', image: '', code: 'EQ-TEX-003', priceSmall: 169.11, priceLarge: 228.72 }, { color: 'TA309', image: '', code: 'EQ-TEX-309', priceSmall: 258.85, priceLarge: 314.53 }, { color: 'TA507', image: '', code: 'EQ-TEX-507', priceSmall: 258.85, priceLarge: 314.53 }, { color: 'TG102', image: '', code: 'EQ-TEX-102', priceSmall: 169.77, priceLarge: 204.69 }, { color: 'TA308', image: '', code: 'EQ-TEX-308', priceSmall: 184.41, priceLarge: 280.34 }, { color: 'TG205', image: '', code: 'EQ-TEX-205', priceSmall: 198.91, priceLarge: 241.76 }, { color: 'TG206', image: '', code: 'EQ-TEX-206', priceSmall: 198.91, priceLarge: 241.76 }, { color: 'TT207', image: '', code: 'EQ-TEX-207', priceSmall: 198.91, priceLarge: 241.76 }, { color: 'TT209', image: '', code: 'EQ-TEX-209', priceSmall: 198.91, priceLarge: 241.76 }, { color: 'TT210', image: '', code: 'EQ-TEX-210', priceSmall: 198.91, priceLarge: 241.76 }, { color: 'TG408', image: '', code: 'EQ-TEX-408', priceSmall: 250.00, priceLarge: 303.14 }] },
-    { id: 6, category: 'paneli', name: 'Linea', code: 'EQ-LIN', desc: 'Lineāra faktūra.', sizeLabels: ['2500x1220x10mm', '3050x1220x10mm'], variants: [{ color: 'LT00', image: '', code: 'EQ-LIN-00', priceSmall: 294.20, priceLarge: 358.91 }, { color: 'LT10', image: '', code: 'EQ-LIN-10', priceSmall: 294.20, priceLarge: 358.91 }, { color: 'LT15', image: '', code: 'EQ-LIN-15', priceSmall: 294.20, priceLarge: 358.91 }, { color: 'LT20', image: '', code: 'EQ-LIN-20', priceSmall: 294.20, priceLarge: 358.91 }, { color: 'LT30', image: '', code: 'EQ-LIN-30', priceSmall: 294.20, priceLarge: 358.91 }, { color: 'LT40', image: '', code: 'EQ-LIN-40', priceSmall: 294.20, priceLarge: 358.91 }, { color: 'LT60', image: '', code: 'EQ-LIN-60', priceSmall: 294.20, priceLarge: 358.91 }, { color: 'LT90', image: '', code: 'EQ-LIN-90', priceSmall: 294.20, priceLarge: 358.91 }, { color: 'LT85', image: '', code: 'EQ-LIN-85', priceSmall: 294.20, priceLarge: 358.91 }] },
-    { id: 7, category: 'paneli', name: 'Lunara', code: 'EQ-LUN', desc: 'Mēnessgaismas nokrāsas.', sizeLabels: ['2500x1220x10mm', '3050x1220x10mm'], variants: [{ color: 'LA20', image: '', code: 'EQ-LUN-20', priceSmall: 340.00, priceLarge: 395.00 }, { color: 'LA60', image: '', code: 'EQ-LUN-60', priceSmall: 355.00, priceLarge: 420.00 }] },
-    { id: 8, category: 'paneli', name: 'EQ Inspiria', code: 'EQ-INS', desc: 'Dizaina kolekcija – koks, betons, rūsa.', sizeLabels: ['2500x1250x8mm', '3100x1250x8mm'], variants: [{ color: 'FCW121', image: '', code: 'EQ-INS-121', priceSmall: 169.05, priceLarge: 210.45 }, { color: 'FCW121 IB', image: '', code: 'EQ-INS-121B', priceSmall: 169.05, priceLarge: 210.45 }, { color: 'FCW125', image: '', code: 'EQ-INS-125', priceSmall: 169.05, priceLarge: 210.45 }, { color: 'FCW125B', image: '', code: 'EQ-INS-125B', priceSmall: 169.05, priceLarge: 210.45 }, { color: 'FCW127', image: '', code: 'EQ-INS-127', priceSmall: 169.05, priceLarge: 210.45 }, { color: 'FCW156', image: '', code: 'EQ-INS-156', priceSmall: 169.05, priceLarge: 210.45 }, { color: 'FCW157', image: '', code: 'EQ-INS-157', priceSmall: 169.05, priceLarge: 210.45 }, { color: 'FCC020A', image: '', code: 'EQ-INS-020A', priceSmall: 169.05, priceLarge: 210.45 }, { color: 'FCC020B', image: '', code: 'EQ-INS-020B', priceSmall: 169.05, priceLarge: 210.45 }, { color: 'FCC025', image: '', code: 'EQ-INS-025', priceSmall: 169.05, priceLarge: 210.45 }, { color: 'FCC292', image: '', code: 'EQ-INS-292', priceSmall: 169.05, priceLarge: 210.45 }, { color: 'FCC318', image: '', code: 'EQ-INS-318', priceSmall: 169.05, priceLarge: 210.45 }, { color: 'FCC318A', image: '', code: 'EQ-INS-318A', priceSmall: 169.05, priceLarge: 210.45 }, { color: 'FCC320', image: '', code: 'EQ-INS-320', priceSmall: 169.05, priceLarge: 210.45 }, { color: 'FCC426', image: '', code: 'EQ-INS-426', priceSmall: 169.05, priceLarge: 210.45 }, { color: 'FCC426B', image: '', code: 'EQ-INS-426B', priceSmall: 169.05, priceLarge: 210.45 }, { color: 'FCC437', image: '', code: 'EQ-INS-437', priceSmall: 169.05, priceLarge: 210.45 }, { color: 'FCR454', image: '', code: 'EQ-INS-454', priceSmall: 169.05, priceLarge: 210.45 }, { color: 'FCR484', image: '', code: 'EQ-INS-484', priceSmall: 169.05, priceLarge: 210.45 }, { color: 'FCR535', image: '', code: 'EQ-INS-535', priceSmall: 169.05, priceLarge: 210.45 }, { color: 'FCR656', image: '', code: 'EQ-INS-656', priceSmall: 169.05, priceLarge: 210.45 }, { color: 'FCS004', image: '', code: 'EQ-INS-004', priceSmall: 169.05, priceLarge: 210.45 }, { color: 'FCS006', image: '', code: 'EQ-INS-006', priceSmall: 169.05, priceLarge: 210.45 }, { color: 'FCS059', image: '', code: 'EQ-INS-059', priceSmall: 169.05, priceLarge: 210.45 }, { color: 'FCS074', image: '', code: 'EQ-INS-074', priceSmall: 169.05, priceLarge: 210.45 }, { color: 'FCS075', image: '', code: 'EQ-INS-075', priceSmall: 169.05, priceLarge: 210.45 }, { color: 'FCS530', image: '', code: 'EQ-INS-530', priceSmall: 169.05, priceLarge: 210.45 }, { color: 'FCS547', image: '', code: 'EQ-INS-547', priceSmall: 169.05, priceLarge: 210.45 }, { color: 'FCS548', image: '', code: 'EQ-INS-548', priceSmall: 169.05, priceLarge: 210.45 }] },
-    { id: 9, category: 'paneli', name: 'EQ Coulora', code: 'EQ-COU', desc: '30 krāsu toņi.', sizeLabels: ['2500x1250x8mm', '3100x1250x8mm'], variants: [{ color: '900', image: '', code: 'EQ-COU-900', priceSmall: 185.46, priceLarge: 230.88 }, { color: '901', image: '', code: 'EQ-COU-901', priceSmall: 185.46, priceLarge: 230.88 }, { color: '902', image: '', code: 'EQ-COU-902', priceSmall: 185.46, priceLarge: 230.88 }, { color: '903', image: '', code: 'EQ-COU-903', priceSmall: 185.46, priceLarge: 230.88 }, { color: '904', image: '', code: 'EQ-COU-904', priceSmall: 185.46, priceLarge: 230.88 }, { color: '905', image: '', code: 'EQ-COU-905', priceSmall: 185.46, priceLarge: 230.88 }, { color: '906', image: '', code: 'EQ-COU-906', priceSmall: 185.46, priceLarge: 230.88 }, { color: '907', image: '', code: 'EQ-COU-907', priceSmall: 185.46, priceLarge: 230.88 }, { color: '908', image: '', code: 'EQ-COU-908', priceSmall: 185.46, priceLarge: 230.88 }, { color: '909', image: '', code: 'EQ-COU-909', priceSmall: 185.46, priceLarge: 230.88 }, { color: '910', image: '', code: 'EQ-COU-910', priceSmall: 185.46, priceLarge: 230.88 }, { color: '911', image: '', code: 'EQ-COU-911', priceSmall: 185.46, priceLarge: 230.88 }, { color: '912', image: '', code: 'EQ-COU-912', priceSmall: 185.46, priceLarge: 230.88 }, { color: '913', image: '', code: 'EQ-COU-913', priceSmall: 185.46, priceLarge: 230.88 }, { color: '914', image: '', code: 'EQ-COU-914', priceSmall: 185.46, priceLarge: 230.88 }, { color: '915', image: '', code: 'EQ-COU-915', priceSmall: 185.46, priceLarge: 230.88 }, { color: '916', image: '', code: 'EQ-COU-916', priceSmall: 185.46, priceLarge: 230.88 }, { color: '917', image: '', code: 'EQ-COU-917', priceSmall: 185.46, priceLarge: 230.88 }, { color: '921', image: '', code: 'EQ-COU-921', priceSmall: 185.46, priceLarge: 230.88 }, { color: '922', image: '', code: 'EQ-COU-922', priceSmall: 185.46, priceLarge: 230.88 }, { color: '923', image: '', code: 'EQ-COU-923', priceSmall: 185.46, priceLarge: 230.88 }, { color: '924', image: '', code: 'EQ-COU-924', priceSmall: 185.46, priceLarge: 230.88 }, { color: '925', image: '', code: 'EQ-COU-925', priceSmall: 185.46, priceLarge: 230.88 }, { color: '926', image: '', code: 'EQ-COU-926', priceSmall: 185.46, priceLarge: 230.88 }, { color: '928', image: '', code: 'EQ-COU-928', priceSmall: 185.46, priceLarge: 230.88 }, { color: '929', image: '', code: 'EQ-COU-929', priceSmall: 185.46, priceLarge: 230.88 }, { color: '931', image: '', code: 'EQ-COU-931', priceSmall: 185.46, priceLarge: 230.88 }, { color: '932', image: '', code: 'EQ-COU-932', priceSmall: 185.46, priceLarge: 230.88 }, { color: '933', image: '', code: 'EQ-COU-933', priceSmall: 185.46, priceLarge: 230.88 }, { color: '934', image: '', code: 'EQ-COU-934', priceSmall: 185.46, priceLarge: 230.88 }, { color: '936', image: '', code: 'EQ-COU-936', priceSmall: 185.46, priceLarge: 230.88 }, { color: '938', image: '', code: 'EQ-COU-938', priceSmall: 185.46, priceLarge: 230.88 }, { color: '939', image: '', code: 'EQ-COU-939', priceSmall: 185.46, priceLarge: 230.88 }, { color: '940', image: '', code: 'EQ-COU-940', priceSmall: 185.46, priceLarge: 230.88 }, { color: '941', image: '', code: 'EQ-COU-941', priceSmall: 185.46, priceLarge: 230.88 }, { color: '942', image: '', code: 'EQ-COU-942', priceSmall: 185.46, priceLarge: 230.88 }] },
-    
-    // FLĪZES
-    { id: 10, category: 'flizes', name: 'Fasādes flīzes', code: 'FL-001', desc: 'Augstas kvalitātes flīzes. 1200x60x9mm.', sizeLabels: ['1200x60x9mm'], variants: [{ color: 'Antracīts', image: '', code: 'FL-ANT', priceSmall: 45.00, priceLarge: 45.00 }, { color: 'Grafīts', image: '', code: 'FL-GRA', priceSmall: 47.50, priceLarge: 47.50 }, { color: 'Smilšu', image: '', code: 'FL-SMI', priceSmall: 42.80, priceLarge: 42.80 }, { color: 'Terakota', image: '', code: 'FL-TER', priceSmall: 49.20, priceLarge: 49.20 }] },
-
-    // ==========================================
-    //  APAKŠKONSTRUKCIJAS (JAUNS SATURS)
-    // ==========================================
-    { id: 101, category: 'apaks', name: 'L-formas profils (visiem paneļiem pa vidu vai flīzes ārējā stūra)', code: '7923', desc: '40 x 50 x 1,8', sizeLabels: ['m'], variants: [{ color: 'Standarts', image: '', code: '7923', priceSmall: 2.48, priceLarge: 2.48 }] },
-    { id: 102, category: 'apaks', name: 'L-formas profils, ārējā stūra profīls HPL komp.pan', code: '1769', desc: '38 x 38 x 1,2 (20 mm no malas)', sizeLabels: ['m'], variants: [{ color: 'Standarts', image: '', code: '1769', priceSmall: 2.40, priceLarge: 2.40 }] },
-    { id: 103, category: 'apaks', name: 'L-formas profils, ārējā stūra profīls fibrocements', code: '1770', desc: '50x50x1,2 (30 mm no malas)', sizeLabels: ['m'], variants: [{ color: 'Standarts', image: '', code: '1770', priceSmall: 2.95, priceLarge: 2.95 }] },
-    { id: 104, category: 'apaks', name: 'L-formas profils, ārējā stūra profīls fibrocements', code: '5979', desc: '60x50x1,2 (40 mm no malas)', sizeLabels: ['m'], variants: [{ color: 'Standarts', image: '', code: '5979', priceSmall: 3.18, priceLarge: 3.18 }] },
-    { id: 105, category: 'apaks', name: 'L-formas logu aiļu profīli', code: '5252', desc: '40x20x1.2', sizeLabels: ['m'], variants: [{ color: 'Standarts', image: '', code: '5252', priceSmall: 1.71, priceLarge: 1.71 }] },
-    { id: 106, category: 'apaks', name: 'L-formas logu aiļu profīli', code: '5015', desc: '50x15x1.8', sizeLabels: ['m'], variants: [{ color: 'Standarts', image: '', code: '5015', priceSmall: 2.74, priceLarge: 2.74 }] },
-    { id: 107, category: 'apaks', name: 'T-formas profils (flīzes tiek stiprinātas ar āķiem)', code: '5725', desc: '50 x 60 x 1.8', sizeLabels: ['m'], variants: [{ color: 'Standarts', image: '', code: '5725', priceSmall: 3.47, priceLarge: 3.47 }] },
-    { id: 108, category: 'apaks', name: 'T-formas profils (HPL komp.paneli)', code: '5726', desc: '50 x 80 x 1.8', sizeLabels: ['m'], variants: [{ color: 'Standarts', image: '', code: '5726', priceSmall: 4.21, priceLarge: 4.21 }] },
-    { id: 109, category: 'apaks', name: 'T-formas profils (fibrocements)', code: '5727', desc: '50 х 100 х 1.8', sizeLabels: ['m'], variants: [{ color: 'Standarts', image: '', code: '5727', priceSmall: 4.65, priceLarge: 4.65 }] },
-    { id: 110, category: 'apaks', name: 'T-formas profils (fibrocements)', code: '8265', desc: '50 х 110 х 1.8', sizeLabels: ['m'], variants: [{ color: 'Standarts', image: '', code: '8265', priceSmall: 5.97, priceLarge: 5.97 }] },
-    { id: 111, category: 'apaks', name: 'T-formas profils (fibrocements, ArGETon paneli)', code: '5675', desc: '50 х 120 х 1.8', sizeLabels: ['m'], variants: [{ color: 'Standarts', image: '', code: '5675', priceSmall: 6.67, priceLarge: 6.67 }] },
-    { id: 112, category: 'apaks', name: 'Ω-formas profils', code: 'N/A-1', desc: '30x50x50/96x50x30x1,8', sizeLabels: ['m'], variants: [{ color: 'Standarts', image: '', code: 'N/A-1', priceSmall: 8.53, priceLarge: 8.53 }] },
-    { id: 113, category: 'apaks', name: 'Ω-formas profils', code: '5974', desc: '20/20x60/100/20/20 x1.8', sizeLabels: ['m'], variants: [{ color: 'Standarts', image: '', code: '5974', priceSmall: 5.27, priceLarge: 5.27 }] },
-    { id: 114, category: 'apaks', name: 'Z-profils', code: '1136', desc: '20x20x20x2', sizeLabels: ['m'], variants: [{ color: 'Standarts', image: '', code: '1136', priceSmall: 2.95, priceLarge: 2.95 }] },
-    
-    // KRONŠTEINI 70mm
-    { id: 115, category: 'apaks', name: 'Kronšteins 70 mm (karton 500)', code: '10', desc: '60x40x3', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '10', priceSmall: 0.68, priceLarge: 0.68 }] },
-    { id: 116, category: 'apaks', name: 'Kronšteins 70 mm (karton 450)', code: '172', desc: '80x40x3', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '172', priceSmall: 0.85, priceLarge: 0.85 }] },
-    { id: 117, category: 'apaks', name: 'Kronšteins 70 mm (karton 400)', code: '22', desc: '100x40x3', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '22', priceSmall: 0.93, priceLarge: 0.93 }] },
-    { id: 118, category: 'apaks', name: 'Kronšteins 70 mm (karton 300)', code: '12', desc: '120x40x3', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '12', priceSmall: 0.88, priceLarge: 0.88 }] },
-    { id: 119, category: 'apaks', name: 'Kronšteins 70 mm (karton 250)', code: '57', desc: '150x40x3', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '57', priceSmall: 1.00, priceLarge: 1.00 }] },
-    { id: 120, category: 'apaks', name: 'Kronšteins 70 mm (karton 230)', code: '17', desc: '180x40x3', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '17', priceSmall: 1.13, priceLarge: 1.13 }] },
-    { id: 121, category: 'apaks', name: 'Kronšteins 70 mm (karton 210)', code: '60', desc: '210x40x4/3', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '60', priceSmall: 1.38, priceLarge: 1.38 }] },
-    { id: 122, category: 'apaks', name: 'Kronšteins 70 mm (karton 190)', code: '35', desc: '240x40x4', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '35', priceSmall: 2.02, priceLarge: 2.02 }] },
-    { id: 123, category: 'apaks', name: 'Kronšteina pagarinājums 70mm (karton 500)', code: '0009344', desc: '90x70x3', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '0009344', priceSmall: 0.78, priceLarge: 0.78 }] },
-    { id: 124, category: 'apaks', name: 'Kronšteins 70mm nerūsējošais tērauds', code: '200', desc: '64x40x2 NT M201', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '200', priceSmall: 0.85, priceLarge: 0.85 }] },
-    { id: 125, category: 'apaks', name: 'Kronšteins 70mm nerūsējošais tērauds', code: 'N/A-2', desc: '64x40x1,5 NT M304', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: 'N/A-2', priceSmall: 0.85, priceLarge: 0.85 }] },
-    { id: 126, category: 'apaks', name: 'Kronšteins 70mm nerūsējošais tērauds', code: 'N/A-3', desc: '64x40x2 NT M304', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: 'N/A-3', priceSmall: 1.01, priceLarge: 1.01 }] },
-    { id: 127, category: 'apaks', name: 'Kronšteins 70mm nerūsējošais tērauds', code: '107', desc: '92x40x2 NT M201', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '107', priceSmall: 0.93, priceLarge: 0.93 }] },
-    { id: 128, category: 'apaks', name: 'Kronšteins 70mm nerūsējošais tērauds', code: 'N/A-4', desc: '92x40x1,5 NT M304', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: 'N/A-4', priceSmall: 0.93, priceLarge: 0.93 }] },
-    { id: 129, category: 'apaks', name: 'Kronšteins 70mm nerūsējošais tērauds', code: 'N/A-5', desc: '92x40x2 NT M304', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: 'N/A-5', priceSmall: 1.09, priceLarge: 1.09 }] },
-    { id: 130, category: 'apaks', name: 'Kronšteins 70mm nerūsējošais tērauds', code: '108', desc: '126x40x2 NT M201', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '108', priceSmall: 1.09, priceLarge: 1.09 }] },
-    { id: 131, category: 'apaks', name: 'Kronšteins 70mm nerūsējošais tērauds', code: 'N/A-6', desc: '126x40x1,5 NT M304', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: 'N/A-6', priceSmall: 1.09, priceLarge: 1.09 }] },
-    { id: 132, category: 'apaks', name: 'Kronšteins 70mm nerūsējošais tērauds', code: 'N/A-7', desc: '126x40x2 NT M304', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: 'N/A-7', priceSmall: 1.32, priceLarge: 1.32 }] },
-    { id: 133, category: 'apaks', name: 'Kronšteins 70mm nerūsējošais tērauds', code: '191', desc: '152x40x2 NT M201', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '191', priceSmall: 1.00, priceLarge: 1.00 }] },
-    { id: 134, category: 'apaks', name: 'Kronšteins 70mm nerūsējošais tērauds', code: 'N/A-8', desc: '152x40x1,5 NT M304 pastipr.mala', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: 'N/A-8', priceSmall: 1.32, priceLarge: 1.32 }] },
-    { id: 135, category: 'apaks', name: 'Kronšteins 70mm nerūsējošais tērauds', code: 'N/A-9', desc: '152x40x2 NT M304', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: 'N/A-9', priceSmall: 1.26, priceLarge: 1.26 }] },
-    { id: 136, category: 'apaks', name: 'Kronšteins 70mm nerūsējošais tērauds (kaste 120gab.)', code: '188', desc: '187x40x2 NT M201', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '188', priceSmall: 1.13, priceLarge: 1.13 }] },
-    { id: 137, category: 'apaks', name: 'Kronšteins 70mm nerūsējošais tērauds', code: 'N/A-10', desc: '187x40x1,5 NT M304 pastipr. mala', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: 'N/A-10', priceSmall: 1.13, priceLarge: 1.13 }] },
-    { id: 138, category: 'apaks', name: 'Kronšteins 70mm nerūsējošais tērauds', code: 'N/A-11', desc: '187x40x2 NT M304', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: 'N/A-11', priceSmall: 1.38, priceLarge: 1.38 }] },
-    { id: 139, category: 'apaks', name: 'Kronšteins 70mm nerūsējošais tērauds', code: '181', desc: '210x40x2 NT M201', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '181', priceSmall: 1.26, priceLarge: 1.26 }] },
-    { id: 140, category: 'apaks', name: 'Kronšteins 70mm nerūsējošais tērauds', code: 'N/A-12', desc: '210x40x1,5 NT M304 pastipr.mala', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: 'N/A-12', priceSmall: 1.19, priceLarge: 1.19 }] },
-    { id: 141, category: 'apaks', name: 'Kronšteins 70mm nerūsējošais tērauds', code: 'N/A-13', desc: '210x40x2 NT M304', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: 'N/A-13', priceSmall: 1.51, priceLarge: 1.51 }] },
-    { id: 142, category: 'apaks', name: 'Kronšteins 70mm nerūsējošais tērauds', code: '121', desc: '238x40x2 NT M201', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '121', priceSmall: 1.32, priceLarge: 1.32 }] },
-    { id: 143, category: 'apaks', name: 'Kronšteins 70mm nerūsējošais tērauds', code: 'N/A-14', desc: '238x40x1,5 NT M304 pastipr.mala', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: 'N/A-14', priceSmall: 1.38, priceLarge: 1.38 }] },
-    { id: 144, category: 'apaks', name: 'Kronšteins 70mm nerūsējošais tērauds', code: 'N/A-15', desc: '238x40x2 NT M304', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: 'N/A-15', priceSmall: 1.63, priceLarge: 1.63 }] },
-    { id: 145, category: 'apaks', name: 'Kronšteins 70mm nerūsējošais tērauds (kaste gab. 80)', code: '136', desc: '273x40x2 NT M201', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '136', priceSmall: 1.71, priceLarge: 1.71 }] },
-    { id: 146, category: 'apaks', name: 'Kronšteins 70mm nerūsējošais tērauds', code: 'N/A-16', desc: '273x40x2 NT M304 pastipr.mala', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: 'N/A-16', priceSmall: 2.17, priceLarge: 2.17 }] },
-    { id: 147, category: 'apaks', name: 'Kronšteins 70mm nerūsējošais tērauds', code: '168', desc: '300x40x2 NT M201', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '168', priceSmall: 1.86, priceLarge: 1.86 }] },
-    { id: 148, category: 'apaks', name: 'Kronšteins 70mm nerūsējošais tērauds', code: 'N/A-17', desc: '300x40x2 NT M304 pastipr.mala', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: 'N/A-17', priceSmall: 2.33, priceLarge: 2.33 }] },
-    { id: 149, category: 'apaks', name: 'Kronšteins 70mm nerūsējošais tērauds', code: '171', desc: '317x40x2 NT M201', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '171', priceSmall: 2.02, priceLarge: 2.02 }] },
-    { id: 150, category: 'apaks', name: 'Kronšteins 70mm nerūsējošais tērauds', code: 'N/A-18', desc: '317x40x2 NT M304 pastipr.mala', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: 'N/A-18', priceSmall: 2.48, priceLarge: 2.48 }] },
-    { id: 151, category: 'apaks', name: 'Kronšteins 70mm nerūsējošais tērauds', code: '103', desc: '350x40x2 NT M201', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '103', priceSmall: 2.17, priceLarge: 2.17 }] },
-    { id: 152, category: 'apaks', name: 'Kronšteins 70mm nerūsējošais tērauds', code: 'N/A-19', desc: '350x40x2 NT M304 pastipr.mala', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: 'N/A-19', priceSmall: 2.64, priceLarge: 2.64 }] },
-    { id: 153, category: 'apaks', name: 'Kronšteins 70mm nerūsējošais tērauds', code: '113', desc: '376x40x2 NT M201', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '113', priceSmall: 2.33, priceLarge: 2.33 }] },
-    { id: 154, category: 'apaks', name: 'Kronšteins 70mm nerūsējošais tērauds', code: 'N/A-20', desc: '376x40x2 NT M304 pastipr.mala', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: 'N/A-20', priceSmall: 2.79, priceLarge: 2.79 }] },
-    { id: 155, category: 'apaks', name: 'Kronšteins 70mm nerūsējošais tērauds', code: 'N/A-21', desc: '70x70x2NT pazole 70x110 PIR M201', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: 'N/A-21', priceSmall: 1.86, priceLarge: 1.86 }] },
-    
-    // KRONŠTEINI 140mm
-    { id: 156, category: 'apaks', name: 'Kronšteins 140 mm (karton 250)', code: '11', desc: '60x40x3', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '11', priceSmall: 1.24, priceLarge: 1.24 }] },
-    { id: 157, category: 'apaks', name: 'Kronšteins 140 mm (karton 200)', code: '173', desc: '80x40x3', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '173', priceSmall: 1.55, priceLarge: 1.55 }] },
-    { id: 158, category: 'apaks', name: 'Kronšteins 140 mm (karton 200)', code: '160', desc: '100x40x3', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '160', priceSmall: 1.78, priceLarge: 1.78 }] },
-    { id: 159, category: 'apaks', name: 'Kronšteins 140 mm (karton 150)', code: '13', desc: '120x40x3', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '13', priceSmall: 1.63, priceLarge: 1.63 }] },
-    { id: 160, category: 'apaks', name: 'Kronšteins 140 mm (karton 130)', code: '67', desc: '150x40x3', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '67', priceSmall: 1.88, priceLarge: 1.88 }] },
-    { id: 161, category: 'apaks', name: 'Kronšteins 140 mm (karton 100)', code: '16', desc: '180x40x3', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '16', priceSmall: 2.13, priceLarge: 2.13 }] },
-    { id: 162, category: 'apaks', name: 'Kronšteins 140 mm (karton 100)', code: '39', desc: '210x40x4/3', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '39', priceSmall: 3.10, priceLarge: 3.10 }] },
-    { id: 163, category: 'apaks', name: 'Kronšteins 140 mm (karton 90)', code: '64', desc: '240x40x4', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '64', priceSmall: 3.88, priceLarge: 3.88 }] },
-    { id: 164, category: 'apaks', name: 'Kronšteina pagarinājums 140mm (karton 250)', code: '0009345', desc: '90x140x3', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '0009345', priceSmall: 1.24, priceLarge: 1.24 }] },
-    { id: 165, category: 'apaks', name: 'Kronšteins 140 mm nerūsējošais tērauds', code: '204', desc: '64x40x2 NT M201', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '204', priceSmall: 1.40, priceLarge: 1.40 }] },
-    { id: 166, category: 'apaks', name: 'Kronšteins 140 mm nerūsējošais tērauds', code: 'N/A-22', desc: '64x40x1,5 NT M304', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: 'N/A-22', priceSmall: 1.24, priceLarge: 1.24 }] },
-    { id: 167, category: 'apaks', name: 'Kronšteins 140 mm nerūsējošais tērauds', code: 'N/A-23', desc: '64x40x2 NT M304', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: 'N/A-23', priceSmall: 1.47, priceLarge: 1.47 }] },
-    { id: 168, category: 'apaks', name: 'Kronšteins 140 mm nerūsējošais tērauds', code: '196', desc: '92x40x2 NT M201', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '196', priceSmall: 1.55, priceLarge: 1.55 }] },
-    { id: 169, category: 'apaks', name: 'Kronšteins 140 mm nerūsējošais tērauds', code: 'N/A-24', desc: '92x40x1,5 NT M304', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: 'N/A-24', priceSmall: 1.47, priceLarge: 1.47 }] },
-    { id: 170, category: 'apaks', name: 'Kronšteins 140 mm nerūsējošais tērauds', code: 'N/A-25', desc: '92x40x2 NT M304', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: 'N/A-25', priceSmall: 1.78, priceLarge: 1.78 }] },
-    { id: 171, category: 'apaks', name: 'Kronšteins 140 mm nerūsējošais tērauds', code: '109', desc: '126x40x2 NT M201', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '109', priceSmall: 1.71, priceLarge: 1.71 }] },
-    { id: 172, category: 'apaks', name: 'Kronšteins 140 mm nerūsējošais tērauds', code: 'N/A-26', desc: '126x40x1,5 NT M304', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: 'N/A-26', priceSmall: 1.71, priceLarge: 1.71 }] },
-    { id: 173, category: 'apaks', name: 'Kronšteins 140 mm nerūsējošais tērauds', code: 'N/A-27', desc: '126x40x2 NT M304', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: 'N/A-27', priceSmall: 2.17, priceLarge: 2.17 }] },
-    { id: 174, category: 'apaks', name: 'Kronšteins 140 mm nerūsējošais tērauds', code: '192', desc: '152x40x2 NT M201', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '192', priceSmall: 2.02, priceLarge: 2.02 }] },
-    { id: 175, category: 'apaks', name: 'Kronšteins 140 mm nerūsējošais tērauds', code: 'N/A-28', desc: '152x40x1,5 NT M304 pastipr.mala', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: 'N/A-28', priceSmall: 2.02, priceLarge: 2.02 }] },
-    { id: 176, category: 'apaks', name: 'Kronšteins 140 mm nerūsējošais tērauds', code: 'N/A-29', desc: '152x40x2 NT M304', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: 'N/A-29', priceSmall: 2.48, priceLarge: 2.48 }] },
-    { id: 177, category: 'apaks', name: 'Kronšteins 140 mm nerūsējošais tērauds (kaste 60 gab.)', code: '193', desc: '187x40x2 NT M201', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '193', priceSmall: 1.91, priceLarge: 1.91 }] },
-    { id: 178, category: 'apaks', name: 'Kronšteins 140 mm nerūsējošais tērauds', code: 'N/A-30', desc: '187x40x1,5 NT M304 pastipr.mala', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: 'N/A-30', priceSmall: 1.91, priceLarge: 1.91 }] },
-    { id: 179, category: 'apaks', name: 'Kronšteins 140 mm nerūsējošais tērauds', code: 'N/A-31', desc: '187x40x2 NT M304', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: 'N/A-31', priceSmall: 2.35, priceLarge: 2.35 }] },
-    { id: 180, category: 'apaks', name: 'Kronšteins 140 mm nerūsējošais tērauds', code: '120', desc: '210x40x2 NT201', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '120', priceSmall: 2.03, priceLarge: 2.03 }] },
-    { id: 181, category: 'apaks', name: 'Kronšteins 140 mm nerūsējošais tērauds', code: 'N/A-32', desc: '210x40x1,5 NT M304 pastipr.mala', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: 'N/A-32', priceSmall: 2.10, priceLarge: 2.10 }] },
-    { id: 182, category: 'apaks', name: 'Kronšteins 140 mm nerūsējošais tērauds', code: 'N/A-33', desc: '210x40x2 NT M304', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: 'N/A-33', priceSmall: 2.54, priceLarge: 2.54 }] },
-    { id: 183, category: 'apaks', name: 'Kronšteins 140 mm nerūsējošais tērauds', code: '163', desc: '238x40x2 NT M201', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '163', priceSmall: 2.22, priceLarge: 2.22 }] },
-    { id: 184, category: 'apaks', name: 'Kronšteins 140 mm nerūsējošais tērauds', code: 'N/A-34', desc: '238x40x1,5 NT M304 pastipr.mala', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: 'N/A-34', priceSmall: 2.29, priceLarge: 2.29 }] },
-    { id: 185, category: 'apaks', name: 'Kronšteins 140 mm nerūsējošais tērauds', code: 'N/A-35', desc: '238x40x2 NT M304', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: 'N/A-35', priceSmall: 2.80, priceLarge: 2.80 }] },
-    { id: 186, category: 'apaks', name: 'Kronšteins 140 mm nerūsējošais tērauds (kaste 40gab.)', code: '137', desc: '273x40x2 NT M201', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '137', priceSmall: 3.02, priceLarge: 3.02 }] },
-    { id: 187, category: 'apaks', name: 'Kronšteins 140 mm nerūsējošais tērauds', code: 'N/A-36', desc: '273x40x2 NT M304 pastipr.mala', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: 'N/A-36', priceSmall: 3.72, priceLarge: 3.72 }] },
-    { id: 188, category: 'apaks', name: 'Kronšteins 140 mm nerūsējošais tērauds', code: '215', desc: '300x40x2 NT M201', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '215', priceSmall: 3.26, priceLarge: 3.26 }] },
-    { id: 189, category: 'apaks', name: 'Kronšteins 140 mm nerūsējošais tērauds', code: 'N/A-37', desc: '300x40x2 NT M304 pastipr.mala', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: 'N/A-37', priceSmall: 4.03, priceLarge: 4.03 }] },
-    { id: 190, category: 'apaks', name: 'Kronšteins 140 mm nerūsējošais tērauds', code: '179', desc: '317x40x2 NT M201', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '179', priceSmall: 3.49, priceLarge: 3.49 }] },
-    { id: 191, category: 'apaks', name: 'Kronšteins 140 mm nerūsējošais tērauds', code: 'N/A-38', desc: '317x40x2 NT M304 pastipr.mala', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: 'N/A-38', priceSmall: 4.34, priceLarge: 4.34 }] },
-    { id: 192, category: 'apaks', name: 'Kronšteins 140 mm nerūsējošais tērauds', code: '111', desc: '350x40x2 NT M201', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '111', priceSmall: 3.72, priceLarge: 3.72 }] },
-    { id: 193, category: 'apaks', name: 'Kronšteins 140 mm nerūsējošais tērauds', code: 'N/A-39', desc: '350x40x2 NT M304 pastipr.mala', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: 'N/A-39', priceSmall: 4.65, priceLarge: 4.65 }] },
-    { id: 194, category: 'apaks', name: 'Kronšteins 140 mm nerūsējošais tērauds', code: '123', desc: '376x40x2 NT M201', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '123', priceSmall: 4.03, priceLarge: 4.03 }] },
-    { id: 195, category: 'apaks', name: 'Kronšteins 140 mm nerūsējošais tērauds', code: 'N/A-40', desc: '376x40x2 NT M304 pastipr.mala', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: 'N/A-40', priceSmall: 4.96, priceLarge: 4.96 }] },
-    { id: 196, category: 'apaks', name: 'Kronšteins 140 mm nerūsējošais tērauds', code: 'N/A-41', desc: '70x140x2 NT pazole 70x180 PIR', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: 'N/A-41', priceSmall: 2.64, priceLarge: 2.64 }] },
-
-    // ĀĶI UN PIEVADU ELEMENTI
-    { id: 197, category: 'apaks', name: 'Nerūsējoša tērauda āķis', code: '0009547', desc: 'abpusējs 4', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '0009547', priceSmall: 0.32, priceLarge: 0.32 }] },
-    { id: 198, category: 'apaks', name: 'Nerūsējoša tērauda āķis', code: '0009548k', desc: 'sānu akis', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '0009548k', priceSmall: 0.32, priceLarge: 0.32 }] },
-    { id: 199, category: 'apaks', name: 'Nerūsējoša tērauda āķis', code: '0009548', desc: 'vienpusējs2 cokola', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '0009548', priceSmall: 0.32, priceLarge: 0.32 }] },
-    { id: 200, category: 'apaks', name: 'Perforēts cokola profils 60x12 mm (2m)', code: '0009685', desc: 'Perforēts cokola profils', sizeLabels: ['m'], variants: [{ color: 'Standarts', image: '', code: '0009685', priceSmall: 2.37, priceLarge: 2.37 }] },
-    { id: 201, category: 'apaks', name: 'Perforēts cokola profils 90x12 mm (2m)', code: '0009681', desc: 'Perforēts cokola profils', sizeLabels: ['m'], variants: [{ color: 'Standarts', image: '', code: '0009681', priceSmall: 2.96, priceLarge: 2.96 }] },
-    { id: 202, category: 'apaks', name: 'Cokola profils (2m)', code: 'N/A-42', desc: '100x0.8mm', sizeLabels: ['m'], variants: [{ color: 'Standarts', image: '', code: 'N/A-42', priceSmall: 2.79, priceLarge: 2.79 }] },
-    { id: 203, category: 'apaks', name: 'Cokola profils (2m)', code: 'N/A-43', desc: '130x0.8mm', sizeLabels: ['m'], variants: [{ color: 'Standarts', image: '', code: 'N/A-43', priceSmall: 3.10, priceLarge: 3.10 }] },
-    { id: 204, category: 'apaks', name: 'Cokola profils (2m)', code: 'N/A-44', desc: '150x0.8mm', sizeLabels: ['m'], variants: [{ color: 'Standarts', image: '', code: 'N/A-44', priceSmall: 2.90, priceLarge: 2.90 }] },
-    { id: 205, category: 'apaks', name: 'Cokola profils (2m)', code: 'N/A-45', desc: '160x0.8mm', sizeLabels: ['m'], variants: [{ color: 'Standarts', image: '', code: 'N/A-45', priceSmall: 3.57, priceLarge: 3.57 }] },
-    { id: 206, category: 'apaks', name: 'Cokola profils (2m)', code: 'N/A-46', desc: '180x0.8mm', sizeLabels: ['m'], variants: [{ color: 'Standarts', image: '', code: 'N/A-46', priceSmall: 3.88, priceLarge: 3.88 }] },
-    { id: 207, category: 'apaks', name: 'Cokola profils (2m)', code: 'N/A-47', desc: '200x0.8mm', sizeLabels: ['m'], variants: [{ color: 'Standarts', image: '', code: 'N/A-47', priceSmall: 4.34, priceLarge: 4.34 }] },
-    { id: 208, category: 'apaks', name: 'Cokola profils (2m)', code: 'N/A-48', desc: '220x0.8mm', sizeLabels: ['m'], variants: [{ color: 'Standarts', image: '', code: 'N/A-48', priceSmall: 4.65, priceLarge: 4.65 }] },
-    { id: 209, category: 'apaks', name: 'Cokola profils (2m)', code: 'N/A-49', desc: '240x0.8mm', sizeLabels: ['m'], variants: [{ color: 'Standarts', image: '', code: 'N/A-49', priceSmall: 4.90, priceLarge: 4.90 }] },
-    { id: 210, category: 'apaks', name: 'Cokola profils (2m)', code: 'N/A-50', desc: '250x0.8mm', sizeLabels: ['m'], variants: [{ color: 'Standarts', image: '', code: 'N/A-50', priceSmall: 5.19, priceLarge: 5.19 }] },
-    { id: 211, category: 'apaks', name: 'Cokola profils (2m)', code: 'N/A-51', desc: '260x0.8mm', sizeLabels: ['m'], variants: [{ color: 'Standarts', image: '', code: 'N/A-51', priceSmall: 5.43, priceLarge: 5.43 }] },
-    { id: 212, category: 'apaks', name: 'Cokola profils (2m)', code: 'N/A-52', desc: '280x0.8mm', sizeLabels: ['m'], variants: [{ color: 'Standarts', image: '', code: 'N/A-52', priceSmall: 5.89, priceLarge: 5.89 }] },
-    { id: 213, category: 'apaks', name: 'Cokola profils (2m)', code: 'N/A-53', desc: '300x0.8mm', sizeLabels: ['m'], variants: [{ color: 'Standarts', image: '', code: 'N/A-53', priceSmall: 6.20, priceLarge: 6.20 }] },
-    { id: 214, category: 'apaks', name: 'Cokola profils (2m)', code: 'N/A-54', desc: '320x0.8mm', sizeLabels: ['m'], variants: [{ color: 'Standarts', image: '', code: 'N/A-54', priceSmall: 6.51, priceLarge: 6.51 }] },
-    { id: 215, category: 'apaks', name: 'Cokola profils (2m)', code: 'N/A-55', desc: '340x0.8mm', sizeLabels: ['m'], variants: [{ color: 'Standarts', image: '', code: 'N/A-55', priceSmall: 6.82, priceLarge: 6.82 }] },
-    { id: 216, category: 'apaks', name: 'Special Horizontal profil (3m)', code: 'N/A-56', desc: '60x21,5x2,0', sizeLabels: ['m'], variants: [{ color: 'Standarts', image: '', code: 'N/A-56', priceSmall: 9.58, priceLarge: 9.58 }] },
-    
-    // STIPRINĀJUMI UN ĶĪMIJA
-    { id: 217, category: 'apaks', name: 'Wkret-met KPR FAST betons un mūris', code: 'N/A-57', desc: '10x80mm', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: 'N/A-57', priceSmall: 0.22, priceLarge: 0.22 }] },
-    { id: 218, category: 'apaks', name: 'EJOT SDF-KB-10x... betons', code: '0009369', desc: 'SDF-KB-10Vx50-V-SW13 (100 gab,kartona kaste)', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '0009369', priceSmall: 0.34, priceLarge: 0.34 }] },
-    { id: 219, category: 'apaks', name: 'EJOT SDF-KB-10x... mūris no veseliem ķieģeļiem', code: '0009370', desc: 'SDF-KB-10Vx60-V-SW13 (100 gab,kartona kaste)', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '0009370', priceSmall: 0.37, priceLarge: 0.37 }] },
-    { id: 220, category: 'apaks', name: 'EJOT SDF-KB-10Hx... caurumains ķieģelis un fibobloks', code: '0009371', desc: 'SDF-KB-10Hx80-V-SW13 (100 gab,kartona kaste)', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '0009371', priceSmall: 0.41, priceLarge: 0.41 }] },
-    { id: 221, category: 'apaks', name: 'EJOT SDF-KB-10Hx... caurumains ķieģelis un fibobloks+ apmetums', code: '0009372', desc: 'SDF-KB-10Hx100-V-SW13 (100 gab,kartona kaste)', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '0009372', priceSmall: 0.44, priceLarge: 0.44 }] },
-    { id: 222, category: 'apaks', name: 'EJOT SDP-KB-10Sx... mūris no poraina gāzobetona', code: '167', desc: 'SDP-KB-10Gx80-V-SW13 (100 gab,kartona kaste)', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '167', priceSmall: 0.44, priceLarge: 0.44 }] },
-    { id: 223, category: 'apaks', name: 'Termostop dubultais', code: '0009438', desc: '(600 gab,kartona kaste)', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '0009438', priceSmall: 0.10, priceLarge: 0.10 }] },
-    { id: 224, category: 'apaks', name: 'Melna dekoratīvā josta', code: 'N/A-58', desc: '6600mmx55mm', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: 'N/A-58', priceSmall: 20.00, priceLarge: 20.00 }] },
-    { id: 225, category: 'apaks', name: 'Profil.stipr.skrūve (4,8x19) NT', code: '0001396', desc: '(L140 -4 gab.un L70 -1 gab.) (pagar.L140-4gab.un L70-2gab)(kast 500gab.)', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '0001396', priceSmall: 0.0684, priceLarge: 0.0684 }] },
-    { id: 226, category: 'apaks', name: 'Stainless steel screw (6.3x19) sandwich panels', code: 'N/A-59', desc: 'Omega profilu stiprināt caur katriem 40 cm ar caurumu 8mm (kart.500)', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: 'N/A-59', priceSmall: 0.1176, priceLarge: 0.1176 }] },
-    { id: 227, category: 'apaks', name: 'Āķa stipr.skrūve (4,2x16) NT', code: '0001393', desc: 'Skrūves galva – sešstūra', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '0001393', priceSmall: 0.0588, priceLarge: 0.0588 }] },
-    { id: 228, category: 'apaks', name: 'Paneļa piest. kniede AL/Ner.met. 4,8x16un18 (K16) krāsota RAL', code: 'N/A-60', desc: 'Paneļa piestiprināšanas kniede', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: 'N/A-60', priceSmall: 0.1176, priceLarge: 0.1176 }] },
-    { id: 229, category: 'apaks', name: 'Kronšteina piest. Kniede', code: 'N/A-61', desc: 'kronsteina piest. kniede sandwich panela', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: 'N/A-61', priceSmall: 0.1911, priceLarge: 0.1911 }] },
-    { id: 230, category: 'apaks', name: 'Sika Aktivator 205 (tīrītājs)', code: '117498', desc: '1000 ml', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '117498', priceSmall: 26.85, priceLarge: 26.85 }] },
-    { id: 231, category: 'apaks', name: 'SikaTack Panel Primer (grunts melns)', code: '117497', desc: '1000 ml', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '117497', priceSmall: 43.43, priceLarge: 43.43 }] },
-    { id: 232, category: 'apaks', name: 'SikaTack Panel tape (lentīte)', code: '4656', desc: "33 m'", sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '4656', priceSmall: 26.93, priceLarge: 26.93 }] },
-    { id: 233, category: 'apaks', name: 'SikaTack Panel 50 (līme)', code: '497834', desc: '', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '497834', priceSmall: 22.73, priceLarge: 22.73 }] },
-    { id: 234, category: 'apaks', name: 'Uzgalis ar fiksatoru AF-7 (4,2x16)', code: '0003303AF7', desc: 'āķa stipr.skrūve (4,2x16) NT', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '0003303AF7', priceSmall: 6.08, priceLarge: 6.08 }] },
-    { id: 235, category: 'apaks', name: 'Uzgalis ar fiksatoru AF-8 (4,8x19)', code: '0003303', desc: 'profil.stipr.skrūve (4,8x19) NT', sizeLabels: ['gab.'], variants: [{ color: 'Standarts', image: '', code: '0003303', priceSmall: 6.08, priceLarge: 6.08 }] }
+    { id: 3, category: 'paneli', name: 'Natura', code: 'EQ-NAT', desc: 'Dabīga šķiedru cementa virsma.', sizeLabels: ['2530x1280x8mm', '3130x1280x8mm'], variants: [
+        { color: 'N164', image: 'https://media.equitone.com/img_117061_gb/large/-793262891/equitonenaturan164', code: 'EQ-NAT-164', priceSmall: 273.91, priceLarge: 323.42 },
+        { color: 'N162', image: 'https://media.equitone.com/img_117108_gb/large/-793262891/equitonenaturan162', code: 'EQ-NAT-162', priceSmall: 187.79, priceLarge: 228.69 },
+        { color: 'N154', image: 'https://media.equitone.com/img_117097_gb/large/-793262891/equitonenaturan154', code: 'EQ-NAT-154', priceSmall: 187.79, priceLarge: 228.69 },
+        { color: 'N861', image: 'https://media.equitone.com/img_117123_gb/large/-793262891/equitonenaturan861', code: 'EQ-NAT-861', priceSmall: 187.79, priceLarge: 228.69 },
+        { color: 'N961', image: 'https://media.equitone.com/img_117144_gb/large/-793262891/equitonenaturan961', code: 'EQ-NAT-961', priceSmall: 187.79, priceLarge: 228.69 },
+        { color: 'N891', image: 'https://media.equitone.com/img_117082_gb/large/-793262891/equitonenaturan891', code: 'EQ-NAT-891', priceSmall: 167.55, priceLarge: 202.74 },
+        { color: 'N892', image: 'https://media.equitone.com/img_117129_gb/large/-793262891/equitonenaturan892', code: 'EQ-NAT-892', priceSmall: 167.55, priceLarge: 202.74 },
+        { color: 'N250', image: 'https://media.equitone.com/img_117126_gb/large/-793262891/equitonenaturan250', code: 'EQ-NAT-250', priceSmall: 167.55, priceLarge: 202.74 },
+        { color: 'N294', image: 'https://media.equitone.com/img_117103_gb/large/-793262891/equitonenaturan294', code: 'EQ-NAT-294', priceSmall: 167.55, priceLarge: 202.74 },
+        { color: 'N161', image: 'https://media.equitone.com/img_117111_gb/large/-793262891/equitonenaturan161', code: 'EQ-NAT-161', priceSmall: 187.79, priceLarge: 228.69 },
+        { color: 'N163', image: 'https://media.equitone.com/img_117138_gb/large/-793262891/equitonenaturan163', code: 'EQ-NAT-163', priceSmall: 187.79, priceLarge: 228.69 },
+        { color: 'N211', image: 'https://media.equitone.com/img_117088_gb/large/-793262891/equitonenaturan211', code: 'EQ-NAT-211', priceSmall: 206.57, priceLarge: 251.56 },
+        { color: 'N252', image: 'https://media.equitone.com/img_117055_gb/large/-793262891/equitonenaturan252', code: 'EQ-NAT-252', priceSmall: 206.57, priceLarge: 251.56 },
+        { color: 'N281', image: 'https://media.equitone.com/img_117170_gb/large/-793262891/equitonenaturan281', code: 'EQ-NAT-281', priceSmall: 197.10, priceLarge: 238.74 },
+        { color: 'N251', image: 'https://media.equitone.com/img_117162_gb/large/-793262891/equitonenaturan251', code: 'EQ-NAT-251', priceSmall: 197.10, priceLarge: 238.74 },
+        { color: 'N073', image: 'https://media.equitone.com/img_117076_gb/large/-793262891/equitonenaturan073', code: 'EQ-NAT-073', priceSmall: 197.10, priceLarge: 238.74 },
+        { color: 'N074', image: 'https://media.equitone.com/img_117079_gb/large/-793262891/equitonenaturan074', code: 'EQ-NAT-074', priceSmall: 197.10, priceLarge: 238.74 },
+        { color: 'N411', image: 'https://media.equitone.com/img_117135_gb/large/-793262891/equitonenaturan411', code: 'EQ-NAT-411', priceSmall: 206.57, priceLarge: 251.56 },
+        { color: 'N594', image: 'https://media.equitone.com/img_117052_gb/large/-793262891/equitonenaturan594', code: 'EQ-NAT-594', priceSmall: 167.55, priceLarge: 202.74 },
+        { color: 'N593', image: 'https://media.equitone.com/img_117049_gb/large/-793262891/equitonenaturan593', code: 'EQ-NAT-593', priceSmall: 167.55, priceLarge: 202.74 },
+        { color: 'N662', image: 'https://media.equitone.com/img_117094_gb/large/-793262891/equitonenaturan662', code: 'EQ-NAT-662', priceSmall: 187.79, priceLarge: 228.69 },
+        { color: 'N661', image: 'https://media.equitone.com/img_117091_gb/large/-793262891/equitonenaturan661', code: 'EQ-NAT-661', priceSmall: 187.79, priceLarge: 228.69 },
+        { color: 'N991', image: 'https://media.equitone.com/img_117156_gb/large/-793262891/equitonenaturan991', code: 'EQ-NAT-991', priceSmall: 167.55, priceLarge: 202.74 },
+        { color: 'N972', image: 'https://media.equitone.com/img_117046_gb/large/-793262891/equitonenaturan972', code: 'EQ-NAT-972', priceSmall: 197.10, priceLarge: 238.74 },
+        { color: 'N331', image: 'https://media.equitone.com/img_117117_gb/large/-793262891/equitonenaturan331', code: 'EQ-NAT-331', priceSmall: 197.10, priceLarge: 238.74 },
+        { color: 'N359', image: 'https://media.equitone.com/img_117176_gb/large/-793262891/equitonenaturan359', code: 'EQ-NAT-359', priceSmall: 197.10, priceLarge: 238.74 }
+    ]}
 ];
-
-// ============================================================
-//  FONA MAIŅA
-// ============================================================
-const bgImages = [
-    'https://media.istockphoto.com/id/1205474316/photo/panorama-and-aerial-view-of-riga-city.jpg?s=170667a&w=0&k=20&c=_1i85RkCaI8X6KJicsy_E5NHbhzNlXUae-IQAxHfeq4=',
-    'https://media.istockphoto.com/id/1489141386/photo/aerial-view-of-quebec-city-skyline-at-night.jpg?s=170667a&w=0&k=20&c=mE-ImN9n1rn2Ry9inIajYpCm2q7wwX5lz116wGN0gO4=',
-    'https://f8.pmo.ee/KXxiRrvfnttWaUvcVoNl3hW7R-M=/1536x0/nginx/o/2021/07/31/13957556t1h99f2.jpg',
-    'https://live.staticflickr.com/65535/51953548137_faae4c1ff7_b.jpg',
-    'https://live.staticflickr.com/7045/6848262748_58e268267e.jpg',
-    'https://live.staticflickr.com/4837/44836418725_d1ce20f10d_b.jpg',
-    'https://live.staticflickr.com/3583/3331837301_f29f278448_c.jpg',
-    'https://images.fineartamerica.com/images/artworkimages/mediumlarge/3/tampa-bay-lights-dominic-modinger.jpg',
-    'https://i.pinimg.com/originals/4e/c0/df/4ec0df9b65547f8d965294dbe5090ee6.jpg',
-    'https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/4a06a8b0-37a0-45db-b0cc-c360f7d84f87/d5n8v75-a974c845-a0b1-4d76-b46f-a269fb2150da.jpg/v1/fill/w_900,h_675,q_75,strp/grand_rapids_blue_bridge_by_historicbridges_d5n8v75-fullview.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9Njc1IiwicGF0aCI6IlwvZlwvNGEwNmE4YjAtMzdhMC00NWRiLWIwY2MtYzM2MGY3ZDg0Zjg3XC9kNW44djc1LWE5NzRjODQ1LWEwYjEtNGQ3Ni1iNDZmLWEyNjlmYjIxNTBkYS5qcGciLCJ3aWR0aCI6Ijw9OTAwIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmltYWdlLm9wZXJhdGlvbnMiXX0.w76iWRHc_XBtlJZzr0IZzf8fkVkRMxOdiTtopCNA9uw',
-    'https://media.istockphoto.com/id/1363097806/photo/yanghwa-bridge-reflection-in-the-han-river-in-seoul-south-korea.jpg?s=170667a&w=0&k=20&c=ffjHnfe6OkUeSmeQ3uTqi18btdCd6NkmKkKHgi0Ed08=',
-    'https://www.acprail.com/wp-content/uploads/2018/07/Bratislava-Budapest.jpg',
-    'https://png.pngtree.com/thumb_back/fh260/background/20241217/pngtree-beautiful-urban-landscape-with-a-bridge-spanning-body-of-water-and-image_16820903.jpg'
-];
-
-let currentBgIndex = 0;
-function changeBackground() {
-    currentBgIndex = (currentBgIndex + 1) % bgImages.length;
-    const url = bgImages[currentBgIndex];
-    let styleElem = document.getElementById('dynamicBgStyle');
-    if (!styleElem) {
-        styleElem = document.createElement('style');
-        styleElem.id = 'dynamicBgStyle';
-        document.head.appendChild(styleElem);
-    }
-    styleElem.innerHTML = `body::before { background-image: url('${url}'); }`;
-}
-let styleElem = document.createElement('style');
-styleElem.id = 'dynamicBgStyle';
-styleElem.innerHTML = `body::before { background-image: url('${bgImages[0]}'); }`;
-document.head.appendChild(styleElem);
-setInterval(changeBackground, 5000);
-
-// ============================================================
-//  VEIKALA FUNKCIJAS UN GROZS
-// ============================================================
 let currentCategory = 'paneli';
 let products = allProducts.filter(p => p.category === currentCategory);
 let cart = [];
-
-function switchCategory(category) {
-    currentCategory = category;
-    products = allProducts.filter(p => p.category === category);
-    renderProducts();
-    document.querySelectorAll('.category-tab').forEach(tab => {
-        tab.classList.toggle('active', tab.dataset.category === category);
-    });
-}
-document.querySelectorAll('.category-tab').forEach(tab => {
-    tab.addEventListener('click', function() { switchCategory(this.dataset.category); });
-});
-
 function renderProducts() {
     const grid = document.getElementById('productGrid');
     const countEl = document.getElementById('productCount');
-    const catName = currentCategory === 'paneli' ? 'Paneļi' : currentCategory === 'flizes' ? 'Flīzes' : 'Apakškonstrukcija';
+    const catName = currentCategory === 'paneli' ? 'Paneļi' : 'Apakškonstrukcija';
     countEl.textContent = `Kopā ${products.length} produkti (${catName})`;
     grid.innerHTML = products.map(p => {
-        const first = p.variants && p.variants.length > 0 ? p.variants[0] : null;
-        const imgSrc = first && first.image ? first.image : '';
-        const sizeLabels = p.sizeLabels || ['Mazais', 'Lielais'];
-        const colorItems = p.variants
-            .filter(v => v.image && v.image.trim() !== '')
-            .map((v, vi) => {
-                const originalIndex = p.variants.indexOf(v);
-                return `<button class="color-btn ${originalIndex === 0 ? 'active' : ''}" 
-                        data-product-id="${p.id}" 
-                        data-variant-index="${originalIndex}"
-                        style="background-image: url('${v.image}');"
-                        title="${v.color}">
-                        <span class="tooltip">${v.color}</span>
-                    </button>`;
-            }).join('');
-        const hasColors = colorItems.length > 0;
+        const first = p.variants[0];
+        const imgSrc = first.image ? first.image : '';
         return `
-        <div class="product-card" data-id="${p.id}">
-            <div class="product-image" id="img-${p.id}" onclick="openLightbox(this.querySelector('img') ? this.querySelector('img').src : '')">
-                ${imgSrc ? `<img src="${imgSrc}" alt="${p.name}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />` : `<span class="no-image">📷</span>`}
-                <span class="zoom-hint"><i class="fas fa-search-plus"></i> Palielināt</span>
+        <div class="product-card">
+            <div class="product-image">
+                ${imgSrc ? `<img src="${imgSrc}" alt="${p.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />` : `<span class="no-image">📷</span>`}
             </div>
             <h3>${p.name}</h3>
             <div class="product-code">${p.code}</div>
-            <div class="product-desc">${p.desc || ''}</div>
-            <div class="size-selector" data-product-id="${p.id}">
-                <span class="label">Izmērs:</span>
-                <button class="size-btn active" data-size="0">${sizeLabels[0]}</button>
-                <button class="size-btn" data-size="1">${sizeLabels[1]}</button>
-            </div>
-            <div class="color-variants">
-                <span class="label">Krāsas:</span>
-                ${hasColors ? colorItems : '<span style="font-size:0.8rem;color:#999;">nav pievienotas bildes</span>'}
-            </div>
-            <div class="product-bottom">
-                <span class="price" id="price-${p.id}">${first ? `€${first.priceSmall.toFixed(2)}` : '—'} <small>/ vienība</small></span>
-                <button class="btn btn-primary btn-sm add-to-cart" data-id="${p.id}"><i class="fas fa-plus"></i> Pievienot</button>
-            </div>
+            <div class="product-desc">${p.desc}</div>
+            <div class="size-selector">Izmērs: <button class="size-btn">${p.sizeLabels[0]}</button></div>
+            <div class="price">€${first.priceSmall.toFixed(2)} / vienība</div>
+            <button class="btn btn-primary add-to-cart" data-id="${p.id}">Pievienot</button>
         </div>`;
     }).join('');
-
-    document.querySelectorAll('.size-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            const productId = parseInt(this.closest('.size-selector').dataset.productId);
-            const sizeIndex = parseInt(this.dataset.size);
-            const parent = this.closest('.size-selector');
-            parent.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-            const product = products.find(p => p.id === productId);
-            if (!product) return;
-            const activeColorEl = this.closest('.product-card').querySelector('.color-btn.active');
-            let variantIndex = 0;
-            if (activeColorEl) variantIndex = parseInt(activeColorEl.dataset.variantIndex);
-            const variant = product.variants[variantIndex];
-            if (!variant) return;
-            const price = sizeIndex === 0 ? variant.priceSmall : variant.priceLarge;
-            const priceEl = document.getElementById(`price-${productId}`);
-            if (priceEl) priceEl.innerHTML = price ? `€${price.toFixed(2)} <small>/ vienība</small>` : '— <small>/ vienība</small>';
-            this.closest('.product-card').dataset.selectedSize = sizeIndex;
-        });
+}
+document.querySelectorAll('.category-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+        currentCategory = this.dataset.category;
+        products = allProducts.filter(p => p.category === currentCategory);
+        document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        renderProducts();
     });
-    document.querySelectorAll('.product-card').forEach(card => card.dataset.selectedSize = '0');
-
-    document.querySelectorAll('.color-btn').forEach(el => {
-        el.addEventListener('click', function(e) {
-            e.stopPropagation();
-            const productId = parseInt(this.dataset.productId);
-            const variantIndex = parseInt(this.dataset.variantIndex);
-            const parent = this.closest('.color-variants');
-            parent.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-            const product = products.find(p => p.id === productId);
-            if (!product) return;
-            const variant = product.variants[variantIndex];
-            if (!variant) return;
-            const container = document.getElementById(`img-${productId}`);
-            const img = container.querySelector('img');
-            const noImg = container.querySelector('.no-image');
-            if (variant.image && variant.image.trim() !== '') {
-                if (img) { img.src = variant.image; img.style.display = 'block'; if (noImg) noImg.style.display = 'none'; }
-                else { container.innerHTML = `<img src="${variant.image}" alt="${product.name}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" /><span class="no-image" style="display:none;">📷</span><span class="zoom-hint"><i class="fas fa-search-plus"></i> Palielināt</span>`;
-                container.onclick = function() { openLightbox(this.querySelector('img') ? this.querySelector('img').src : ''); }; }
-            } else {
-                if (img) { img.style.display = 'none'; if (noImg) noImg.style.display = 'flex'; }
-            }
-            const card = this.closest('.product-card');
-            const selectedSize = parseInt(card.dataset.selectedSize || '0');
-            const price = selectedSize === 0 ? variant.priceSmall : variant.priceLarge;
-            const priceEl = document.getElementById(`price-${productId}`);
-            if (priceEl) priceEl.innerHTML = price ? `€${price.toFixed(2)} <small>/ vienība</small>` : '— <small>/ vienība</small>';
-        });
-    });
-
-    document.querySelectorAll('.add-to-cart').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            const id = parseInt(this.dataset.id);
-            addToCart(id);
-        });
-    });
-    updateCartUI();
-}
-
-function addToCart(productId) {
-    const product = allProducts.find(p => p.id === productId);
-    if (!product) return;
-    const card = document.querySelector(`.product-card[data-id="${productId}"]`);
-    let selectedSize = 0;
-    if (card && card.dataset.selectedSize) selectedSize = parseInt(card.dataset.selectedSize);
-    const activeColorEl = card ? card.querySelector('.color-btn.active') : null;
-    let variantIndex = 0;
-    if (activeColorEl) variantIndex = parseInt(activeColorEl.dataset.variantIndex);
-    const variant = product.variants[variantIndex];
-    if (!variant) return;
-    const price = selectedSize === 0 ? variant.priceSmall : variant.priceLarge;
-    const sizeLabel = product.sizeLabels ? product.sizeLabels[selectedSize] : (selectedSize === 0 ? 'Mazais' : 'Lielais');
-    const variantColor = variant.color || '';
-    const existing = cart.find(item => item.id === productId && item.size === selectedSize && item.variantColor === variantColor);
-    if (existing) { existing.qty += 1; } else {
-        cart.push({ id: product.id, name: product.name, category: product.category, price: price, image: variant.image || '', qty: 1, size: selectedSize, sizeLabel: sizeLabel, variantColor: variantColor });
-    }
-    updateCartUI();
-    showToast(`Pievienots grozam (${sizeLabel})!`);
-}
-
-function removeFromCart(index) { cart.splice(index, 1); updateCartUI(); }
-function updateQty(index, delta) {
-    const item = cart[index];
-    if (!item) return;
-    item.qty += delta;
-    if (item.qty <= 0) { removeFromCart(index); return; }
-    updateCartUI();
-}
-
-function updateCartUI() {
-    const badge = document.getElementById('cartBadge');
-    const totalItems = cart.reduce((s, i) => s + i.qty, 0);
-    badge.textContent = totalItems;
-    badge.style.display = totalItems > 0 ? 'block' : 'none';
-    const container = document.getElementById('cartItems');
-    const totalSpan = document.getElementById('cartTotal');
-    if (cart.length === 0) {
-        container.innerHTML = `<div class="cart-empty"><i class="fas fa-box-open"></i><p>Grozs ir tukšs</p></div>`;
-        totalSpan.textContent = '€0.00';
-        return;
-    }
-    container.innerHTML = cart.map((item, idx) => `
-        <div class="cart-item" data-index="${idx}">
-            <div style="font-size:1.8rem;cursor:pointer;" onclick="openLightbox('${item.image}')">
-                ${item.image ? `<img src="${item.image}" style="width:40px;height:40px;object-fit:cover;border-radius:8px;" onerror="this.style.display='none';" />` : '📦'}
-            </div>
-            <div class="cart-item-info">
-                <h4>${item.name} ${item.variantColor ? '('+item.variantColor+')' : ''} <small style="font-weight:400;color:#888;">${item.sizeLabel}</small></h4>
-                <div class="item-price">€${item.price.toFixed(2)}</div>
-            </div>
-            <div class="cart-item-qty">
-                <button class="qty-dec" data-index="${idx}">−</button>
-                <span>${item.qty}</span>
-                <button class="qty-inc" data-index="${idx}">+</button>
-            </div>
-            <button class="cart-item-remove" data-index="${idx}"><i class="fas fa-trash-alt"></i></button>
-        </div>
-    `).join('');
-    document.querySelectorAll('.qty-dec').forEach(btn => { btn.addEventListener('click', function() { updateQty(parseInt(this.dataset.index), -1); }); });
-    document.querySelectorAll('.qty-inc').forEach(btn => { btn.addEventListener('click', function() { updateQty(parseInt(this.dataset.index), 1); }); });
-    document.querySelectorAll('.cart-item-remove').forEach(btn => { btn.addEventListener('click', function() { removeFromCart(parseInt(this.dataset.index)); }); });
-    totalSpan.textContent = `€${cart.reduce((s, i) => s + i.price * i.qty, 0).toFixed(2)}`;
-}
-
-function openLightbox(imgSrc) {
-    const lightbox = document.getElementById('lightbox');
-    const img = document.getElementById('lightboxImg');
-    if (!imgSrc) return;
-    img.src = imgSrc;
-    lightbox.classList.add('open');
-    document.body.style.overflow = 'hidden';
-}
-function closeLightbox() {
-    const lightbox = document.getElementById('lightbox');
-    lightbox.classList.remove('open');
-    document.body.style.overflow = '';
-}
-
-document.getElementById('cartToggle').addEventListener('click', function() {
-    document.getElementById('cartOverlay').classList.add('open');
-    document.getElementById('cartSidebar').classList.add('open');
-    document.body.style.overflow = 'hidden';
-    updateCartUI();
 });
-document.getElementById('cartClose').addEventListener('click', function() {
-    document.getElementById('cartOverlay').classList.remove('open');
-    document.getElementById('cartSidebar').classList.remove('open');
-    document.body.style.overflow = '';
-});
-document.getElementById('cartOverlay').addEventListener('click', function() {
-    document.getElementById('cartOverlay').classList.remove('open');
-    document.getElementById('cartSidebar').classList.remove('open');
-    document.body.style.overflow = '';
-});
-
-// ============================================================
-//  PASIŪTĪJUMA VEIKŠANA – PAMATOJOTIES UZ PRODUKTU KATEGORIJĀM
-// ============================================================
-function getShippingSection() {
-    const hasPanels = cart.some(item => item.category === 'paneli');
-    const hasTiles = cart.some(item => item.category === 'flizes');
-    const hasSub = cart.some(item => item.category === 'apaks');
-
-    if (hasPanels) {
-        return `
-            <div class="shipping-info">
-                <label>Piegādes veids</label>
-                <p style="color:#ccc; margin-bottom:10px;">EQUITONE paneļi tiek piegādāti ar smago auto uz norādīto adresi 4 nedēļu laikā pēc apmaksas. Kurjers, pakomāts vai saņemšana uz vietas šai kategorijai nav pieejama.</p>
-                <input type="hidden" id="checkoutShipping" value="smagais_auto">
-            </div>
-        `;
-    } else if (hasTiles) {
-        return `
-            <div class="shipping-info">
-                <label>Piegādes veids</label>
-                <p style="color:#ccc; margin-bottom:10px;">Flīzes tiek piegādātas tikai ar kurjeru.</p>
-                <input type="hidden" id="checkoutShipping" value="kurjers">
-            </div>
-        `;
-    } else if (hasSub) {
-        return `
-            <div class="shipping-info">
-                <label>Piegādes veids</label>
-                <select id="checkoutShipping">
-                    <option value="pakomats">Pakomāts</option>
-                    <option value="kurjers">Kurjers</option>
-                    <option value="uz_vietas">Saņemšana uz vietas</option>
-                </select>
-            </div>
-        `;
-    } else {
-        return `
-            <div class="shipping-info">
-                <label>Piegādes veids</label>
-                <select id="checkoutShipping">
-                    <option value="pakomats">Pakomāts</option>
-                    <option value="kurjers">Kurjers</option>
-                    <option value="uz_vietas">Saņemšana uz vietas</option>
-                </select>
-            </div>
-        `;
-    }
-}
-
-document.getElementById('checkoutBtn').addEventListener('click', function() {
-    if (cart.length === 0) { showToast('Grozs ir tukšs!'); return; }
-    document.getElementById('shippingSection').innerHTML = getShippingSection();
-    document.getElementById('checkoutModal').classList.add('open');
-});
-document.getElementById('checkoutCancel').addEventListener('click', function() {
-    document.getElementById('checkoutModal').classList.remove('open');
-});
-document.getElementById('checkoutModal').addEventListener('click', function(e) {
-    if (e.target === this) this.classList.remove('open');
-});
-
-document.getElementById('checkoutForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const name = document.getElementById('checkoutName').value.trim();
-    const email = document.getElementById('checkoutEmail').value.trim();
-    const phone = document.getElementById('checkoutPhone').value.trim();
-    const city = document.getElementById('checkoutCity').value.trim();
-    const address = document.getElementById('checkoutAddress').value.trim();
-    const zip = document.getElementById('checkoutZip').value.trim();
-    const shipping = document.getElementById('checkoutShipping') ? document.getElementById('checkoutShipping').value : 'smagais_auto';
-    const payment = document.querySelector('input[name="payment"]:checked').value;
-
-    if (!name || !email || !phone || !city || !address || !zip) { showToast('Lūdzu, aizpildiet visus obligātos laukus!'); return; }
-
-    let totalPrice = cart.reduce((s, i) => s + i.price * i.qty, 0);
-    let shippingDesc = '';
-
-    if (shipping === 'smagais_auto') {
-        shippingDesc = 'Smagais auto (4 nedēļas pēc apmaksas)';
-    } else if (shipping === 'kurjers') {
-        shippingDesc = 'Kurjers';
-    } else if (shipping === 'pakomats') {
-        shippingDesc = 'Pakomāts';
-        totalPrice += 2.50;
-    } else if (shipping === 'uz_vietas') {
-        shippingDesc = 'Saņemšana uz vietas';
-    }
-
-    const orderSummary = cart.map(item => `${item.name} (${item.sizeLabel}) x${item.qty} - €${item.price.toFixed(2)}`).join('\n');
-
-    const paymentDetails = `
-        -------------------------
-        MAKSĀJUMA UZDEVUMS
-        -------------------------
-        Saņēmējs: "O Fasades", SIA
-        Reģ. Nr.: 40203075809
-        PVN: LV40203075809
-        Adrese: Rīga, Meža iela 4, LV-1048
-        Konts: LV55 HABA 0531 0437 0761 5
-        Banka: "Swedbank", A/S
-        SWIFT: HABALV22
-        Mērķis: Maksājums par pasūtījumu
-        Summa: €${totalPrice.toFixed(2)}
-        
-        Pēc pārskaitījuma veikšanas, lūdzu, nosūtiet maksājuma apstiprinājumu uz e-pastu ometrium@inbox.lv
-    `;
-
-    const message = `Paldies, ${name}! Jūsu pasūtījums ir reģistrēts.\n\n` +
-        `Preces:\n${orderSummary}\n\n` +
-        `Piegāde: ${shippingDesc}\n` +
-        `Kopā: €${totalPrice.toFixed(2)}\n\n` +
-        `Adrese: ${address}, ${city}, ${zip}\n` +
-        `Apmaksas veids: ${payment === 'transfer' ? 'Pārskaitījums' : 'Maksājums ar karti'}\n\n` +
-        (payment === 'transfer' ? paymentDetails : 'Karšu maksājumi tiks pievienoti vēlāk. Lūdzu, izmantojiet pārskaitījumu!');
-
-    alert(message);
-
-    cart = [];
-    updateCartUI();
-    document.getElementById('checkoutModal').classList.remove('open');
-    document.getElementById('cartOverlay').classList.remove('open');
-    document.getElementById('cartSidebar').classList.remove('open');
-    document.body.style.overflow = '';
-    showToast('✅ Pasūtījums reģistrēts!');
-    this.reset();
-});
-
-// Admin loģika (nav mainīta)
-const ADMIN_PASSWORD = 'admin123';
-document.getElementById('adminLoginBtn').addEventListener('click', function(e) {
-    e.preventDefault();
-    document.getElementById('loginOverlay').classList.add('open');
-    document.getElementById('adminPassword').value = '';
-    document.getElementById('loginError').style.display = 'none';
-});
-document.getElementById('loginSubmit').addEventListener('click', function() {
-    const pass = document.getElementById('adminPassword').value;
-    if (pass === ADMIN_PASSWORD) {
-        document.getElementById('loginOverlay').classList.remove('open');
-        document.getElementById('adminPanel').classList.add('visible');
-        renderAdminTable();
-        showToast('🔓 Pieslēgts admin panelim.');
-    } else {
-        document.getElementById('loginError').style.display = 'block';
-    }
-});
-document.getElementById('adminPassword').addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') document.getElementById('loginSubmit').click();
-});
-document.getElementById('adminLogoutBtn').addEventListener('click', function() {
-    document.getElementById('adminPanel').classList.remove('visible');
-    showToast('🔒 Izgājāt no admin.');
-});
-
-let toastTimer = null;
-function showToast(msg) {
-    const el = document.getElementById('toast');
-    el.textContent = msg;
-    el.classList.add('show');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
-}
-document.getElementById('contactForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    showToast('📩 Ziņa nosūtīta!');
-    this.reset();
-});
-
-function renderAdminTable() {
-    const tbody = document.getElementById('adminTableBody');
-    tbody.innerHTML = allProducts.map(p => {
-        const first = p.variants && p.variants.length > 0 ? p.variants[0] : null;
-        const sizeLabels = p.sizeLabels || ['Mazais', 'Lielais'];
-        const catName = p.category === 'paneli' ? 'Paneļi' : p.category === 'flizes' ? 'Flīzes' : 'Apakškonstrukcija';
-        return `<tr>
-            <td>${p.id}</td>
-            <td><strong>${p.name}</strong></td>
-            <td>${catName}</td>
-            <td>${sizeLabels.join(' / ')}</td>
-            <td>${p.variants ? p.variants.map(v => v.color).join(', ') : 'nav'}</td>
-            <td>${first ? '€'+first.priceSmall.toFixed(2) : '—'}</td>
-            <td>${first ? '€'+first.priceLarge.toFixed(2) : '—'}</td>
-            <td class="actions">
-                <button class="btn btn-primary btn-sm edit-product" data-id="${p.id}"><i class="fas fa-edit"></i></button>
-                <button class="btn btn-danger btn-sm delete-product" data-id="${p.id}"><i class="fas fa-trash"></i></button>
-                <button class="btn btn-gold btn-sm edit-variants" data-id="${p.id}"><i class="fas fa-palette"></i> Varianti</button>
-            </td>
-        </tr>`;
-    }).join('');
-    document.querySelectorAll('.edit-product').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const id = parseInt(this.dataset.id);
-            const product = allProducts.find(p => p.id === id);
-            if (!product) return;
-            document.getElementById('addProdName').value = product.name || '';
-            document.getElementById('addProdCode').value = product.code || '';
-            document.getElementById('addCategory').value = product.category || 'paneli';
-            document.getElementById('addProdDesc').value = product.desc || '';
-            const sizeLabels = product.sizeLabels || ['', ''];
-            document.getElementById('addSize1').value = sizeLabels[0] || '';
-            document.getElementById('addSize2').value = sizeLabels[1] || '';
-            const first = product.variants && product.variants.length > 0 ? product.variants[0] : null;
-            document.getElementById('addProdPriceSmall').value = first ? first.priceSmall : '';
-            document.getElementById('addProdPriceLarge').value = first ? first.priceLarge : '';
-            const form = document.getElementById('adminAddProductForm');
-            const submitBtn = form.querySelector('button[type="submit"]');
-            submitBtn.innerHTML = '<i class="fas fa-save"></i> Saglabāt izmaiņas';
-            submitBtn.dataset.editId = id;
-            form.onsubmit = null;
-            form.onsubmit = function(e) {
-                e.preventDefault();
-                const editId = parseInt(submitBtn.dataset.editId);
-                const ps = parseFloat(document.getElementById('addProdPriceSmall').value);
-                const pl = parseFloat(document.getElementById('addProdPriceLarge').value);
-                const size1 = document.getElementById('addSize1').value.trim();
-                const size2 = document.getElementById('addSize2').value.trim();
-                if (isNaN(ps) || isNaN(pl) || !size1 || !size2) { showToast('Aizpildiet visus laukus!'); return; }
-                const idx = allProducts.findIndex(p => p.id === editId);
-                if (idx !== -1) {
-                    allProducts[idx].name = document.getElementById('addProdName').value.trim();
-                    allProducts[idx].code = document.getElementById('addProdCode').value.trim();
-                    allProducts[idx].category = document.getElementById('addCategory').value;
-                    allProducts[idx].desc = document.getElementById('addProdDesc').value.trim();
-                    allProducts[idx].sizeLabels = [size1, size2];
-                    allProducts[idx].variants.forEach(v => { v.priceSmall = ps; v.priceLarge = pl; });
-                    products = allProducts.filter(p => p.category === currentCategory);
-                    renderProducts();
-                    renderAdminTable();
-                    showToast('✅ Produkts atjaunināts!');
-                    form.reset();
-                    submitBtn.innerHTML = '<i class="fas fa-save"></i> Pievienot produktu';
-                    delete submitBtn.dataset.editId;
-                    form.onsubmit = null;
-                    form.onsubmit = handleAddProduct;
-                }
-            };
-        });
-    });
-    document.querySelectorAll('.delete-product').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const id = parseInt(this.dataset.id);
-            if (confirm('Vai tiešām vēlaties dzēst šo produktu?')) {
-                const idx = allProducts.findIndex(p => p.id === id);
-                if (idx !== -1) { allProducts.splice(idx, 1); }
-                products = allProducts.filter(p => p.category === currentCategory);
-                renderProducts();
-                renderAdminTable();
-                showToast('🗑️ Produkts dzēsts.');
-            }
-        });
-    });
-    document.querySelectorAll('.edit-variants').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const productId = parseInt(this.dataset.id);
-            renderVariantEditor(productId);
-        });
-    });
-}
-
-function renderVariantEditor(productId) {
-    const product = allProducts.find(p => p.id === productId);
-    if (!product) return;
-    const container = document.getElementById('variantEditContainer');
-    let html = `
-        <div class="variant-editor-header">
-            <h4><i class="fas fa-palette"></i> Labot variantus: ${product.name}</h4>
-            <button class="btn btn-outline btn-sm" id="closeVariantEditor">Aizvērt</button>
-        </div>
-    `;
-    product.variants.forEach((v, idx) => {
-        const hasImage = v.image && v.image.trim() !== '';
-        html += `
-            <div class="variant-edit-row" data-variant-index="${idx}">
-                <div style="display:flex;align-items:center;gap:8px;">
-                    ${hasImage ? `<img src="${v.image}" class="v-preview" alt="priekšskats" onerror="this.style.display='none';" />` : `<div class="v-preview" style="display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.04);color:#666;font-size:0.7rem;">nav bildes</div>`}
-                    <span class="v-color-label" style="font-weight:600;font-size:0.9rem;color:#fff;">${v.color}</span>
-                </div>
-                <label style="font-size:0.75rem;color:#999;">1.izm.: <input type="number" step="0.01" class="v-price-small" value="${v.priceSmall}" style="width:80px;" /></label>
-                <label style="font-size:0.75rem;color:#999;">2.izm.: <input type="number" step="0.01" class="v-price-large" value="${v.priceLarge}" style="width:80px;" /></label>
-                <input type="text" class="v-image" value="${v.image || ''}" placeholder="Attēla URL" style="font-size:0.75rem;color:#fff;" />
-                <button class="btn btn-danger btn-xs remove-image-btn" data-product-id="${productId}" data-variant-index="${idx}" ${!hasImage ? 'disabled' : ''}><i class="fas fa-times"></i> Noņemt bildi</button>
-                <button class="btn btn-primary btn-xs save-variant-btn" data-product-id="${productId}" data-variant-index="${idx}"><i class="fas fa-save"></i> Saglabāt</button>
-            </div>
-        `;
-    });
-    container.innerHTML = html;
-    container.querySelectorAll('.save-variant-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const pId = parseInt(this.dataset.productId);
-            const vIdx = parseInt(this.dataset.variantIndex);
-            const row = this.closest('.variant-edit-row');
-            const ps = parseFloat(row.querySelector('.v-price-small').value);
-            const pl = parseFloat(row.querySelector('.v-price-large').value);
-            const img = row.querySelector('.v-image').value.trim();
-            if (isNaN(ps) || isNaN(pl)) { showToast('Ievadiet derīgas cenas!'); return; }
-            const prod = allProducts.find(p => p.id === pId);
-            if (!prod) return;
-            prod.variants[vIdx].priceSmall = ps;
-            prod.variants[vIdx].priceLarge = pl;
-            prod.variants[vIdx].image = img;
-            products = allProducts.filter(p => p.category === currentCategory);
-            renderProducts();
-            renderAdminTable();
-            renderVariantEditor(pId);
-            showToast('✅ Variants atjaunināts!');
-        });
-    });
-    container.querySelectorAll('.remove-image-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const pId = parseInt(this.dataset.productId);
-            const vIdx = parseInt(this.dataset.variantIndex);
-            const prod = allProducts.find(p => p.id === pId);
-            if (!prod) return;
-            prod.variants[vIdx].image = '';
-            products = allProducts.filter(p => p.category === currentCategory);
-            renderProducts();
-            renderAdminTable();
-            renderVariantEditor(pId);
-            showToast('🖼️ Bilde noņemta!');
-        });
-    });
-    document.getElementById('closeVariantEditor').addEventListener('click', function() {
-        document.getElementById('variantEditContainer').innerHTML = '';
-    });
-}
-
-function handleAddProduct(e) {
-    e.preventDefault();
-    const name = document.getElementById('addProdName').value.trim();
-    const code = document.getElementById('addProdCode').value.trim();
-    const category = document.getElementById('addCategory').value;
-    const desc = document.getElementById('addProdDesc').value.trim();
-    const size1 = document.getElementById('addSize1').value.trim();
-    const size2 = document.getElementById('addSize2').value.trim();
-    const ps = parseFloat(document.getElementById('addProdPriceSmall').value);
-    const pl = parseFloat(document.getElementById('addProdPriceLarge').value);
-    if (!name || !code || !size1 || !size2 || isNaN(ps) || isNaN(pl)) { showToast('Aizpildiet visus laukus!'); return; }
-    const newId = allProducts.length > 0 ? Math.max(...allProducts.map(p => p.id)) + 1 : 1;
-    allProducts.push({ id: newId, category, name, code, desc, sizeLabels: [size1, size2], variants: [{ color: 'Noklusējums', image: '', code: code + '-DEFAULT', priceSmall: ps, priceLarge: pl }] });
-    products = allProducts.filter(p => p.category === currentCategory);
-    renderProducts();
-    renderAdminTable();
-    showToast('✅ Produkts pievienots!');
-    document.getElementById('adminAddProductForm').reset();
-    const submitBtn = document.getElementById('adminAddProductForm').querySelector('button[type="submit"]');
-    submitBtn.innerHTML = '<i class="fas fa-save"></i> Pievienot produktu';
-    delete submitBtn.dataset.editId;
-    document.getElementById('adminAddProductForm').onsubmit = handleAddProduct;
-}
-document.getElementById('adminAddProductForm').onsubmit = handleAddProduct;
-
-function populateVariantSelect() {
-    const select = document.getElementById('variantProductId');
-    select.innerHTML = '<option value="">Izvēlies produktu</option>';
-    allProducts.forEach(p => {
-        const opt = document.createElement('option');
-        opt.value = p.id;
-        opt.textContent = `${p.name} (${p.code})`;
-        select.appendChild(opt);
-    });
-}
-populateVariantSelect();
-
-document.getElementById('variantFileInput').addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function(ev) {
-        document.getElementById('variantImage').value = ev.target.result;
-        document.getElementById('variantPreview').src = ev.target.result;
-        document.getElementById('variantPreview').style.display = 'block';
-    };
-    reader.readAsDataURL(file);
-});
-
-document.getElementById('adminAddVariantForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const productId = parseInt(document.getElementById('variantProductId').value);
-    const colorName = document.getElementById('variantColorName').value.trim();
-    const image = document.getElementById('variantImage').value.trim();
-    const code = document.getElementById('variantCode').value.trim();
-    if (!productId || !colorName) { showToast('Lūdzu, aizpildiet produktu un krāsas nosaukumu!'); return; }
-    const product = allProducts.find(p => p.id === productId);
-    if (!product) { showToast('Produkts nav atrasts!'); return; }
-    const existing = product.variants.find(v => v.color === colorName);
-    if (existing) {
-        if (existing.image && existing.image.trim() !== '') { showToast(`⚠️ Krāsa "${colorName}" jau ir pievienota ar bildi!`); return; }
-        existing.image = image || '';
-        existing.code = code || existing.code || '';
-        if (image && image.trim() !== '') {
-            products = allProducts.filter(p => p.category === currentCategory);
-            renderProducts();
-            showToast(`✅ Krāsai "${colorName}" pievienota bilde!`);
-        } else { showToast('Lūdzu, pievienojiet bildi!'); }
-        return;
-    }
-    const base = product.variants && product.variants.length > 0 ? product.variants[0] : null;
-    product.variants.push({ color: colorName, image: image || '', code: code || '', priceSmall: base ? base.priceSmall : 0, priceLarge: base ? base.priceLarge : 0 });
-    product.variants.sort((a,b) => a.color.localeCompare(b.color));
-    products = allProducts.filter(p => p.category === currentCategory);
-    renderProducts();
-    this.reset();
-    document.getElementById('variantPreview').style.display = 'none';
-    populateVariantSelect();
-    showToast('✅ Krāsu variants pievienots un sakārtots!');
-});
-
 renderProducts();
-updateCartUI();
-console.log('✅ O FASADES — gatavs. Parole: admin123');
 </script>
 </body>
 </html>
