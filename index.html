@@ -161,6 +161,16 @@ body::after {
 .checkout-box select option { background: #1a1e24; color: #fff; }
 .payment-options { display: flex; gap: 15px; margin-bottom: 18px; flex-wrap: wrap; }
 .payment-options label { display: flex; align-items: center; gap: 8px; font-weight: 400; font-size: 0.95rem; color: #ccc; cursor: pointer; }
+.checkout-transfer-success { margin-top:14px; padding:16px; border:1px solid rgba(201,168,76,.45); border-radius:14px; background:rgba(201,168,76,.08); color:#eee; line-height:1.65; }
+.checkout-transfer-success strong { color:var(--eq-gold); }
+.checkout-transfer-success .bank-line { display:flex; justify-content:space-between; gap:12px; border-bottom:1px solid rgba(255,255,255,.07); padding:5px 0; }
+.checkout-transfer-success .bank-line span:last-child { text-align:right; color:#fff; }
+.checkout-confirmation { text-align:center; padding:6px 0 2px; }
+.checkout-confirmation .confirm-icon { width:64px; height:64px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 14px; background:rgba(45,160,90,.18); border:1px solid rgba(80,210,130,.45); color:#7ee0a5; font-size:1.8rem; }
+.checkout-confirmation h2 { margin-bottom:8px; }
+.checkout-confirmation .order-no { color:var(--eq-gold); font-weight:800; font-size:1.05rem; }
+.checkout-confirmation .confirm-actions { display:flex; gap:10px; margin-top:18px; }
+.checkout-confirmation .confirm-actions .btn { flex:1; justify-content:center; }
 .checkout-actions { display: flex; gap: 12px; margin-top: 8px; }
 .checkout-actions .btn { flex: 1; justify-content: center; }
 .admin-panel { background: rgba(18,22,28,0.92); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.06); border-radius: var(--radius); padding: 32px; box-shadow: 0 8px 40px rgba(0,0,0,0.3); margin: 40px 0; display: none; }
@@ -221,6 +231,25 @@ html { scroll-behavior:smooth; }
   #contact form { grid-template-columns:1fr !important; }
   #contact form input, #contact form textarea, #contact form button { grid-column:1 !important; }
 }
+
+/* ===== O FASADES pasūtījumu sistēmas karkass ===== */
+.admin-main-tabs{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0 22px}
+.admin-main-tab{padding:10px 18px;border-radius:40px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#ddd;cursor:pointer;font-weight:600}
+.admin-main-tab.active{background:var(--eq-gold);color:#1a1a1a;border-color:var(--eq-gold)}
+.admin-view[hidden]{display:none!important}
+.order-status{padding:6px 10px;border-radius:30px;background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.10)}
+.order-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0 0 14px}.order-summary-card{padding:14px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.10)}.order-summary-card strong{display:block;font-size:1.5rem;color:#fff}.order-summary-card span{color:#aaa;font-size:.9rem}.order-summary-card.waiting{border-color:rgba(216,189,112,.55);background:rgba(216,189,112,.08)}.order-summary-card.paid{border-color:rgba(65,190,120,.45);background:rgba(65,190,120,.08)}@media(max-width:700px){.order-summary{grid-template-columns:1fr}}
+.order-empty{padding:28px;text-align:center;color:#aaa;background:rgba(255,255,255,.03);border-radius:14px}
+.checkout-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 14px}
+.checkout-grid .full{grid-column:1/-1}
+.checkout-grid label{display:block;margin-bottom:6px;color:#ddd;font-size:.9rem}
+.checkout-grid input,.checkout-grid select,.checkout-grid textarea{width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#fff;font:inherit}
+.checkout-grid textarea{min-height:84px;resize:vertical}
+.checkout-notice{font-size:.83rem;color:#aaa;background:rgba(255,255,255,.04);padding:12px 14px;border-radius:10px}
+.checkout-status{margin-top:12px;padding:10px 12px;border-radius:10px;display:none}
+.checkout-status.show{display:block}.checkout-status.error{background:rgba(192,57,43,.18);color:#ffd8d3}.checkout-status.ok{background:rgba(0,107,62,.2);color:#d8ffea}
+.company-fields[hidden]{display:none!important}
+@media(max-width:620px){.checkout-grid{grid-template-columns:1fr}.checkout-grid .full{grid-column:1}.admin-main-tabs{gap:8px}.admin-main-tab{flex:1;text-align:center}.admin-table th,.admin-table td{padding:9px 10px;font-size:.82rem}}
 </style>
 </head>
 <body>
@@ -284,6 +313,12 @@ html { scroll-behavior:smooth; }
 <p><i class="fas fa-map-marker-alt" style="color:var(--eq-gold);width:28px;"></i> Rīga, Meža iela 4, LV-1048</p>
 <p><i class="fas fa-phone" style="color:var(--eq-gold);width:28px;"></i> +371 29117081</p>
 <p><i class="fas fa-envelope" style="color:var(--eq-gold);width:28px;"></i> omterum@inbox.lv</p>
+<div style="margin-top:18px;padding-top:16px;border-top:1px solid rgba(255,255,255,.08);line-height:1.75;color:#bbb;">
+<strong style="color:#fff;">SIA “O Fasādes”</strong><br>
+Reģ. Nr. 40203075809 · PVN Nr. LV40203075809<br>
+Swedbank AS · IBAN LV55 HABA 0551 0437 0761 5<br>
+SWIFT/BIC HABALV22
+</div>
 </div>
 <div style="flex:2;min-width:240px;">
 <form id="contactForm" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
@@ -295,11 +330,34 @@ html { scroll-behavior:smooth; }
 </div>
 </div>
 </section>
+<section class="container" id="terms" style="padding:20px 0 20px;scroll-margin-top:90px;">
+<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);padding:28px 32px;">
+<h2 class="section-title" style="margin-bottom:16px;">Distances līguma un pirkuma noteikumi</h2>
+<p><strong>Pārdevējs:</strong> SIA “O Fasādes”, Reģ. Nr. 40203075809, PVN Nr. LV40203075809, Rīga, Meža iela 4, LV-1048. Tālrunis +371 29117081, e-pasts omterum@inbox.lv.</p>
+<p><strong>Cenas:</strong> produktu pamatdati sistēmā tiek glabāti bez PVN. Pircējam pirms pasūtījuma apstiprināšanas tiek parādīta summa bez PVN, PVN 21% un kopējā summa ar PVN. Ja piegādes cena nav iepriekš aprēķināma, tā tiek saskaņota ar klientu pirms izpildes.</p>
+<p><strong>Apmaksa:</strong> bankas pārskaitījums vai, pēc Swedbank e-komercijas aktivizēšanas, droša kartes apmaksa. Kartes dati O FASADES vietnē netiek glabāti.</p>
+<p><strong>Piegāde:</strong> piegādes veids ir atkarīgs no preču kategorijas. Lielgabarīta paneļu piegāde tiek organizēta ar kravas transportu; konkrētais termiņš un izmaksas tiek apstiprinātas pasūtījumam.</p>
+<p><strong>Atteikuma tiesības patērētājiem:</strong> distances pirkumam parasti ir 14 dienu atteikuma tiesības no preces saņemšanas dienas. Normatīvajos aktos ir izņēmumi, tostarp individuāli izgatavotām vai nepārprotami personalizētām precēm. Atteikumu var paziņot rakstveidā uz omterum@inbox.lv.</p>
+<p style="color:#aaa;font-size:.9rem;">Pirms publiskas palaišanas šī sadaļa vēl jāsaskaņo ar gala piegādes kārtību un jāpapildina ar oficiālo atteikuma veidlapu.</p>
+</div></section>
+<section class="container" id="privacy" style="padding:0 0 40px;scroll-margin-top:90px;">
+<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);padding:28px 32px;">
+<h2 class="section-title" style="margin-bottom:16px;">Privātuma informācija</h2>
+<p><strong>Datu pārzinis:</strong> SIA “O Fasādes”, Reģ. Nr. 40203075809, Rīga, Meža iela 4, LV-1048, omterum@inbox.lv.</p>
+<p>Pasūtījuma izpildei tiek apstrādāts klienta vārds, kontaktinformācija, piegādes adrese, pasūtījuma saturs un, uzņēmuma pircējam, uzņēmuma rekvizīti. Dati tiek izmantoti pasūtījuma izpildei, saziņai, piegādei, maksājuma uzskaitei un normatīvajos aktos noteikto grāmatvedības pienākumu izpildei.</p>
+<p>Kartes numuru un drošības kodu O FASADES vietne neglabā; kartes maksājumu apstrādā pieslēgtais maksājumu pakalpojuma sniedzējs.</p>
+<p style="color:#aaa;font-size:.9rem;">Pirms publiskas palaišanas šo sadaļu papildināsim ar faktiski izmantoto servera, maksājumu, piegādes un sīkdatņu pakalpojumu sniedzēju informāciju.</p>
+</div></section>
 <div class="container">
 <div class="admin-panel" id="adminPanel">
 <h2><i class="fas fa-user-shield" style="color:var(--eq-gold);"></i> Administrācija</h2>
 <p class="sub">Pārvaldi produktus, krāsu variantus un cenas.</p>
 <button class="btn btn-danger btn-sm" id="adminLogoutBtn" style="margin-bottom:16px;"><i class="fas fa-sign-out-alt"></i> Iziet no admin</button>
+<div class="admin-main-tabs">
+<button class="admin-main-tab active" type="button" data-admin-view="products"><i class="fas fa-boxes"></i> Produkti</button>
+<button class="admin-main-tab" type="button" data-admin-view="orders"><i class="fas fa-clipboard-list"></i> Pasūtījumi</button>
+</div>
+<div class="admin-view" id="adminProductsView">
 <div class="category-tabs" id="adminCategoryTabs" style="justify-content:flex-start;margin:4px 0 14px;">
 <button class="category-tab active" type="button" data-admin-category="paneli">Paneļi</button>
 <button class="category-tab" type="button" data-admin-category="flizes">Flīzes</button>
@@ -345,6 +403,24 @@ html { scroll-behavior:smooth; }
 </form>
 <div id="variantEditContainer" style="margin-top:24px;"></div>
 </div>
+<div class="admin-view" id="adminOrdersView" hidden>
+<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px;">
+<div><h3 style="color:#fff;margin-bottom:4px;"><i class="fas fa-clipboard-list" style="color:var(--eq-gold);"></i> Pasūtījumi</h3><p class="sub" style="margin:0;">Klientu pasūtījumi, piegādes dati un statuss.</p></div>
+<button class="btn btn-outline btn-sm" id="refreshOrdersBtn" type="button"><i class="fas fa-sync-alt"></i> Atjaunot</button>
+</div>
+<div id="ordersSystemInfo" class="checkout-notice" style="margin-bottom:14px;"></div>
+<div class="order-summary" id="orderSummary">
+  <div class="order-summary-card"><strong id="ordersAllCount">0</strong><span>Visi pasūtījumi</span></div>
+  <div class="order-summary-card waiting"><strong id="ordersWaitingCount">0</strong><span>Gaida apmaksu / pārskaitījumu</span></div>
+  <div class="order-summary-card paid"><strong id="ordersPaidCount">0</strong><span>Apmaksāti</span></div>
+</div>
+<div style="overflow-x:auto;">
+<table class="admin-table" id="ordersTable">
+<thead><tr><th>Nr.</th><th>Datums</th><th>Klients</th><th>Kontakti</th><th>Piegāde</th><th>Summa</th><th>Statuss</th><th>Detaļas</th></tr></thead>
+<tbody id="ordersTableBody"></tbody>
+</table>
+</div>
+</div>
 </div>
 <div class="lightbox" id="lightbox" onclick="closeLightbox()">
 <button class="lightbox-close" onclick="closeLightbox()"><i class="fas fa-times"></i></button>
@@ -354,7 +430,7 @@ html { scroll-behavior:smooth; }
 <div class="container">
 <div><h4>O FASADES</h4><p style="color:#999;">Oficiālais EQUITONE dīleris Latvijā.</p></div>
 <div><h4>Produkti</h4><a href="#products">Katalogs</a></div>
-<div><h4>Atbalsts</h4><a href="#contact">Kontakti</a></div>
+<div><h4>Atbalsts</h4><a href="#contact">Kontakti</a><a href="#terms">Pirkuma noteikumi</a><a href="#privacy">Privātums</a><span style="display:block;color:#777;font-size:.86rem;line-height:1.55;margin-top:10px;">SIA “O Fasādes”<br>Reģ. Nr. 40203075809<br>PVN LV40203075809</span></div>
 <div><h4>Uzņēmuma mājaslapa</h4><a href="https://ofasadesmarmoroc.lv/" target="_blank">ofasadesmarmoroc.lv</a></div>
 <div class="copy">&copy; 2026 O FASADES. Visas tiesības aizsargātas.</div>
 </div>
@@ -363,27 +439,45 @@ html { scroll-behavior:smooth; }
 <div class="cart-sidebar" id="cartSidebar">
 <div class="cart-header"><h2><i class="fas fa-shopping-bag" style="color:var(--eq-gold);"></i> Grozs</h2><button class="cart-close" id="cartClose"><i class="fas fa-times"></i></button></div>
 <div class="cart-items" id="cartItems"><div class="cart-empty"><i class="fas fa-box-open"></i><p>Grozs ir tukšs</p></div></div>
-<div class="cart-total"><span>Kopā:</span><span id="cartTotal">€0.00</span></div>
+<div class="cart-total" style="display:block;line-height:1.7;">
+<div style="display:flex;justify-content:space-between;"><span>Preces bez PVN:</span><span id="cartSubtotal">€0.00</span></div>
+<div style="display:flex;justify-content:space-between;color:#aaa;font-size:.92rem;"><span>PVN 21%:</span><span id="cartVat">€0.00</span></div>
+<div style="display:flex;justify-content:space-between;font-size:1.12rem;margin-top:4px;"><strong>Kopā ar PVN:</strong><strong id="cartTotal">€0.00</strong></div>
+</div>
 <div class="cart-actions"><button class="btn btn-primary" id="checkoutBtn" style="justify-content:center;width:100%;"><i class="fas fa-lock"></i> Noformēt pasūtījumu</button></div>
 </div>
 <div class="checkout-modal" id="checkoutModal">
 <div class="checkout-box">
 <h2>Pasūtījuma noformēšana</h2>
-<p class="sub">Aizpildiet informāciju. Pēc apstiprināšanas redzēsiet pasūtījuma kopsavilkumu un maksājuma rekvizītus.</p>
+<p class="sub">Aizpildiet kontaktinformāciju un piegādes adresi. Pasūtījuma summa ir redzama zemāk.</p>
 <form id="checkoutForm">
-<label>Vārds, uzvārds</label><input type="text" id="checkoutName" required placeholder="Jānis Bērziņš" />
-<label>E-pasts</label><input type="email" id="checkoutEmail" required placeholder="janis@berzins.lv" />
-<label>Telefons</label><input type="tel" id="checkoutPhone" required placeholder="+371 2 123 4567" />
-<label>Pilsēta</label><input type="text" id="checkoutCity" required placeholder="Rīga" />
-<label>Iela un mājas numurs</label><input type="text" id="checkoutAddress" required placeholder="Meža iela 4" />
-<label>Pasta indekss</label><input type="text" id="checkoutZip" required placeholder="LV-1048" />
-<div id="shippingSection"></div>
-<label>Apmaksas veids</label>
-<div class="payment-options">
-    <label><input type="radio" name="payment" value="transfer" checked> Pārskaitījums (maksājuma uzdevums)</label>
+<div class="checkout-grid">
+<div class="full"><label>Pircēja veids</label><select id="checkoutBuyerType"><option value="person">Privātpersona</option><option value="company">Uzņēmums</option></select></div>
+<div class="company-fields full" id="companyFields" hidden>
+<div class="checkout-grid">
+<div><label>Uzņēmuma nosaukums *</label><input type="text" id="checkoutCompany" placeholder="SIA Nosaukums" /></div>
+<div><label>Reģistrācijas Nr. *</label><input type="text" id="checkoutRegNo" placeholder="4000..." /></div>
+<div class="full"><label>PVN Nr.</label><input type="text" id="checkoutVatNo" placeholder="LV..." /></div>
 </div>
-<label>Piezīmes</label><textarea id="checkoutNote" placeholder="Īpašas vēlmes..."></textarea>
-<div class="checkout-actions"><button type="button" class="btn btn-outline" id="checkoutCancel">Atcelt</button><button type="submit" class="btn btn-gold"><i class="fas fa-check"></i> Apstiprināt pasūtījumu</button></div>
+</div>
+<div><label>Vārds, uzvārds *</label><input type="text" id="checkoutName" required placeholder="Jānis Bērziņš" /></div>
+<div><label>Telefons *</label><input type="tel" id="checkoutPhone" required placeholder="+371 2..." /></div>
+<div class="full"><label>E-pasts *</label><input type="email" id="checkoutEmail" required placeholder="epasts@piemers.lv" /></div>
+<div><label>Pilsēta *</label><input type="text" id="checkoutCity" required placeholder="Rīga" /></div>
+<div><label>Pasta indekss *</label><input type="text" id="checkoutZip" required placeholder="LV-1048" /></div>
+<div class="full"><label>Piegādes adrese *</label><input type="text" id="checkoutAddress" required placeholder="Iela, mājas numurs" /></div>
+<div class="full" id="shippingSection"></div>
+<div class="full checkout-notice" id="checkoutPriceSummary" style="font-size:.95rem;line-height:1.75;"></div>
+<div class="full"><label>Apmaksas veids</label><div class="payment-options">
+<label style="opacity:.55;cursor:not-allowed;"><input type="radio" name="payment" value="card" disabled> <i class="fas fa-credit-card"></i> Karte (Visa / Mastercard) — drīzumā</label>
+<label><input type="radio" name="payment" value="transfer" checked> <i class="fas fa-university"></i> Bankas pārskaitījums — darbojas</label>
+</div><div class="checkout-notice" id="cardPaymentInfo" style="margin-top:10px;">Kartes apmaksa tiks ieslēgta pēc Swedbank e-komercijas līguma aktivizēšanas. Bankas pārskaitījums darbojas jau tagad: pēc pasūtījuma izveides klients saņem O FASADES rekvizītus un unikālo pasūtījuma numuru maksājuma mērķim.</div></div>
+<div class="full"><label>Piezīmes</label><textarea id="checkoutNote" placeholder="Piegādes vai citas piezīmes..."></textarea></div>
+<div class="full checkout-notice">Piegādes cena nav iekļauta preču summā. Ja nepieciešama piegāde, O FASADES to aprēķina un saskaņo ar klientu pirms pasūtījuma galīgās apstiprināšanas.</div>
+<div class="full"><label style="display:flex;gap:10px;align-items:flex-start;"><input type="checkbox" id="checkoutConsent" required style="width:auto;margin-top:4px;"> <span>Esmu iepazinies ar <a href="#terms" style="color:var(--eq-gold);">Distances līguma noteikumiem</a> un <a href="#privacy" style="color:var(--eq-gold);">Privātuma informāciju</a>, un piekrītu manu datu izmantošanai pasūtījuma izpildei.</span></label></div>
+</div>
+<div class="checkout-status" id="checkoutStatus"></div>
+<div class="checkout-actions"><button type="button" class="btn btn-outline" id="checkoutCancel">Atcelt</button><button type="submit" class="btn btn-gold" id="checkoutSubmitBtn"><i class="fas fa-check"></i> Izveidot pasūtījumu</button></div>
 </form>
 </div>
 </div>
@@ -457,6 +551,11 @@ document.querySelectorAll('.category-tab').forEach(tab => {
     tab.addEventListener('click', function() { switchCategory(this.dataset.category); });
 });
 
+const VAT_RATE = 0.21;
+function vatAmount(net){ return Number(net||0) * VAT_RATE; }
+function grossAmount(net){ return Number(net||0) * (1 + VAT_RATE); }
+function money(v){ return `€${Number(v||0).toFixed(2)}`; }
+
 function renderProducts() {
     const grid = document.getElementById('productGrid');
     const countEl = document.getElementById('productCount');
@@ -498,7 +597,7 @@ function renderProducts() {
                 ${hasColors ? colorItems : '<span style="font-size:0.8rem;color:#999;">nav pievienotas bildes</span>'}
             </div>
             <div class="product-bottom">
-                <span class="price" id="price-${p.id}">${first ? `€${first.priceSmall.toFixed(2)}` : '—'} <small>/ vienība</small></span>
+                <span class="price" id="price-${p.id}">${first ? `${money(grossAmount(first.priceSmall))} <small>ar PVN</small><br><small>${money(first.priceSmall)} bez PVN / vienība</small>` : '—'}</span>
                 <button class="btn btn-primary btn-sm add-to-cart" data-id="${p.id}"><i class="fas fa-plus"></i> Pievienot</button>
             </div>
         </div>`;
@@ -521,7 +620,7 @@ function renderProducts() {
             if (!variant) return;
             const price = sizeIndex === 0 ? variant.priceSmall : variant.priceLarge;
             const priceEl = document.getElementById(`price-${productId}`);
-            if (priceEl) priceEl.innerHTML = price ? `€${price.toFixed(2)} <small>/ vienība</small>` : '— <small>/ vienība</small>';
+            if (priceEl) priceEl.innerHTML = price ? `${money(grossAmount(price))} <small>ar PVN</small><br><small>${money(price)} bez PVN / vienība</small>` : '—';
             this.closest('.product-card').dataset.selectedSize = sizeIndex;
         });
     });
@@ -553,7 +652,7 @@ function renderProducts() {
             const selectedSize = parseInt(card.dataset.selectedSize || '0');
             const price = selectedSize === 0 ? variant.priceSmall : variant.priceLarge;
             const priceEl = document.getElementById(`price-${productId}`);
-            if (priceEl) priceEl.innerHTML = price ? `€${price.toFixed(2)} <small>/ vienība</small>` : '— <small>/ vienība</small>';
+            if (priceEl) priceEl.innerHTML = price ? `${money(grossAmount(price))} <small>ar PVN</small><br><small>${money(price)} bez PVN / vienība</small>` : '—';
         });
     });
 
@@ -583,7 +682,7 @@ function addToCart(productId) {
     const variantColor = variant.color || '';
     const existing = cart.find(item => item.id === productId && item.size === selectedSize && item.variantColor === variantColor);
     if (existing) { existing.qty += 1; } else {
-        cart.push({ id: product.id, name: product.name, category: product.category, price: price, image: variant.image || '', qty: 1, size: selectedSize, sizeLabel: sizeLabel, variantColor: variantColor });
+        cart.push({ id: product.id, name: product.name, category: product.category, price: price, image: variant.image || '', qty: 1, size: selectedSize, sizeLabel: sizeLabel, variantColor: variantColor, variantCode: variant.code || product.code || '' });
     }
     updateCartUI();
     showToast(`Pievienots grozam (${sizeLabel})!`);
@@ -605,9 +704,11 @@ function updateCartUI() {
     badge.style.display = totalItems > 0 ? 'block' : 'none';
     const container = document.getElementById('cartItems');
     const totalSpan = document.getElementById('cartTotal');
+    const subtotalSpan = document.getElementById('cartSubtotal');
+    const vatSpan = document.getElementById('cartVat');
     if (cart.length === 0) {
         container.innerHTML = `<div class="cart-empty"><i class="fas fa-box-open"></i><p>Grozs ir tukšs</p></div>`;
-        totalSpan.textContent = '€0.00';
+        subtotalSpan.textContent = '€0.00'; vatSpan.textContent = '€0.00'; totalSpan.textContent = '€0.00';
         return;
     }
     container.innerHTML = cart.map((item, idx) => `
@@ -617,7 +718,7 @@ function updateCartUI() {
             </div>
             <div class="cart-item-info">
                 <h4>${item.name} ${item.variantColor ? '('+item.variantColor+')' : ''} <small style="font-weight:400;color:#888;">${item.sizeLabel}</small></h4>
-                <div class="item-price">€${item.price.toFixed(2)}</div>
+                <div class="item-price">${money(grossAmount(item.price))} <small style="color:#888;">ar PVN</small></div>
             </div>
             <div class="cart-item-qty">
                 <button class="qty-dec" data-index="${idx}">−</button>
@@ -630,7 +731,10 @@ function updateCartUI() {
     document.querySelectorAll('.qty-dec').forEach(btn => { btn.addEventListener('click', function() { updateQty(parseInt(this.dataset.index), -1); }); });
     document.querySelectorAll('.qty-inc').forEach(btn => { btn.addEventListener('click', function() { updateQty(parseInt(this.dataset.index), 1); }); });
     document.querySelectorAll('.cart-item-remove').forEach(btn => { btn.addEventListener('click', function() { removeFromCart(parseInt(this.dataset.index)); }); });
-    totalSpan.textContent = `€${cart.reduce((s, i) => s + i.price * i.qty, 0).toFixed(2)}`;
+    const netTotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
+    subtotalSpan.textContent = money(netTotal);
+    vatSpan.textContent = money(vatAmount(netTotal));
+    totalSpan.textContent = money(grossAmount(netTotal));
 }
 
 function openLightbox(imgSrc) {
@@ -670,125 +774,200 @@ document.getElementById('cartOverlay').addEventListener('click', function() {
 function getShippingSection() {
     const hasPanels = cart.some(item => item.category === 'paneli');
     const hasTiles = cart.some(item => item.category === 'flizes');
-    const hasSub = cart.some(item => item.category === 'apaks');
 
     if (hasPanels) {
         return `
             <div class="shipping-info">
-                <label>Piegādes veids</label>
-                <p style="color:#ccc; margin-bottom:10px;">EQUITONE paneļi tiek piegādāti ar smago auto uz norādīto adresi 4 nedēļu laikā pēc apmaksas. Kurjers, pakomāts vai saņemšana uz vietas šai kategorijai nav pieejama.</p>
-                <input type="hidden" id="checkoutShipping" value="smagais_auto">
-            </div>
-        `;
-    } else if (hasTiles) {
-        return `
-            <div class="shipping-info">
-                <label>Piegādes veids</label>
-                <p style="color:#ccc; margin-bottom:10px;">Flīzes tiek piegādātas tikai ar kurjeru.</p>
-                <input type="hidden" id="checkoutShipping" value="kurjers">
-            </div>
-        `;
-    } else if (hasSub) {
-        return `
-            <div class="shipping-info">
-                <label>Piegādes veids</label>
-                <select id="checkoutShipping">
-                    <option value="pakomats">Pakomāts</option>
-                    <option value="kurjers">Kurjers</option>
-                    <option value="uz_vietas">Saņemšana uz vietas</option>
-                </select>
-            </div>
-        `;
-    } else {
-        return `
-            <div class="shipping-info">
-                <label>Piegādes veids</label>
-                <select id="checkoutShipping">
-                    <option value="pakomats">Pakomāts</option>
-                    <option value="kurjers">Kurjers</option>
-                    <option value="uz_vietas">Saņemšana uz vietas</option>
-                </select>
+                <label>Piegāde</label>
+                <p style="color:#ccc; margin-bottom:10px;">EQUITONE paneļiem piegāde tiek organizēta ar kravas transportu uz augstāk norādīto adresi. Piegādes cenu O FASADES aprēķina un saskaņo atsevišķi.</p>
+                <input type="hidden" id="checkoutShipping" value="adrese_krava">
             </div>
         `;
     }
+    if (hasTiles) {
+        return `
+            <div class="shipping-info">
+                <label>Piegāde</label>
+                <p style="color:#ccc; margin-bottom:10px;">Flīžu piegāde uz augstāk norādīto adresi. Piegādes cenu O FASADES saskaņo atsevišķi.</p>
+                <input type="hidden" id="checkoutShipping" value="adrese_kurjers">
+            </div>
+        `;
+    }
+    return `
+        <div class="shipping-info">
+            <label>Piegādes veids</label>
+            <select id="checkoutShipping">
+                <option value="pakomats">Pakomāts — mazām precēm</option>
+                <option value="adrese_kurjers">Kurjers uz norādīto adresi</option>
+            </select>
+            <div id="parcelLockerFields" style="margin-top:10px;">
+                <label for="checkoutParcelOperator">Pakomātu operators</label>
+                <select id="checkoutParcelOperator">
+                    <option value="Omniva">Omniva</option>
+                    <option value="DPD">DPD</option>
+                    <option value="Venipak">Venipak</option>
+                </select>
+                <label for="checkoutParcelLocker" style="margin-top:10px; display:block;">Pakomāta nosaukums vai adrese</label>
+                <input id="checkoutParcelLocker" type="text" placeholder="Piemēram: Omniva Origo pakomāts">
+                <p style="color:#aaa; margin-top:8px; font-size:.9rem;">Pakomāts pieejams tikai precēm, kuru izmērs un svars atbilst operatora ierobežojumiem. O FASADES apstiprina piegādes iespēju pēc pasūtījuma saņemšanas.</p>
+            </div>
+        </div>
+    `;
 }
+
+function setupShippingControls() {
+    const shipping = document.getElementById('checkoutShipping');
+    const fields = document.getElementById('parcelLockerFields');
+    const locker = document.getElementById('checkoutParcelLocker');
+    if (!shipping || !fields || !locker) return;
+    const sync = () => {
+        const isParcel = shipping.value === 'pakomats';
+        fields.style.display = isParcel ? 'block' : 'none';
+        locker.required = isParcel;
+    };
+    shipping.addEventListener('change', sync);
+    sync();
+}
+
+const ORDER_API_URL = '/api/orders';
+const PAYMENT_API_URL = '/api/payments/create';
+const LOCAL_ORDER_KEY = 'ofasades_test_orders_v1';
+
+function isLocalPreview() { return window.location.protocol === 'file:'; }
+function createOrderNumber() {
+    const d = new Date();
+    const stamp = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+    const rnd = Math.floor(1000 + Math.random()*9000);
+    return `OF-${stamp}-${rnd}`;
+}
+function setCheckoutStatus(message, type='error') {
+    const el = document.getElementById('checkoutStatus');
+    el.textContent = message; el.className = `checkout-status show ${type}`;
+}
+function clearCheckoutStatus(){ const el=document.getElementById('checkoutStatus'); el.textContent=''; el.className='checkout-status'; }
+function showTransferSuccess(order, localOnly=false){
+    const box = document.querySelector('#checkoutModal .checkout-box');
+    box.innerHTML = `<div class="checkout-confirmation">
+        <div class="confirm-icon"><i class="fas fa-check"></i></div>
+        <h2>Pasūtījums veiksmīgi izveidots</h2>
+        <div class="order-no">${esc(order.orderNumber)}</div>
+        <p style="color:#bbb;margin:10px 0 16px;">Paldies! Pasūtījums ir saņemts un šobrīd GAIDA APMAKSU. Saglabājiet pasūtījuma numuru un veiciet bankas pārskaitījumu.</p>
+        <div class="checkout-transfer-success" style="text-align:left;">
+            <div>Bankas pārskaitījuma maksājuma mērķī obligāti norādiet <strong>${esc(order.orderNumber)}</strong>.</div>
+            <div class="bank-line"><span>Saņēmējs</span><span>SIA “O Fasādes”</span></div>
+            <div class="bank-line"><span>Reģ. Nr.</span><span>40203075809</span></div>
+            <div class="bank-line"><span>Banka</span><span>Swedbank AS</span></div>
+            <div class="bank-line"><span>IBAN</span><span><strong>LV55 HABA 0551 0437 0761 5</strong></span></div>
+            <div class="bank-line"><span>SWIFT/BIC</span><span>HABALV22</span></div>
+            <div class="bank-line"><span>Preču summa ar PVN</span><span><strong>${money(order.total)}</strong></span></div>
+            <div style="margin-top:8px;color:#bbb;">Piegādes izmaksas, ja tādas būs, O FASADES saskaņos atsevišķi pirms galīgās piegādes.</div>
+            ${localOnly?'<div style="margin-top:8px;color:#d8bd70;">TESTA REŽĪMS: pasūtījums ir saglabāts šajā pārlūkā un redzams Admin → Pasūtījumi. E-pasts no lokāla HTML faila netiek nosūtīts.</div>':''}
+        </div>
+        <div class="confirm-actions">
+            <button type="button" class="btn btn-outline" id="closeOrderConfirmation">Aizvērt</button>
+            <button type="button" class="btn btn-gold" id="continueShoppingBtn">Turpināt iepirkties</button>
+        </div>
+    </div>`;
+    document.getElementById('closeOrderConfirmation').addEventListener('click', ()=>window.location.reload());
+    document.getElementById('continueShoppingBtn').addEventListener('click', ()=>{
+        window.location.reload();
+    });
+}
+function getLocalOrders(){ try{return JSON.parse(localStorage.getItem(LOCAL_ORDER_KEY)||'[]');}catch{return [];} }
+function saveLocalOrders(orders){ localStorage.setItem(LOCAL_ORDER_KEY, JSON.stringify(orders)); }
+
+async function sendOrder(order) {
+    if (isLocalPreview()) {
+        const orders = getLocalOrders(); orders.unshift(order); saveLocalOrders(orders);
+        return {ok:true, localOnly:true, order};
+    }
+    const response = await fetch(ORDER_API_URL, {
+        method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(order)
+    });
+    if (!response.ok) throw new Error(`Servera kļūda (${response.status})`);
+    return await response.json();
+}
+
+document.getElementById('checkoutBuyerType').addEventListener('change', function(){
+    const company = this.value === 'company';
+    document.getElementById('companyFields').hidden = !company;
+    document.getElementById('checkoutCompany').required = company;
+    document.getElementById('checkoutRegNo').required = company;
+});
 
 document.getElementById('checkoutBtn').addEventListener('click', function() {
     if (cart.length === 0) { showToast('Grozs ir tukšs!'); return; }
     document.getElementById('shippingSection').innerHTML = getShippingSection();
+    setupShippingControls();
+    const checkoutNet = cart.reduce((sum,item)=>sum+item.price*item.qty,0);
+    document.getElementById('checkoutPriceSummary').innerHTML = `<strong>Pasūtījuma summa</strong><br>Preces bez PVN: ${money(checkoutNet)}<br>PVN 21%: ${money(vatAmount(checkoutNet))}<br><strong>Kopā ar PVN: ${money(grossAmount(checkoutNet))}</strong><br><small>Piegādes cena: tiek aprēķināta un saskaņota atsevišķi, ja nepieciešama piegāde.</small>`;
+    clearCheckoutStatus();
     document.getElementById('checkoutModal').classList.add('open');
 });
-document.getElementById('checkoutCancel').addEventListener('click', function() {
-    document.getElementById('checkoutModal').classList.remove('open');
-});
-document.getElementById('checkoutModal').addEventListener('click', function(e) {
-    if (e.target === this) this.classList.remove('open');
-});
+document.getElementById('checkoutCancel').addEventListener('click', function() { document.getElementById('checkoutModal').classList.remove('open'); });
+document.getElementById('checkoutModal').addEventListener('click', function(e) { if (e.target === this) this.classList.remove('open'); });
 
-document.getElementById('checkoutForm').addEventListener('submit', function(e) {
-    e.preventDefault();
+document.getElementById('checkoutForm').addEventListener('submit', async function(e) {
+    e.preventDefault(); clearCheckoutStatus();
+    const buyerType = document.getElementById('checkoutBuyerType').value;
     const name = document.getElementById('checkoutName').value.trim();
     const email = document.getElementById('checkoutEmail').value.trim();
     const phone = document.getElementById('checkoutPhone').value.trim();
     const city = document.getElementById('checkoutCity').value.trim();
     const address = document.getElementById('checkoutAddress').value.trim();
     const zip = document.getElementById('checkoutZip').value.trim();
-    const shipping = document.getElementById('checkoutShipping') ? document.getElementById('checkoutShipping').value : 'smagais_auto';
-    const payment = document.querySelector('input[name="payment"]:checked').value;
-
-    if (!name || !email || !phone || !city || !address || !zip) { showToast('Lūdzu, aizpildiet visus obligātos laukus!'); return; }
-
-    let totalPrice = cart.reduce((s, i) => s + i.price * i.qty, 0);
-    let shippingDesc = '';
-
-    if (shipping === 'smagais_auto') {
-        shippingDesc = 'Smagais auto (4 nedēļas pēc apmaksas)';
-    } else if (shipping === 'kurjers') {
-        shippingDesc = 'Kurjers';
-    } else if (shipping === 'pakomats') {
-        shippingDesc = 'Pakomāts';
-        totalPrice += 2.50;
-    } else if (shipping === 'uz_vietas') {
-        shippingDesc = 'Saņemšana uz vietas';
+    const company = document.getElementById('checkoutCompany').value.trim();
+    const regNo = document.getElementById('checkoutRegNo').value.trim();
+    const vatNo = document.getElementById('checkoutVatNo').value.trim();
+    const note = document.getElementById('checkoutNote').value.trim();
+    const shipping = document.getElementById('checkoutShipping') ? document.getElementById('checkoutShipping').value : 'adrese_krava';
+    const parcelOperator = document.getElementById('checkoutParcelOperator')?.value || '';
+    const parcelLocker = document.getElementById('checkoutParcelLocker')?.value.trim() || '';
+    if (!name || !email || !phone || !city || !address || !zip || (buyerType==='company' && (!company || !regNo))) {
+        setCheckoutStatus('Lūdzu, aizpildiet visus obligātos laukus.'); return;
     }
+    if (shipping === 'pakomats' && !parcelLocker) {
+        setCheckoutStatus('Lūdzu, norādiet izvēlēto pakomātu.'); return;
+    }
+    if (!document.getElementById('checkoutConsent').checked) { setCheckoutStatus('Lūdzu, apstipriniet datu izmantošanu pasūtījuma apstrādei.'); return; }
 
-    const orderSummary = cart.map(item => `${item.name} (${item.sizeLabel}) x${item.qty} - €${item.price.toFixed(2)}`).join('\n');
-
-    const paymentDetails = `
-        -------------------------
-        MAKSĀJUMA UZDEVUMS
-        -------------------------
-        Saņēmējs: "O Fasades", SIA
-        Reģ. Nr.: 40203075809
-        PVN: LV40203075809
-        Adrese: Rīga, Meža iela 4, LV-1048
-        Konts: LV55 HABA 0531 0437 0761 5
-        Banka: "Swedbank", A/S
-        SWIFT: HABALV22
-        Mērķis: Maksājums par pasūtījumu
-        Summa: €${totalPrice.toFixed(2)}
-        
-        Pēc pārskaitījuma veikšanas, lūdzu, nosūtiet maksājuma apstiprinājumu uz e-pastu omterum@inbox.lv
-    `;
-
-    const message = `Paldies, ${name}! Pasūtījuma informācija ir sagatavota.\n\n` +
-        `Preces:\n${orderSummary}\n\n` +
-        `Piegāde: ${shippingDesc}\n` +
-        `Kopā: €${totalPrice.toFixed(2)}\n\n` +
-        `Adrese: ${address}, ${city}, ${zip}\n` +
-        `Apmaksas veids: ${payment === 'transfer' ? 'Pārskaitījums' : 'Maksājums ar karti'}\n\n` +
-        (payment === 'transfer' ? paymentDetails : 'Karšu maksājumi tiks pievienoti vēlāk. Lūdzu, izmantojiet pārskaitījumu!');
-
-    alert(message);
-
-    cart = [];
-    updateCartUI();
-    document.getElementById('checkoutModal').classList.remove('open');
-    document.getElementById('cartOverlay').classList.remove('open');
-    document.getElementById('cartSidebar').classList.remove('open');
-    document.body.style.overflow = '';
-    showToast('✅ Pasūtījuma informācija sagatavota.');
-    this.reset();
+    const subtotal = cart.reduce((s,i)=>s+i.price*i.qty,0);
+    const vat = vatAmount(subtotal);
+    const total = grossAmount(subtotal);
+    const shippingMap = {adrese_krava:'Piegāde ar kravas transportu uz norādīto adresi',adrese_kurjers:'Kurjers uz norādīto adresi',pakomats:`Pakomāts — ${parcelOperator}: ${parcelLocker}`};
+    const order = {
+        orderNumber:createOrderNumber(), createdAt:new Date().toISOString(), status:(document.querySelector('input[name="payment"]:checked')?.value === 'card' ? 'Gaida apmaksu' : 'Gaida pārskaitījumu'),
+        buyer:{type:buyerType,name,email,phone,company:buyerType==='company'?company:'',regNo:buyerType==='company'?regNo:'',vatNo:buyerType==='company'?vatNo:''},
+        delivery:{city,address,zip,method:shipping,label:shippingMap[shipping]||shipping},
+        payment:(document.querySelector('input[name="payment"]:checked')?.value === 'card' ? 'Karte' : 'Pārskaitījums'), note,
+        items:cart.map(i=>({productId:i.id,name:i.name,variant:i.variantColor||'',sapCode:i.variantCode||'',size:i.sizeLabel||'',qty:i.qty,unitPrice:i.price,lineTotal:Number((i.price*i.qty).toFixed(2))})),
+        subtotal:Number(subtotal.toFixed(2)), vatRate:VAT_RATE, vat:Number(vat.toFixed(2)), total:Number(total.toFixed(2)), shippingCost:null, currency:'EUR'
+    };
+    const submit=document.getElementById('checkoutSubmitBtn'); submit.disabled=true; submit.innerHTML='<i class="fas fa-spinner fa-spin"></i> Nosūta...';
+    try {
+        const result=await sendOrder(order);
+        if (order.payment === 'Karte' && !result.localOnly) {
+            setCheckoutStatus(`Pasūtījums ${order.orderNumber} izveidots. Savienojam ar drošo kartes apmaksu...`, 'ok');
+            const payResponse = await fetch(PAYMENT_API_URL, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({orderNumber:order.orderNumber})});
+            if (!payResponse.ok) throw new Error('Kartes maksājumu serviss nav pieejams');
+            const payData = await payResponse.json();
+            if (!payData.paymentUrl) throw new Error('Nav saņemta maksājuma adrese');
+            window.location.href = payData.paymentUrl;
+            return;
+        }
+        if (order.payment === 'Pārskaitījums') {
+            showTransferSuccess(order, !!result.localOnly);
+        } else if (result.localOnly) {
+            setCheckoutStatus(`TESTS: ${order.orderNumber} saglabāts šajā pārlūkā. Īsta kartes apmaksa sāks darboties pēc Swedbank tirgotāja pieslēguma saņemšanas.`, 'ok');
+        } else {
+            setCheckoutStatus(`Pasūtījums ${order.orderNumber} saņemts.`, 'ok');
+        }
+        cart=[]; updateCartUI();
+        if (document.getElementById('adminPanel').classList.contains('visible')) loadOrders();
+    } catch(err) {
+        setCheckoutStatus('Pasūtījumu neizdevās nosūtīt. Grozs nav izdzēsts. Lūdzu, mēģiniet vēlreiz vai sazinieties ar O FASADES.');
+        console.error(err);
+    } finally { submit.disabled=false; submit.innerHTML='<i class="fas fa-check"></i> Izveidot pasūtījumu'; }
 });
 
 // ============================================================
@@ -822,6 +1001,7 @@ document.getElementById('loginSubmit').addEventListener('click', function() {
         document.getElementById('adminPanel').classList.add('visible');
         sessionStorage.setItem('ofasades_admin_session', '1');
         setAdminCategory(currentCategory || 'paneli');
+        setAdminView('products');
         document.getElementById('adminPanel').scrollIntoView({behavior:'smooth', block:'start'});
         showToast('🔓 Pieslēgts admin panelim.');
     } else {
@@ -867,6 +1047,57 @@ document.getElementById('contactForm').addEventListener('submit', function(e) {
     window.location.href = `mailto:omterum@inbox.lv?subject=${subject}&body=${body}`;
     showToast('📩 Atvērta e-pasta programma ziņas nosūtīšanai.');
 });
+
+let adminView = 'products';
+function setAdminView(view){
+    adminView = view === 'orders' ? 'orders' : 'products';
+    document.querySelectorAll('[data-admin-view]').forEach(b=>b.classList.toggle('active',b.dataset.adminView===adminView));
+    document.getElementById('adminProductsView').hidden = adminView !== 'products';
+    document.getElementById('adminOrdersView').hidden = adminView !== 'orders';
+    if (adminView === 'orders') loadOrders();
+}
+document.querySelectorAll('[data-admin-view]').forEach(btn=>btn.addEventListener('click',()=>setAdminView(btn.dataset.adminView)));
+document.getElementById('refreshOrdersBtn').addEventListener('click', loadOrders);
+
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function orderDetailsText(o){
+    const buyer=o.buyer||{}, del=o.delivery||{};
+    const items=(o.items||[]).map(i=>`${i.name}${i.variant?' '+i.variant:''} | ${i.size||''} | SAP ${i.sapCode||'—'} | ${i.qty} × €${Number(i.unitPrice||0).toFixed(2)}`).join('\n');
+    return `${o.orderNumber}\n${buyer.company?buyer.company+' / ':''}${buyer.name||''}\n${buyer.phone||''} | ${buyer.email||''}\n${del.address||''}, ${del.city||''}, ${del.zip||''}\n${del.label||''}\n\n${items}\n\nBez PVN: ${money(o.subtotal||0)}\nPVN: ${money(o.vat ?? vatAmount(o.subtotal||0))}\nKopā ar PVN: ${money(o.total ?? grossAmount(o.subtotal||0))}\nApmaksa: ${o.payment||'—'}\nPiezīmes: ${o.note||'—'}`;
+}
+async function fetchOrders(){
+    if (isLocalPreview()) return getLocalOrders();
+    const r=await fetch(ORDER_API_URL,{headers:{'Accept':'application/json'}});
+    if(!r.ok) throw new Error(`Servera kļūda (${r.status})`);
+    const data=await r.json(); return Array.isArray(data)?data:(data.orders||[]);
+}
+async function updateOrderStatus(orderNumber,status){
+    if(isLocalPreview()){
+        const orders=getLocalOrders(); const o=orders.find(x=>x.orderNumber===orderNumber); if(o)o.status=status; saveLocalOrders(orders); return;
+    }
+    const r=await fetch(`${ORDER_API_URL}/${encodeURIComponent(orderNumber)}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status})});
+    if(!r.ok) throw new Error(`Servera kļūda (${r.status})`);
+}
+async function loadOrders(){
+    const info=document.getElementById('ordersSystemInfo'), tbody=document.getElementById('ordersTableBody');
+    info.textContent=isLocalPreview()?'Lokālais tests: bankas pārskaitījuma pasūtījumi šajā datorā tiek saglabāti un ir redzami te uzreiz. Publiskajā veikalā tie glabāsies serverī un tiks nosūtīts e-pasta paziņojums.':'Tiešsaistes pasūtījumi no servera.';
+    tbody.innerHTML='<tr><td colspan="8" style="text-align:center;color:#aaa;">Ielādē...</td></tr>';
+    try{
+        const orders=await fetchOrders();
+        const waitingCount=orders.filter(o=>['Gaida pārskaitījumu','Gaida apmaksu','Jauns'].includes(o.status)).length;
+        const paidCount=orders.filter(o=>o.status==='Apmaksāts').length;
+        document.getElementById('ordersAllCount').textContent=orders.length;
+        document.getElementById('ordersWaitingCount').textContent=waitingCount;
+        document.getElementById('ordersPaidCount').textContent=paidCount;
+        if(!orders.length){tbody.innerHTML='<tr><td colspan="8"><div class="order-empty">Pasūtījumu vēl nav.</div></td></tr>';return;}
+        tbody.innerHTML=orders.map(o=>{
+            const b=o.buyer||{},d=o.delivery||{}; const total=Number(o.total ?? grossAmount(o.subtotal||0));
+            return `<tr><td><strong>${esc(o.orderNumber)}</strong></td><td>${esc(new Date(o.createdAt).toLocaleString('lv-LV'))}</td><td>${esc(b.company||b.name||'—')}<br><small>${esc(b.company?b.name:'')}</small></td><td>${esc(b.phone||'')}<br><small>${esc(b.email||'')}</small></td><td>${esc(d.address||'')}, ${esc(d.city||'')} ${esc(d.zip||'')}<br><small>${esc(d.label||'')}</small></td><td>€${total.toFixed(2)}</td><td><select class="order-status" data-order-status="${esc(o.orderNumber)}"><option ${o.status==='Jauns'?'selected':''}>Jauns</option><option ${o.status==='Gaida pārskaitījumu'?'selected':''}>Gaida pārskaitījumu</option><option ${o.status==='Gaida apmaksu'?'selected':''}>Gaida apmaksu</option><option ${o.status==='Apmaksāts'?'selected':''}>Apmaksāts</option><option ${o.status==='Apstiprināts'?'selected':''}>Apstiprināts</option><option ${o.status==='Sagatavošanā'?'selected':''}>Sagatavošanā</option><option ${o.status==='Piegādāts'?'selected':''}>Piegādāts</option><option ${o.status==='Atcelts'?'selected':''}>Atcelts</option></select></td><td><button class="btn btn-outline btn-xs" type="button" data-order-details="${esc(o.orderNumber)}">Skatīt</button></td></tr>`;
+        }).join('');
+        document.querySelectorAll('[data-order-details]').forEach(btn=>btn.addEventListener('click',()=>{const o=orders.find(x=>x.orderNumber===btn.dataset.orderDetails); if(o) alert(orderDetailsText(o));}));
+        document.querySelectorAll('[data-order-status]').forEach(sel=>sel.addEventListener('change',async()=>{try{await updateOrderStatus(sel.dataset.orderStatus,sel.value);showToast('✅ Pasūtījuma statuss saglabāts.');}catch(e){showToast('❌ Statusu neizdevās saglabāt.');console.error(e);}}));
+    }catch(e){tbody.innerHTML='<tr><td colspan="8"><div class="order-empty">Pasūtījumu serveris vēl nav pieslēgts. Pirms veikala publicēšanas tas ir obligāti jāpieslēdz.</div></td></tr>';console.error(e);}
+}
 
 let adminCategory = 'paneli';
 
