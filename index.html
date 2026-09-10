@@ -473,7 +473,7 @@ SWIFT/BIC HABALV22
 <label><input type="radio" name="payment" value="transfer" checked> <i class="fas fa-university"></i> Bankas pārskaitījums — darbojas</label>
 </div><div class="checkout-notice" id="cardPaymentInfo" style="margin-top:10px;">Kartes apmaksa tiks ieslēgta pēc Swedbank e-komercijas līguma aktivizēšanas. Bankas pārskaitījums darbojas jau tagad: pēc pasūtījuma izveides klients saņem O FASADES rekvizītus un unikālo pasūtījuma numuru maksājuma mērķim.</div></div>
 <div class="full"><label>Piezīmes</label><textarea id="checkoutNote" placeholder="Piegādes vai citas piezīmes..."></textarea></div>
-<div class="full checkout-notice">Piegādes cena nav iekļauta preču summā. Ja nepieciešama piegāde, O FASADES to aprēķina un saskaņo ar klientu pirms pasūtījuma galīgās apstiprināšanas.</div>
+<div class="full checkout-notice">Piegādes veids un cena tiek parādīta atbilstoši izvēlētajai preču kategorijai. Ja piegādes cena nav norādīta, O FASADES to saskaņos atsevišķi.</div>
 <div class="full"><label style="display:flex;gap:10px;align-items:flex-start;"><input type="checkbox" id="checkoutConsent" required style="width:auto;margin-top:4px;"> <span>Esmu iepazinies ar <a href="#terms" style="color:var(--eq-gold);">Distances līguma noteikumiem</a> un <a href="#privacy" style="color:var(--eq-gold);">Privātuma informāciju</a>, un piekrītu manu datu izmantošanai pasūtījuma izpildei.</span></label></div>
 </div>
 <div class="checkout-status" id="checkoutStatus"></div>
@@ -771,6 +771,47 @@ document.getElementById('cartOverlay').addEventListener('click', function() {
 // ============================================================
 //  PASIŪTĪJUMA VEIKŠANA – PAMATOJOTIES UZ PRODUKTU KATEGORIJĀM
 // ============================================================
+const SUBSTRUCTURE_SHIPPING = {
+    pakomats: 4.90,
+    adrese_kurjers: 9.90,
+    garprofili: 39.90
+};
+
+function hasLongSubstructureGoods() {
+    return cart.some(item => {
+        if (item.category !== 'apaks') return false;
+        const product = allProducts.find(p => p.id === item.id);
+        const source = `${product?.name || item.name || ''} ${product?.desc || ''}`.toLowerCase();
+        return /\((2|3|6)m\)|\b(2|3|6)m\b/.test(source);
+    });
+}
+
+function getShippingPrice() {
+    const hasPanels = cart.some(item => item.category === 'paneli');
+    const hasTiles = cart.some(item => item.category === 'flizes');
+    if (hasPanels || hasTiles) return null;
+    const shipping = document.getElementById('checkoutShipping')?.value;
+    return Object.prototype.hasOwnProperty.call(SUBSTRUCTURE_SHIPPING, shipping) ? SUBSTRUCTURE_SHIPPING[shipping] : 0;
+}
+
+function updateCheckoutPriceSummary() {
+    const box = document.getElementById('checkoutPriceSummary');
+    if (!box) return;
+    const goodsNet = cart.reduce((sum,item)=>sum+item.price*item.qty,0);
+    const goodsVat = vatAmount(goodsNet);
+    const goodsGross = grossAmount(goodsNet);
+    const shippingGross = getShippingPrice();
+
+    if (shippingGross === null) {
+        box.innerHTML = `<strong>Pasūtījuma summa</strong><br>Preces bez PVN: ${money(goodsNet)}<br>PVN 21%: ${money(goodsVat)}<br><strong>Kopā ar PVN: ${money(goodsGross)}</strong><br><small>Piegādes cena: tiek saskaņota atsevišķi.</small>`;
+        return;
+    }
+
+    const shippingNet = shippingGross / (1 + VAT_RATE);
+    const shippingVat = shippingGross - shippingNet;
+    box.innerHTML = `<strong>Pasūtījuma summa</strong><br>Preces bez PVN: ${money(goodsNet)}<br>Piegāde ar PVN: ${money(shippingGross)}<br>PVN 21% kopā: ${money(goodsVat + shippingVat)}<br><strong>Kopā ar piegādi: ${money(goodsGross + shippingGross)}</strong>`;
+}
+
 function getShippingSection() {
     const hasPanels = cart.some(item => item.category === 'paneli');
     const hasTiles = cart.some(item => item.category === 'flizes');
@@ -793,12 +834,25 @@ function getShippingSection() {
             </div>
         `;
     }
+
+    if (hasLongSubstructureGoods()) {
+        return `
+            <div class="shipping-info">
+                <label>Piegādes veids</label>
+                <select id="checkoutShipping">
+                    <option value="garprofili">Garizmēra preču piegāde uz adresi — 39,90 €</option>
+                </select>
+                <p style="color:#aaa; margin-top:8px; font-size:.9rem;">Gariem profiliem pakomāts nav pieejams. Piegāde tiek organizēta uz pasūtījumā norādīto adresi.</p>
+            </div>
+        `;
+    }
+
     return `
         <div class="shipping-info">
             <label>Piegādes veids</label>
             <select id="checkoutShipping">
-                <option value="pakomats">Pakomāts — mazām precēm</option>
-                <option value="adrese_kurjers">Kurjers uz norādīto adresi</option>
+                <option value="pakomats">Pakomāts — 4,90 €</option>
+                <option value="adrese_kurjers">Kurjers uz norādīto adresi — 9,90 €</option>
             </select>
             <div id="parcelLockerFields" style="margin-top:10px;">
                 <label for="checkoutParcelOperator">Pakomātu operators</label>
@@ -809,7 +863,7 @@ function getShippingSection() {
                 </select>
                 <label for="checkoutParcelLocker" style="margin-top:10px; display:block;">Pakomāta nosaukums vai adrese</label>
                 <input id="checkoutParcelLocker" type="text" placeholder="Piemēram: Omniva Origo pakomāts">
-                <p style="color:#aaa; margin-top:8px; font-size:.9rem;">Pakomāts pieejams tikai precēm, kuru izmērs un svars atbilst operatora ierobežojumiem. O FASADES apstiprina piegādes iespēju pēc pasūtījuma saņemšanas.</p>
+                <p style="color:#aaa; margin-top:8px; font-size:.9rem;">Pakomāts paredzēts mazām apakškonstrukciju precēm. Ja sūtījums pārsniedz pakomāta izmēru vai svaru, O FASADES sazināsies ar klientu pirms nosūtīšanas.</p>
             </div>
         </div>
     `;
@@ -817,13 +871,14 @@ function getShippingSection() {
 
 function setupShippingControls() {
     const shipping = document.getElementById('checkoutShipping');
+    if (!shipping) return;
     const fields = document.getElementById('parcelLockerFields');
     const locker = document.getElementById('checkoutParcelLocker');
-    if (!shipping || !fields || !locker) return;
     const sync = () => {
         const isParcel = shipping.value === 'pakomats';
-        fields.style.display = isParcel ? 'block' : 'none';
-        locker.required = isParcel;
+        if (fields) fields.style.display = isParcel ? 'block' : 'none';
+        if (locker) locker.required = isParcel;
+        updateCheckoutPriceSummary();
     };
     shipping.addEventListener('change', sync);
     sync();
@@ -855,15 +910,17 @@ function showTransferSuccess(order, localOnly=false, emailSent=false){
         <div class="order-no">${esc(order.orderNumber)}</div>
         <p style="color:#bbb;margin:10px 0 16px;">Paldies! Pasūtījums ir saņemts un šobrīd GAIDA APMAKSU. Saglabājiet pasūtījuma numuru un veiciet bankas pārskaitījumu.</p>
         <div class="checkout-transfer-success" style="text-align:left;">
-            <div>Bankas pārskaitījuma maksājuma mērķī obligāti norādiet <strong>${esc(order.orderNumber)}</strong>.</div>
+            <div><span style="color:#86c98a;font-weight:800;">Bankas pārskaitījuma maksājuma mērķī obligāti norādiet</span> <strong>${esc(order.orderNumber)}</strong></div>
             <div class="bank-line"><span>Saņēmējs</span><span>SIA “O Fasādes”</span></div>
             <div class="bank-line"><span>Reģ. Nr.</span><span>40203075809</span></div>
             <div class="bank-line"><span>Banka</span><span>Swedbank AS</span></div>
             <div class="bank-line"><span>IBAN</span><span><strong>LV55 HABA 0551 0437 0761 5</strong></span></div>
             <div class="bank-line"><span>SWIFT/BIC</span><span>HABALV22</span></div>
-            <div class="bank-line"><span>Preču summa ar PVN</span><span><strong>${money(order.total)}</strong></span></div>
-            <div style="margin-top:8px;color:#bbb;">Piegādes izmaksas, ja tādas būs, O FASADES saskaņos atsevišķi pirms galīgās piegādes.</div>
-            ${localOnly?'<div style="margin-top:8px;color:#d8bd70;">TESTA REŽĪMS: pasūtījums ir saglabāts tikai šajā pārlūkā.</div>':(emailSent?'<div style="margin-top:8px;color:#9ee7b8;">Pasūtījuma apstiprinājums nosūtīts uz klienta e-pastu. O FASADES ir saņēmis paziņojumu.</div>':'<div style="margin-top:8px;color:#d8bd70;">Pasūtījums ir droši saglabāts serverī. E-pasta paziņojums nav nosūtīts, jo serverī vēl nav konfigurēts SMTP.</div>')}
+            <div class="bank-line"><span>Kopā apmaksai ar PVN</span><span><strong>${money(order.total)}</strong></span></div>
+            ${order.shippingCost == null
+    ? '<div class="bank-line"><span>Piegāde</span><span><strong>Tiks aprēķināta atsevišķi</strong></span></div>'
+    : `<div class="bank-line"><span>Piegāde</span><span><strong>${money(order.shippingCost)}</strong></span></div>`}
+            ${localOnly?'<div style="margin-top:8px;color:#d8bd70;">TESTA REŽĪMS: pasūtījums ir saglabāts tikai šajā pārlūkā.</div>':(emailSent?'<div style="margin-top:8px;color:#9ee7b8;">Pasūtījuma apstiprinājums nosūtīts uz klienta e-pastu. O FASADES ir saņēmis paziņojumu.</div>':'<div style="margin-top:8px;color:#d8bd70;">Pasūtījums ir veiksmīgi saglabāts. Pēc maksājuma saņemšanas nosūtīsim apstiprinājumu uz Jūsu e-pastu.</div>')}
         </div>
         <div class="confirm-actions">
             <button type="button" class="btn btn-outline" id="closeOrderConfirmation">Aizvērt</button>
@@ -926,8 +983,7 @@ document.getElementById('checkoutBtn').addEventListener('click', function() {
     if (cart.length === 0) { showToast('Grozs ir tukšs!'); return; }
     document.getElementById('shippingSection').innerHTML = getShippingSection();
     setupShippingControls();
-    const checkoutNet = cart.reduce((sum,item)=>sum+item.price*item.qty,0);
-    document.getElementById('checkoutPriceSummary').innerHTML = `<strong>Pasūtījuma summa</strong><br>Preces bez PVN: ${money(checkoutNet)}<br>PVN 21%: ${money(vatAmount(checkoutNet))}<br><strong>Kopā ar PVN: ${money(grossAmount(checkoutNet))}</strong><br><small>Piegādes cena: tiek aprēķināta un saskaņota atsevišķi, ja nepieciešama piegāde.</small>`;
+    updateCheckoutPriceSummary();
     clearCheckoutStatus();
     document.getElementById('checkoutModal').classList.add('open');
 });
@@ -958,17 +1014,25 @@ document.getElementById('checkoutForm').addEventListener('submit', async functio
     }
     if (!document.getElementById('checkoutConsent').checked) { setCheckoutStatus('Lūdzu, apstipriniet datu izmantošanu pasūtījuma apstrādei.'); return; }
 
-    const subtotal = cart.reduce((s,i)=>s+i.price*i.qty,0);
-    const vat = vatAmount(subtotal);
-    const total = grossAmount(subtotal);
-    const shippingMap = {adrese_krava:'Piegāde ar kravas transportu uz norādīto adresi',adrese_kurjers:'Kurjers uz norādīto adresi',pakomats:`Pakomāts — ${parcelOperator}: ${parcelLocker}`};
+    const goodsSubtotal = cart.reduce((s,i)=>s+i.price*i.qty,0);
+    const shippingGross = getShippingPrice();
+    const shippingNet = shippingGross === null ? 0 : shippingGross / (1 + VAT_RATE);
+    const subtotal = goodsSubtotal + shippingNet;
+    const vat = vatAmount(goodsSubtotal) + (shippingGross === null ? 0 : shippingGross - shippingNet);
+    const total = grossAmount(goodsSubtotal) + (shippingGross === null ? 0 : shippingGross);
+    const shippingMap = {
+        adrese_krava:'Piegāde ar kravas transportu uz norādīto adresi',
+        adrese_kurjers: shippingGross === null ? 'Kurjers uz norādīto adresi' : `Kurjers uz norādīto adresi — ${money(shippingGross)}`,
+        pakomats:`Pakomāts — ${parcelOperator}: ${parcelLocker} — ${money(shippingGross || 0)}`,
+        garprofili:`Garizmēra preču piegāde uz norādīto adresi — ${money(shippingGross || 0)}`
+    };
     const order = {
         orderNumber:createOrderNumber(), createdAt:new Date().toISOString(), status:(document.querySelector('input[name="payment"]:checked')?.value === 'card' ? 'Gaida apmaksu' : 'Gaida pārskaitījumu'),
         buyer:{type:buyerType,name,email,phone,company:buyerType==='company'?company:'',regNo:buyerType==='company'?regNo:'',vatNo:buyerType==='company'?vatNo:''},
         delivery:{city,address,zip,method:shipping,label:shippingMap[shipping]||shipping},
         payment:(document.querySelector('input[name="payment"]:checked')?.value === 'card' ? 'Karte' : 'Pārskaitījums'), note,
         items:cart.map(i=>({productId:i.id,name:i.name,variant:i.variantColor||'',sapCode:i.variantCode||'',size:i.sizeLabel||'',qty:i.qty,unitPrice:i.price,lineTotal:Number((i.price*i.qty).toFixed(2))})),
-        subtotal:Number(subtotal.toFixed(2)), vatRate:VAT_RATE, vat:Number(vat.toFixed(2)), total:Number(total.toFixed(2)), shippingCost:null, currency:'EUR'
+        subtotal:Number(subtotal.toFixed(2)), vatRate:VAT_RATE, vat:Number(vat.toFixed(2)), total:Number(total.toFixed(2)), shippingCost:shippingGross === null ? null : Number(shippingGross.toFixed(2)), currency:'EUR'
     };
     const submit=document.getElementById('checkoutSubmitBtn'); submit.disabled=true; submit.innerHTML='<i class="fas fa-spinner fa-spin"></i> Nosūta...';
     try {
