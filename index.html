@@ -829,8 +829,8 @@ function setupShippingControls() {
     sync();
 }
 
-const ORDER_API_URL = '/api/orders';
-const PAYMENT_API_URL = '/api/payments/create';
+const ORDER_API_URL = 'https://dnpkkofglgkvnpxnqksw.supabase.co/functions/v1/orders';
+const PAYMENT_API_URL = ''; // aktivizēsim pēc Swedbank e-komercijas pieslēguma
 const LOCAL_ORDER_KEY = 'ofasades_test_orders_v1';
 
 function isLocalPreview() { return window.location.protocol === 'file:'; }
@@ -976,14 +976,15 @@ document.getElementById('checkoutForm').addEventListener('submit', async functio
 //  Publiskajā navigācijā Admin saites nav.
 //  Īpašnieks atver to pašu lapu ar #admin adreses beigās.
 // ============================================================
-const LOCAL_ADMIN_PASSWORD = 'admin123';
+const ADMIN_SESSION_KEY = 'ofasades_admin_password';
+function getAdminPassword(){ return isLocalPreview() ? '' : (sessionStorage.getItem(ADMIN_SESSION_KEY) || ''); }
 async function adminSessionActive() {
-    if (isLocalPreview()) return sessionStorage.getItem('ofasades_admin_session') === '1';
+    if (isLocalPreview()) return false;
+    const pass = getAdminPassword();
+    if (!pass) return false;
     try {
-        const r = await fetch('/api/admin/session', {headers:{'Accept':'application/json'}, credentials:'same-origin'});
-        if (!r.ok) return false;
-        const d = await r.json();
-        return !!d.authenticated;
+        const r = await fetch(ORDER_API_URL, {headers:{'Accept':'application/json','x-admin-password':pass}});
+        return r.ok;
     } catch { return false; }
 }
 function openAdminLogin() {
@@ -1008,12 +1009,12 @@ document.getElementById('loginSubmit').addEventListener('click', async function(
     const pass = document.getElementById('adminPassword').value;
     let ok = false;
     if (isLocalPreview()) {
-        ok = pass === LOCAL_ADMIN_PASSWORD;
-        if (ok) sessionStorage.setItem('ofasades_admin_session', '1');
+        ok = false;
     } else {
         try {
-            const r = await fetch('/api/admin/login', {method:'POST', headers:{'Content-Type':'application/json'}, credentials:'same-origin', body:JSON.stringify({password:pass})});
+            const r = await fetch(ORDER_API_URL, {headers:{'Accept':'application/json','x-admin-password':pass}});
             ok = r.ok;
+            if (ok) sessionStorage.setItem(ADMIN_SESSION_KEY, pass);
         } catch { ok = false; }
     }
     if (ok) {
@@ -1032,8 +1033,7 @@ document.getElementById('adminPassword').addEventListener('keydown', function(e)
 });
 document.getElementById('adminLogoutBtn').addEventListener('click', async function() {
     document.getElementById('adminPanel').classList.remove('visible');
-    if (isLocalPreview()) sessionStorage.removeItem('ofasades_admin_session');
-    else { try { await fetch('/api/admin/logout', {method:'POST', credentials:'same-origin'}); } catch {} }
+    sessionStorage.removeItem(ADMIN_SESSION_KEY);
     if (window.location.hash.toLowerCase() === '#admin') {
         history.replaceState(null, '', window.location.pathname + window.location.search);
     }
@@ -1087,7 +1087,7 @@ function orderDetailsText(o){
 }
 async function fetchOrders(){
     if (isLocalPreview()) return getLocalOrders();
-    const r=await fetch(ORDER_API_URL,{headers:{'Accept':'application/json'},credentials:'same-origin'});
+    const r=await fetch(ORDER_API_URL,{headers:{'Accept':'application/json','x-admin-password':getAdminPassword()}});
     if(!r.ok) throw new Error(`Servera kļūda (${r.status})`);
     const data=await r.json(); return Array.isArray(data)?data:(data.orders||[]);
 }
@@ -1095,7 +1095,7 @@ async function updateOrderStatus(orderNumber,status){
     if(isLocalPreview()){
         const orders=getLocalOrders(); const o=orders.find(x=>x.orderNumber===orderNumber); if(o)o.status=status; saveLocalOrders(orders); return;
     }
-    const r=await fetch(`${ORDER_API_URL}/${encodeURIComponent(orderNumber)}`,{method:'PATCH',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({status})});
+    const r=await fetch(ORDER_API_URL,{method:'PATCH',headers:{'Content-Type':'application/json','x-admin-password':getAdminPassword()},body:JSON.stringify({orderNumber,status})});
     if(!r.ok) throw new Error(`Servera kļūda (${r.status})`);
 }
 async function loadOrders(){
@@ -1394,7 +1394,7 @@ document.getElementById('adminAddVariantForm').addEventListener('submit', functi
 
 renderProducts();
 updateCartUI();
-console.log('✅ O FASADES — gatavs. Parole: admin123');
+console.log('✅ O FASADES — pasūtījumu serveris pieslēgts.');
 </script>
 </body>
 </html>
