@@ -1010,7 +1010,7 @@ async function adminSessionActive() {
     const pass = getAdminPassword();
     if (!pass) return false;
     try {
-        const r = await fetch(`${ADMIN_ORDER_API_URL}?_=${Date.now()}`, {cache:'no-store',headers:{'Accept':'application/json','Cache-Control':'no-cache, no-store, max-age=0','Pragma':'no-cache','x-admin-password':pass}});
+        const r = await fetch(ADMIN_ORDER_API_URL, {headers:{'Accept':'application/json','x-admin-password':pass}});
         return r.ok;
     } catch { return false; }
 }
@@ -1039,7 +1039,7 @@ document.getElementById('loginSubmit').addEventListener('click', async function(
         ok = false;
     } else {
         try {
-            const r = await fetch(`${ADMIN_ORDER_API_URL}?_=${Date.now()}`, {cache:'no-store',headers:{'Accept':'application/json','Cache-Control':'no-cache, no-store, max-age=0','Pragma':'no-cache','x-admin-password':pass}});
+            const r = await fetch(ADMIN_ORDER_API_URL, {headers:{'Accept':'application/json','x-admin-password':pass}});
             ok = r.ok;
             if (ok) sessionStorage.setItem(ADMIN_SESSION_KEY, pass);
         } catch { ok = false; }
@@ -1132,8 +1132,6 @@ async function fetchOrders(){
         cache:'no-store',
         headers:{
             'Accept':'application/json',
-            'Cache-Control':'no-cache, no-store, max-age=0',
-            'Pragma':'no-cache',
             'x-admin-password':getAdminPassword()
         }
     });
