@@ -1010,7 +1010,7 @@ async function adminSessionActive() {
     const pass = getAdminPassword();
     if (!pass) return false;
     try {
-        const r = await fetch(ADMIN_ORDER_API_URL, {headers:{'Accept':'application/json','x-admin-password':pass}});
+        const r = await fetch(`${ADMIN_ORDER_API_URL}?_=${Date.now()}`, {cache:'no-store',headers:{'Accept':'application/json','Cache-Control':'no-cache, no-store, max-age=0','Pragma':'no-cache','x-admin-password':pass}});
         return r.ok;
     } catch { return false; }
 }
@@ -1039,7 +1039,7 @@ document.getElementById('loginSubmit').addEventListener('click', async function(
         ok = false;
     } else {
         try {
-            const r = await fetch(ADMIN_ORDER_API_URL, {headers:{'Accept':'application/json','x-admin-password':pass}});
+            const r = await fetch(`${ADMIN_ORDER_API_URL}?_=${Date.now()}`, {cache:'no-store',headers:{'Accept':'application/json','Cache-Control':'no-cache, no-store, max-age=0','Pragma':'no-cache','x-admin-password':pass}});
             ok = r.ok;
             if (ok) sessionStorage.setItem(ADMIN_SESSION_KEY, pass);
         } catch { ok = false; }
@@ -1104,7 +1104,19 @@ function setAdminView(view){
     if (adminView === 'orders') loadOrders();
 }
 document.querySelectorAll('[data-admin-view]').forEach(btn=>btn.addEventListener('click',()=>setAdminView(btn.dataset.adminView)));
-document.getElementById('refreshOrdersBtn').addEventListener('click', loadOrders);
+document.getElementById('refreshOrdersBtn').addEventListener('click', async function(){
+    const btn=this;
+    const original=btn.innerHTML;
+    btn.disabled=true;
+    btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Atjauno...';
+    try {
+        await loadOrders();
+        showToast('✅ Pasūtījumi atjaunoti.');
+    } finally {
+        btn.disabled=false;
+        btn.innerHTML=original;
+    }
+});
 
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function orderDetailsText(o){
@@ -1114,7 +1126,17 @@ function orderDetailsText(o){
 }
 async function fetchOrders(){
     if (isLocalPreview()) return getLocalOrders();
-    const r=await fetch(ADMIN_ORDER_API_URL,{headers:{'Accept':'application/json','x-admin-password':getAdminPassword()}});
+    const url = `${ADMIN_ORDER_API_URL}?_=${Date.now()}`;
+    const r=await fetch(url,{
+        method:'GET',
+        cache:'no-store',
+        headers:{
+            'Accept':'application/json',
+            'Cache-Control':'no-cache, no-store, max-age=0',
+            'Pragma':'no-cache',
+            'x-admin-password':getAdminPassword()
+        }
+    });
     if(!r.ok) throw new Error(`Servera kļūda (${r.status})`);
     const data=await r.json(); return Array.isArray(data)?data:(data.orders||[]);
 }
