@@ -201,7 +201,7 @@ body::after {
 .footer .copy { grid-column: 1/-1; text-align: center; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.04); font-size: 0.9rem; color: #666; }
 @media (max-width:992px){ .hero .container { grid-template-columns:1fr; text-align:center; } .hero-content p { margin-left:auto; margin-right:auto; } .hero-actions { justify-content:center; } .footer .container { grid-template-columns:1fr 1fr; } }
 @media (max-width:700px){ .header .container { flex-wrap:wrap; } .nav-links { order:3; width:100%; justify-content:center; gap:16px; flex-wrap:wrap; } .hero-content h1 { font-size:2.2rem; } .product-grid { grid-template-columns:1fr 1fr; gap:16px; } .admin-add-form { grid-template-columns:1fr; } .admin-add-form .full-width { grid-column:1; } .file-upload-wrapper { grid-column:1; } .cart-sidebar { max-width:100%; padding:24px 18px; } .footer .container { grid-template-columns:1fr; gap:24px; } .checkout-box { padding:28px 20px; } .lightbox-content { max-width:95%; max-height:80%; } }
-@media (max-width:480px){ .product-grid { grid-template-columns:1fr; } .hero-content h1 { font-size:1.8rem; } .admin-table { font-size:0.8rem; } .admin-table th, .admin-table td { padding:8px 8px; } .color-btn { width:30px; height:30px; } .size-btn { font-size:0.7rem; padding:2px 10px; } }
+@media (max-width:480px){ .product-grid { grid-template-columns:1fr; } .hero-content h1 { font-size:1.8rem; } .admin-table { font-size:0.8rem; } .admin-table th, .admin-table td { padding:8px 8px; } .color-btn { width:34px; height:34px; } .color-variants { margin-bottom:34px; } .color-btn .tooltip { display:none; top:calc(100% + 6px); bottom:auto; z-index:20; } .color-btn.active .tooltip { display:block; } .size-btn { font-size:0.7rem; padding:4px 10px; } .product-bottom { flex-direction:column; align-items:stretch; gap:10px; } .product-bottom .price { width:100%; } .product-bottom .add-to-cart { width:100%; justify-content:center; } }
 .variant-edit-row { background: rgba(255,255,255,0.04); border-radius: 12px; padding: 16px; margin-top: 12px; display: grid; grid-template-columns: 140px 1fr 1fr 1fr auto auto; gap: 10px; align-items: center; border: 1px solid rgba(255,255,255,0.06); }
 .variant-edit-row .v-preview { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; border: 1px solid rgba(255,255,255,0.10); background: rgba(255,255,255,0.04); }
 .variant-edit-row input[type="text"], .variant-edit-row input[type="number"] { padding: 6px 10px; border: 1px solid rgba(255,255,255,0.10); border-radius: 8px; font-size: 0.85rem; width: 100%; background: rgba(255,255,255,0.04); color: #fff; }
@@ -209,6 +209,18 @@ body::after {
 @media (max-width:700px){ .variant-edit-row { grid-template-columns: 1fr 1fr; } .variant-edit-row .v-preview { grid-column:1/2; } }
 .variant-editor-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 16px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.06); }
 .variant-editor-header h4 { font-size: 1.2rem; color: #fff; }
+
+/* Karkasa V1: publiskā navigācija un mobilā lietojamība */
+html { scroll-behavior:smooth; }
+.nav-links a { white-space:nowrap; }
+@media (max-width:700px){
+  .header .container { gap:12px; }
+  .nav-links { gap:12px; }
+  .nav-links a { font-size:0.9rem; }
+  .header-actions { margin-left:auto; }
+  #contact form { grid-template-columns:1fr !important; }
+  #contact form input, #contact form textarea, #contact form button { grid-column:1 !important; }
+}
 </style>
 </head>
 <body>
@@ -226,7 +238,6 @@ body::after {
 <a href="#products">Produkti</a>
 <a href="#about">Par mums</a>
 <a href="#contact">Kontakti</a>
-<a href="#" id="adminLoginBtn" style="color:var(--eq-gold);"><i class="fas fa-lock"></i> Admin</a>
 </nav>
 <div class="header-actions">
 <button class="cart-btn" id="cartToggle">
@@ -358,7 +369,7 @@ body::after {
 <div class="checkout-modal" id="checkoutModal">
 <div class="checkout-box">
 <h2>Pasūtījuma noformēšana</h2>
-<p class="sub">Aizpildiet informāciju. Pēc apstiprināšanas Jūs redzēsiet maksājuma uzdevumu.</p>
+<p class="sub">Aizpildiet informāciju. Pēc apstiprināšanas redzēsiet pasūtījuma kopsavilkumu un maksājuma rekvizītus.</p>
 <form id="checkoutForm">
 <label>Vārds, uzvārds</label><input type="text" id="checkoutName" required placeholder="Jānis Bērziņš" />
 <label>E-pasts</label><input type="email" id="checkoutEmail" required placeholder="janis@berzins.lv" />
@@ -370,7 +381,6 @@ body::after {
 <label>Apmaksas veids</label>
 <div class="payment-options">
     <label><input type="radio" name="payment" value="transfer" checked> Pārskaitījums (maksājuma uzdevums)</label>
-    <label><input type="radio" name="payment" value="card"> Maksājums ar karti</label>
 </div>
 <label>Piezīmes</label><textarea id="checkoutNote" placeholder="Īpašas vēlmes..."></textarea>
 <div class="checkout-actions"><button type="button" class="btn btn-outline" id="checkoutCancel">Atcelt</button><button type="submit" class="btn btn-gold"><i class="fas fa-check"></i> Apstiprināt pasūtījumu</button></div>
@@ -481,7 +491,7 @@ function renderProducts() {
             <div class="size-selector" data-product-id="${p.id}">
                 <span class="label">Izmērs:</span>
                 <button class="size-btn active" data-size="0">${sizeLabels[0]}</button>
-                <button class="size-btn" data-size="1">${sizeLabels[1]}</button>
+                ${sizeLabels.length > 1 && sizeLabels[1] ? `<button class="size-btn" data-size="1">${sizeLabels[1]}</button>` : ''}
             </div>
             <div class="color-variants">
                 <span class="label">Krāsas:</span>
@@ -761,7 +771,7 @@ document.getElementById('checkoutForm').addEventListener('submit', function(e) {
         Pēc pārskaitījuma veikšanas, lūdzu, nosūtiet maksājuma apstiprinājumu uz e-pastu omterum@inbox.lv
     `;
 
-    const message = `Paldies, ${name}! Jūsu pasūtījums ir reģistrēts.\n\n` +
+    const message = `Paldies, ${name}! Pasūtījuma informācija ir sagatavota.\n\n` +
         `Preces:\n${orderSummary}\n\n` +
         `Piegāde: ${shippingDesc}\n` +
         `Kopā: €${totalPrice.toFixed(2)}\n\n` +
@@ -777,24 +787,42 @@ document.getElementById('checkoutForm').addEventListener('submit', function(e) {
     document.getElementById('cartOverlay').classList.remove('open');
     document.getElementById('cartSidebar').classList.remove('open');
     document.body.style.overflow = '';
-    showToast('✅ Pasūtījums reģistrēts!');
+    showToast('✅ Pasūtījuma informācija sagatavota.');
     this.reset();
 });
 
-// Admin loģika (nav mainīta)
+// ============================================================
+//  ADMIN PIEKĻUVE
+//  Publiskajā navigācijā Admin saites nav.
+//  Īpašnieks atver to pašu lapu ar #admin adreses beigās.
+// ============================================================
 const ADMIN_PASSWORD = 'admin123';
-document.getElementById('adminLoginBtn').addEventListener('click', function(e) {
-    e.preventDefault();
+function openAdminLogin() {
     document.getElementById('loginOverlay').classList.add('open');
     document.getElementById('adminPassword').value = '';
     document.getElementById('loginError').style.display = 'none';
-});
+    setTimeout(() => document.getElementById('adminPassword').focus(), 50);
+}
+function handleAdminRoute() {
+    if (window.location.hash.toLowerCase() !== '#admin') return;
+    if (sessionStorage.getItem('ofasades_admin_session') === '1') {
+        document.getElementById('adminPanel').classList.add('visible');
+        setAdminCategory(currentCategory || 'paneli');
+        setTimeout(() => document.getElementById('adminPanel').scrollIntoView({behavior:'smooth', block:'start'}), 50);
+    } else if (!document.getElementById('adminPanel').classList.contains('visible')) {
+        openAdminLogin();
+    }
+}
+window.addEventListener('hashchange', handleAdminRoute);
+window.addEventListener('DOMContentLoaded', handleAdminRoute);
 document.getElementById('loginSubmit').addEventListener('click', function() {
     const pass = document.getElementById('adminPassword').value;
     if (pass === ADMIN_PASSWORD) {
         document.getElementById('loginOverlay').classList.remove('open');
         document.getElementById('adminPanel').classList.add('visible');
+        sessionStorage.setItem('ofasades_admin_session', '1');
         setAdminCategory(currentCategory || 'paneli');
+        document.getElementById('adminPanel').scrollIntoView({behavior:'smooth', block:'start'});
         showToast('🔓 Pieslēgts admin panelim.');
     } else {
         document.getElementById('loginError').style.display = 'block';
@@ -805,7 +833,20 @@ document.getElementById('adminPassword').addEventListener('keydown', function(e)
 });
 document.getElementById('adminLogoutBtn').addEventListener('click', function() {
     document.getElementById('adminPanel').classList.remove('visible');
+    sessionStorage.removeItem('ofasades_admin_session');
+    if (window.location.hash.toLowerCase() === '#admin') {
+        history.replaceState(null, '', window.location.pathname + window.location.search);
+    }
+    window.scrollTo({top:0, behavior:'smooth'});
     showToast('🔒 Izgājāt no admin.');
+});
+
+// Aizver pieslēgšanās logu ar ESC vai klikšķi ārpus loga.
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') document.getElementById('loginOverlay').classList.remove('open');
+});
+document.getElementById('loginOverlay').addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('open');
 });
 
 let toastTimer = null;
@@ -818,8 +859,13 @@ function showToast(msg) {
 }
 document.getElementById('contactForm').addEventListener('submit', function(e) {
     e.preventDefault();
-    showToast('📩 Ziņa nosūtīta!');
-    this.reset();
+    const name = this.querySelector('input[type="text"]').value.trim();
+    const email = this.querySelector('input[type="email"]').value.trim();
+    const message = this.querySelector('textarea').value.trim();
+    const subject = encodeURIComponent('Jautājums no O FASADES mājaslapas');
+    const body = encodeURIComponent(`Vārds: ${name}\nE-pasts: ${email}\n\n${message}`);
+    window.location.href = `mailto:omterum@inbox.lv?subject=${subject}&body=${body}`;
+    showToast('📩 Atvērta e-pasta programma ziņas nosūtīšanai.');
 });
 
 let adminCategory = 'paneli';
