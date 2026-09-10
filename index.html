@@ -829,7 +829,8 @@ function setupShippingControls() {
     sync();
 }
 
-const ORDER_API_URL = 'https://dnpkkofglgkvnpxnqksw.supabase.co/functions/v1/orders';
+const ORDER_API_URL = 'https://dnpkkofglgkvnpxnqksw.supabase.co/rest/v1/orders';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_j2K-1jR0sYjoDvN2k2SyoQ_J1lol_Zm';
 const PAYMENT_API_URL = ''; // aktivizēsim pēc Swedbank e-komercijas pieslēguma
 const LOCAL_ORDER_KEY = 'ofasades_test_orders_v1';
 
@@ -881,11 +882,36 @@ async function sendOrder(order) {
         const orders = getLocalOrders(); orders.unshift(order); saveLocalOrders(orders);
         return {ok:true, localOnly:true, order};
     }
+    const row = {
+        order_number: order.orderNumber,
+        created_at: order.createdAt,
+        status: 'Gaida pārskaitījumu',
+        buyer: order.buyer,
+        delivery: order.delivery,
+        payment: order.payment,
+        note: order.note || '',
+        items: order.items,
+        subtotal: order.subtotal,
+        vat: order.vat,
+        total: order.total,
+        currency: 'EUR'
+    };
     const response = await fetch(ORDER_API_URL, {
-        method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(order)
+        method:'POST',
+        headers:{
+            'Content-Type':'application/json',
+            'apikey': SUPABASE_PUBLISHABLE_KEY,
+            'Authorization': `Bearer ${SUPABASE_PUBLISHABLE_KEY}`,
+            'Prefer':'return=minimal'
+        },
+        body:JSON.stringify(row)
     });
-    if (!response.ok) throw new Error(`Servera kļūda (${response.status})`);
-    return await response.json();
+    if (!response.ok) {
+        const detail = await response.text().catch(()=> '');
+        console.error('Pasūtījuma servera atbilde:', response.status, detail);
+        throw new Error(`Servera kļūda (${response.status})`);
+    }
+    return {ok:true, order:{orderNumber:order.orderNumber, createdAt:order.createdAt, status:'Gaida pārskaitījumu'}};
 }
 
 document.getElementById('checkoutBuyerType').addEventListener('change', function(){
