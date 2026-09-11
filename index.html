@@ -904,7 +904,103 @@ function setupShippingControls() {
 const ORDER_API_URL = 'https://dnpkkofglgkvnpxnqksw.supabase.co/rest/v1/orders';
 const ADMIN_ORDER_API_URL = 'https://dnpkkofglgkvnpxnqksw.supabase.co/functions/v1/orders';
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_j2K-1jR0sYjoDvN2k2SyoQ_J1lol_Zm';
+const PRODUCT_OVERRIDES_API = 'https://dnpkkofglgkvnpxnqksw.supabase.co/rest/v1/product_overrides';
+const PRODUCT_IMAGE_UPLOAD_API = 'https://dnpkkofglgkvnpxnqksw.supabase.co/storage/v1/object/product-images';
+const PRODUCT_IMAGE_PUBLIC_BASE = 'https://dnpkkofglgkvnpxnqksw.supabase.co/storage/v1/object/public/product-images';
 const PAYMENT_API_URL = ''; // aktivizēsim pēc Swedbank e-komercijas pieslēguma
+
+function productApiHeaders(admin=false, extra={}) {
+    const h = {
+        'apikey': SUPABASE_PUBLISHABLE_KEY,
+        'Authorization': `Bearer ${SUPABASE_PUBLISHABLE_KEY}`,
+        ...extra
+    };
+    if (admin) h['x-admin-password'] = getAdminPassword();
+    return h;
+}
+
+async function loadProductOverrides() {
+    try {
+        const r = await fetch(`${PRODUCT_OVERRIDES_API}?select=product_id,product,deleted&order=product_id.asc`, {
+            headers: productApiHeaders(false),
+            cache: 'no-store'
+        });
+        if (!r.ok) throw new Error(`products_load_${r.status}`);
+        const rows = await r.json();
+        rows.forEach(row => {
+            const id = Number(row.product_id);
+            const idx = allProducts.findIndex(p => Number(p.id) === id);
+            if (row.deleted) {
+                if (idx !== -1) allProducts.splice(idx, 1);
+                return;
+            }
+            if (!row.product || typeof row.product !== 'object') return;
+            if (idx !== -1) allProducts[idx] = row.product;
+            else allProducts.push(row.product);
+        });
+        products = allProducts.filter(p => p.category === currentCategory);
+    } catch (e) {
+        console.error('Produktu servera dati nav ielādēti:', e);
+    }
+}
+
+async function saveProductOverride(product) {
+    const r = await fetch(`${PRODUCT_OVERRIDES_API}?on_conflict=product_id`, {
+        method: 'POST',
+        headers: productApiHeaders(true, {
+            'Content-Type': 'application/json',
+            'Prefer': 'resolution=merge-duplicates,return=minimal'
+        }),
+        body: JSON.stringify({product_id:Number(product.id), product, deleted:false})
+    });
+    if (!r.ok) throw new Error(`product_save_${r.status}`);
+}
+
+async function persistProductDeletion(productId) {
+    const r = await fetch(`${PRODUCT_OVERRIDES_API}?on_conflict=product_id`, {
+        method: 'POST',
+        headers: productApiHeaders(true, {
+            'Content-Type': 'application/json',
+            'Prefer': 'resolution=merge-duplicates,return=minimal'
+        }),
+        body: JSON.stringify({product_id:Number(productId), product:null, deleted:true})
+    });
+    if (!r.ok) throw new Error(`product_delete_${r.status}`);
+}
+
+async function compressImageFile(file) {
+    if (!file || !file.type.startsWith('image/')) throw new Error('invalid_image');
+    const url = URL.createObjectURL(file);
+    try {
+        const img = await new Promise((resolve,reject)=>{
+            const i = new Image();
+            i.onload=()=>resolve(i); i.onerror=reject; i.src=url;
+        });
+        const max = 1600;
+        let w=img.naturalWidth, h=img.naturalHeight;
+        const scale=Math.min(1,max/Math.max(w,h));
+        w=Math.max(1,Math.round(w*scale)); h=Math.max(1,Math.round(h*scale));
+        const canvas=document.createElement('canvas'); canvas.width=w; canvas.height=h;
+        canvas.getContext('2d').drawImage(img,0,0,w,h);
+        const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',0.84));
+        if (!blob) throw new Error('image_compress_failed');
+        return blob;
+    } finally { URL.revokeObjectURL(url); }
+}
+
+async function uploadProductImage(file, productId, colorName) {
+    const blob = await compressImageFile(file);
+    const safe = String(colorName||'image').replace(/[^a-zA-Z0-9_-]+/g,'-').slice(0,40) || 'image';
+    const path = `${Number(productId)}/${Date.now()}-${safe}-${Math.random().toString(36).slice(2,8)}.jpg`;
+    const r = await fetch(`${PRODUCT_IMAGE_UPLOAD_API}/${path}`, {
+        method:'POST',
+        headers: productApiHeaders(true, {'Content-Type':'image/jpeg','x-upsert':'false'}),
+        body: blob
+    });
+    if (!r.ok) throw new Error(`image_upload_${r.status}`);
+    return `${PRODUCT_IMAGE_PUBLIC_BASE}/${path}`;
+}
+
 const LOCAL_ORDER_KEY = 'ofasades_test_orders_v1';
 
 function isLocalPreview() { return window.location.protocol === 'file:'; }
@@ -1350,7 +1446,7 @@ function renderAdminTable() {
             submitBtn.innerHTML = '<i class="fas fa-save"></i> Saglabāt izmaiņas';
             submitBtn.dataset.editId = id;
             form.onsubmit = null;
-            form.onsubmit = function(e) {
+            form.onsubmit = async function(e) {
                 e.preventDefault();
                 const editId = parseInt(submitBtn.dataset.editId);
                 const ps = parseFloat(document.getElementById('addProdPriceSmall').value);
@@ -1367,10 +1463,17 @@ function renderAdminTable() {
                     allProducts[idx].desc = document.getElementById('addProdDesc').value.trim();
                     allProducts[idx].sizeLabels = [size1, size2];
                     allProducts[idx].variants.forEach(v => { v.priceSmall = ps; v.priceLarge = pl; });
+                    try {
+                        await saveProductOverride(allProducts[idx]);
+                    } catch (err) {
+                        showToast('❌ Neizdevās saglabāt produktu serverī.');
+                        console.error(err);
+                        return;
+                    }
                     products = allProducts.filter(p => p.category === currentCategory);
                     renderProducts();
                     setAdminCategory(adminCategory);
-                    showToast('✅ Produkts atjaunināts!');
+                    showToast('✅ Produkts saglabāts serverī!');
                     form.reset();
                     submitBtn.innerHTML = '<i class="fas fa-save"></i> Pievienot produktu';
                     delete submitBtn.dataset.editId;
@@ -1381,16 +1484,18 @@ function renderAdminTable() {
         });
     });
     document.querySelectorAll('.delete-product').forEach(btn => {
-        btn.addEventListener('click', function() {
+        btn.addEventListener('click', async function() {
             const id = parseInt(this.dataset.id);
             if (confirm('Vai tiešām vēlaties dzēst šo produktu?')) {
+                try { await persistProductDeletion(id); }
+                catch (err) { showToast('❌ Neizdevās dzēst produktu serverī.'); console.error(err); return; }
                 const idx = allProducts.findIndex(p => p.id === id);
                 if (idx !== -1) { allProducts.splice(idx, 1); }
                 products = allProducts.filter(p => p.category === currentCategory);
                 renderProducts();
                 renderAdminTable();
                 populateVariantSelect();
-                showToast('🗑️ Produkts dzēsts.');
+                showToast('🗑️ Produkts dzēsts serverī.');
             }
         });
     });
@@ -1430,7 +1535,7 @@ function renderVariantEditor(productId) {
     });
     container.innerHTML = html;
     container.querySelectorAll('.save-variant-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
+        btn.addEventListener('click', async function() {
             const pId = parseInt(this.dataset.productId);
             const vIdx = parseInt(this.dataset.variantIndex);
             const row = this.closest('.variant-edit-row');
@@ -1443,20 +1548,24 @@ function renderVariantEditor(productId) {
             prod.variants[vIdx].priceSmall = ps;
             prod.variants[vIdx].priceLarge = pl;
             prod.variants[vIdx].image = img;
+            try { await saveProductOverride(prod); }
+            catch (err) { showToast('❌ Neizdevās saglabāt variantu serverī.'); console.error(err); return; }
             products = allProducts.filter(p => p.category === currentCategory);
             renderProducts();
             renderAdminTable();
             renderVariantEditor(pId);
-            showToast('✅ Variants atjaunināts!');
+            showToast('✅ Variants saglabāts serverī!');
         });
     });
     container.querySelectorAll('.remove-image-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
+        btn.addEventListener('click', async function() {
             const pId = parseInt(this.dataset.productId);
             const vIdx = parseInt(this.dataset.variantIndex);
             const prod = allProducts.find(p => p.id === pId);
             if (!prod) return;
             prod.variants[vIdx].image = '';
+            try { await saveProductOverride(prod); }
+            catch (err) { showToast('❌ Neizdevās noņemt bildi serverī.'); console.error(err); return; }
             products = allProducts.filter(p => p.category === currentCategory);
             renderProducts();
             renderAdminTable();
@@ -1469,7 +1578,7 @@ function renderVariantEditor(productId) {
     });
 }
 
-function handleAddProduct(e) {
+async function handleAddProduct(e) {
     e.preventDefault();
     const name = document.getElementById('addProdName').value.trim();
     const code = document.getElementById('addProdCode').value.trim();
@@ -1481,12 +1590,15 @@ function handleAddProduct(e) {
     const pl = parseFloat(document.getElementById('addProdPriceLarge').value);
     if (!name || !code || !size1 || !size2 || isNaN(ps) || isNaN(pl)) { showToast('Aizpildiet visus laukus!'); return; }
     const newId = allProducts.length > 0 ? Math.max(...allProducts.map(p => p.id)) + 1 : 1;
-    allProducts.push({ id: newId, category, name, code, desc, sizeLabels: [size1, size2], variants: [{ color: 'Noklusējums', image: '', code: code + '-DEFAULT', priceSmall: ps, priceLarge: pl }] });
+    const newProduct = { id: newId, category, name, code, desc, sizeLabels: [size1, size2], variants: [{ color: 'Noklusējums', image: '', code: code + '-DEFAULT', priceSmall: ps, priceLarge: pl }] };
+    try { await saveProductOverride(newProduct); }
+    catch (err) { showToast('❌ Neizdevās saglabāt jauno produktu serverī.'); console.error(err); return; }
+    allProducts.push(newProduct);
     products = allProducts.filter(p => p.category === currentCategory);
     renderProducts();
     adminCategory = category;
     setAdminCategory(category);
-    showToast('✅ Produkts pievienots!');
+    showToast('✅ Produkts pievienots un saglabāts serverī!');
     document.getElementById('adminAddProductForm').reset();
     const submitBtn = document.getElementById('adminAddProductForm').querySelector('button[type="submit"]');
     submitBtn.innerHTML = '<i class="fas fa-save"></i> Pievienot produktu';
@@ -1512,50 +1624,68 @@ setAdminCategory(currentCategory || 'paneli');
 document.getElementById('variantFileInput').addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function(ev) {
-        document.getElementById('variantImage').value = ev.target.result;
-        document.getElementById('variantPreview').src = ev.target.result;
-        document.getElementById('variantPreview').style.display = 'block';
-    };
-    reader.readAsDataURL(file);
+    const previewUrl = URL.createObjectURL(file);
+    document.getElementById('variantImage').value = '';
+    document.getElementById('variantPreview').src = previewUrl;
+    document.getElementById('variantPreview').style.display = 'block';
 });
 
-document.getElementById('adminAddVariantForm').addEventListener('submit', function(e) {
+document.getElementById('adminAddVariantForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     const productId = parseInt(document.getElementById('variantProductId').value);
     const colorName = document.getElementById('variantColorName').value.trim();
-    const image = document.getElementById('variantImage').value.trim();
+    let image = document.getElementById('variantImage').value.trim();
+    const selectedFile = document.getElementById('variantFileInput').files[0] || null;
     const code = document.getElementById('variantCode').value.trim();
     if (!productId || !colorName) { showToast('Lūdzu, aizpildiet produktu un krāsas nosaukumu!'); return; }
     const product = allProducts.find(p => p.id === productId);
     if (!product) { showToast('Produkts nav atrasts!'); return; }
+    if (selectedFile) {
+        try {
+            showToast('⏳ Augšupielādē bildi...');
+            image = await uploadProductImage(selectedFile, productId, colorName);
+        } catch (err) {
+            showToast('❌ Bildi neizdevās saglabāt serverī.');
+            console.error(err);
+            return;
+        }
+    }
     const existing = product.variants.find(v => v.color === colorName);
     if (existing) {
         if (existing.image && existing.image.trim() !== '') { showToast(`⚠️ Krāsa "${colorName}" jau ir pievienota ar bildi!`); return; }
         existing.image = image || '';
         existing.code = code || existing.code || '';
         if (image && image.trim() !== '') {
+            try { await saveProductOverride(product); }
+            catch (err) { showToast('❌ Bildi neizdevās piesaistīt produktam serverī.'); console.error(err); return; }
             products = allProducts.filter(p => p.category === currentCategory);
             renderProducts();
-            showToast(`✅ Krāsai "${colorName}" pievienota bilde!`);
+            renderAdminTable();
+            showToast(`✅ Krāsai "${colorName}" bilde saglabāta serverī!`);
         } else { showToast('Lūdzu, pievienojiet bildi!'); }
         return;
     }
     const base = product.variants && product.variants.length > 0 ? product.variants[0] : null;
     product.variants.push({ color: colorName, image: image || '', code: code || '', priceSmall: base ? base.priceSmall : 0, priceLarge: base ? base.priceLarge : 0 });
     product.variants.sort((a,b) => a.color.localeCompare(b.color));
+    try { await saveProductOverride(product); }
+    catch (err) { showToast('❌ Krāsu variantu neizdevās saglabāt serverī.'); console.error(err); return; }
     products = allProducts.filter(p => p.category === currentCategory);
     renderProducts();
     this.reset();
     document.getElementById('variantPreview').style.display = 'none';
     populateVariantSelect();
-    showToast('✅ Krāsu variants pievienots un sakārtots!');
+    showToast('✅ Krāsu variants saglabāts serverī!');
 });
 
-renderProducts();
+loadProductOverrides().finally(() => {
+    products = allProducts.filter(p => p.category === currentCategory);
+    renderProducts();
+    renderAdminTable();
+    populateVariantSelect();
+});
 updateCartUI();
-console.log('✅ O FASADES — pasūtījumu serveris pieslēgts.');
+console.log('✅ O FASADES — pasūtījumu un produktu serveris pieslēgts.');
 </script>
 </body>
 </html>
