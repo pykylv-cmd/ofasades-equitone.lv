@@ -366,7 +366,7 @@ SWIFT/BIC HABALV22
 <p class="sub" id="adminCategoryInfo" style="margin-bottom:16px;"></p>
 <div style="overflow-x:auto;">
 <table class="admin-table" id="adminTable">
-<thead><tr><th>ID</th><th>Nosaukums</th><th>Kategorija</th><th>Izmēri</th><th>Krāsas</th><th>Cena (1.izm.)</th><th>Cena (2.izm.)</th><th>Darbības</th></tr></thead>
+<thead><tr><th>ID</th><th>Nosaukums</th><th>Specifikācija / izmērs</th><th>Kategorija</th><th>Izmēri</th><th>Krāsas</th><th>Cena (1.izm.)</th><th>Cena (2.izm.)</th><th>Darbības</th></tr></thead>
 <tbody id="adminTableBody"></tbody>
 </table>
 </div>
@@ -1307,9 +1307,16 @@ function renderAdminTable() {
         const first = p.variants && p.variants.length > 0 ? p.variants[0] : null;
         const sizeLabels = p.sizeLabels || ['Mazais', 'Lielais'];
         const catName = p.category === 'paneli' ? 'Paneļi' : p.category === 'flizes' ? 'Flīzes' : 'Apakškonstrukcija';
+        const adminSpec = p.category === 'apaks'
+            ? String(p.desc || '')
+                .replace(/\s*[-·•]?\s*Atlaide piegādātāja sarakstā:[^·•-]*/i, '')
+                .replace(/\s*[-·•]?\s*Svars:.*$/i, '')
+                .trim()
+            : (p.desc || '');
         return `<tr>
             <td>${p.id}</td>
             <td><strong>${p.name}</strong></td>
+            <td>${adminSpec || '—'}</td>
             <td>${catName}</td>
             <td>${sizeLabels.join(' / ')}</td>
             <td>${p.variants ? p.variants.map(v => v.color).join(', ') : 'nav'}</td>
