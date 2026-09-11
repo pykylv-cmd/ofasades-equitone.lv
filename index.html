@@ -1209,6 +1209,19 @@ async function updateOrderStatus(orderNumber,status){
     const r=await fetch(ADMIN_ORDER_API_URL,{method:'PATCH',headers:{'Content-Type':'application/json','x-admin-password':getAdminPassword()},body:JSON.stringify({orderNumber,status})});
     if(!r.ok) throw new Error(`Servera kļūda (${r.status})`);
 }
+async function deleteOrder(orderNumber){
+    if(isLocalPreview()){
+        const orders=getLocalOrders().filter(o=>o.orderNumber!==orderNumber);
+        saveLocalOrders(orders);
+        return;
+    }
+    const r=await fetch(ADMIN_ORDER_API_URL,{method:'DELETE',headers:{'Content-Type':'application/json','x-admin-password':getAdminPassword()},body:JSON.stringify({orderNumber})});
+    if(!r.ok){
+        const data=await r.json().catch(()=>({}));
+        if(r.status===409 && data.error==='delete_only_cancelled') throw new Error('delete_only_cancelled');
+        throw new Error(`Servera kļūda (${r.status})`);
+    }
+}
 async function loadOrders(){
     const info=document.getElementById('ordersSystemInfo'), tbody=document.getElementById('ordersTableBody');
     info.textContent=isLocalPreview()?'Lokālais tests: bankas pārskaitījuma pasūtījumi šajā datorā tiek saglabāti un ir redzami te uzreiz. Publiskajā veikalā tie glabāsies serverī un tiks nosūtīts e-pasta paziņojums.':'Tiešsaistes pasūtījumi no O FASADES servera. Jauns pasūtījums te parādās uzreiz pēc klienta noformēšanas.';
@@ -1223,10 +1236,22 @@ async function loadOrders(){
         if(!orders.length){tbody.innerHTML='<tr><td colspan="8"><div class="order-empty">Pasūtījumu vēl nav.</div></td></tr>';return;}
         tbody.innerHTML=orders.map(o=>{
             const b=o.buyer||{},d=o.delivery||{}; const total=Number(o.total ?? grossAmount(o.subtotal||0));
-            return `<tr><td><strong>${esc(o.orderNumber)}</strong></td><td>${esc(new Date(o.createdAt).toLocaleString('lv-LV'))}</td><td>${esc(b.company||b.name||'—')}<br><small>${esc(b.company?b.name:'')}</small></td><td>${esc(b.phone||'')}<br><small>${esc(b.email||'')}</small></td><td>${esc(d.address||'')}, ${esc(d.city||'')} ${esc(d.zip||'')}<br><small>${esc(d.label||'')}</small></td><td>€${total.toFixed(2)}</td><td><select class="order-status" data-order-status="${esc(o.orderNumber)}"><option ${o.status==='Jauns'?'selected':''}>Jauns</option><option ${o.status==='Gaida pārskaitījumu'?'selected':''}>Gaida pārskaitījumu</option><option ${o.status==='Gaida apmaksu'?'selected':''}>Gaida apmaksu</option><option ${o.status==='Apmaksāts'?'selected':''}>Apmaksāts</option><option ${o.status==='Apstiprināts'?'selected':''}>Apstiprināts</option><option ${o.status==='Sagatavošanā'?'selected':''}>Sagatavošanā</option><option ${o.status==='Piegādāts'?'selected':''}>Piegādāts</option><option ${o.status==='Atcelts'?'selected':''}>Atcelts</option></select></td><td><button class="btn btn-outline btn-xs" type="button" data-order-details="${esc(o.orderNumber)}">Skatīt</button></td></tr>`;
+            return `<tr><td><strong>${esc(o.orderNumber)}</strong></td><td>${esc(new Date(o.createdAt).toLocaleString('lv-LV'))}</td><td>${esc(b.company||b.name||'—')}<br><small>${esc(b.company?b.name:'')}</small></td><td>${esc(b.phone||'')}<br><small>${esc(b.email||'')}</small></td><td>${esc(d.address||'')}, ${esc(d.city||'')} ${esc(d.zip||'')}<br><small>${esc(d.label||'')}</small></td><td>€${total.toFixed(2)}</td><td><select class="order-status" data-order-status="${esc(o.orderNumber)}"><option ${o.status==='Jauns'?'selected':''}>Jauns</option><option ${o.status==='Gaida pārskaitījumu'?'selected':''}>Gaida pārskaitījumu</option><option ${o.status==='Gaida apmaksu'?'selected':''}>Gaida apmaksu</option><option ${o.status==='Apmaksāts'?'selected':''}>Apmaksāts</option><option ${o.status==='Apstiprināts'?'selected':''}>Apstiprināts</option><option ${o.status==='Sagatavošanā'?'selected':''}>Sagatavošanā</option><option ${o.status==='Piegādāts'?'selected':''}>Piegādāts</option><option ${o.status==='Atcelts'?'selected':''}>Atcelts</option></select></td><td><button class="btn btn-outline btn-xs" type="button" data-order-details="${esc(o.orderNumber)}">Skatīt</button>${o.status==='Atcelts'?` <button class="btn btn-outline btn-xs" type="button" data-order-delete="${esc(o.orderNumber)}" style="margin-left:6px;">Dzēst</button>`:''}</td></tr>`;
         }).join('');
         document.querySelectorAll('[data-order-details]').forEach(btn=>btn.addEventListener('click',()=>{const o=orders.find(x=>x.orderNumber===btn.dataset.orderDetails); if(o) alert(orderDetailsText(o));}));
-        document.querySelectorAll('[data-order-status]').forEach(sel=>sel.addEventListener('change',async()=>{try{await updateOrderStatus(sel.dataset.orderStatus,sel.value);showToast('✅ Pasūtījuma statuss saglabāts.');}catch(e){showToast('❌ Statusu neizdevās saglabāt.');console.error(e);}}));
+        document.querySelectorAll('[data-order-delete]').forEach(btn=>btn.addEventListener('click',async()=>{
+            const orderNumber=btn.dataset.orderDelete;
+            if(!confirm(`Vai tiešām neatgriezeniski dzēst pasūtījumu ${orderNumber}?`)) return;
+            try{
+                await deleteOrder(orderNumber);
+                showToast('🗑️ Pasūtījums izdzēsts.');
+                await renderAdminOrders();
+            }catch(e){
+                showToast(e.message==='delete_only_cancelled'?'❌ Dzēst drīkst tikai atceltu pasūtījumu.':'❌ Pasūtījumu neizdevās izdzēst.');
+                console.error(e);
+            }
+        }));
+        document.querySelectorAll('[data-order-status]').forEach(sel=>sel.addEventListener('change',async()=>{try{await updateOrderStatus(sel.dataset.orderStatus,sel.value);showToast('✅ Pasūtījuma statuss saglabāts.');await renderAdminOrders();}catch(e){showToast('❌ Statusu neizdevās saglabāt.');console.error(e);}}));
     }catch(e){tbody.innerHTML='<tr><td colspan="8"><div class="order-empty">Neizdevās ielādēt pasūtījumus. Pārbaudiet servera savienojumu vai Admin pieslēgumu.</div></td></tr>';console.error(e);}
 }
 
