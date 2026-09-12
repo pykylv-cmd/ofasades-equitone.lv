@@ -366,7 +366,7 @@ SWIFT/BIC HABALV22
 <p class="sub" id="adminCategoryInfo" style="margin-bottom:16px;"></p>
 <div style="overflow-x:auto;">
 <table class="admin-table" id="adminTable">
-<thead><tr><th>ID</th><th>Nosaukums</th><th>Specifikācija / izmērs</th><th>Kategorija</th><th>Izmēri</th><th>Krāsas</th><th>Cena (1.izm.)</th><th>Cena (2.izm.)</th><th>Darbības</th></tr></thead>
+<thead><tr><th>ID</th><th>Nosaukums</th><th>Specifikācija / izmērs</th><th>Kategorija</th><th>Izmēri</th><th>Krāsas</th><th>Cena bez PVN</th><th>Darbības</th></tr></thead>
 <tbody id="adminTableBody"></tbody>
 </table>
 </div>
@@ -382,10 +382,20 @@ SWIFT/BIC HABALV22
 <textarea id="addProdDesc" placeholder="Apraksts" class="full-width" style="grid-column:1/2;"></textarea>
 <input type="text" id="addSize1" placeholder="1. izmērs (piem., 2520x1240x8mm) *" required />
 <input type="text" id="addSize2" placeholder="2. izmērs (piem., 3070x1240x8mm) *" required />
-<input type="number" id="addProdPriceSmall" placeholder="Cena (1. izm.) *" step="0.01" required />
-<input type="number" id="addProdPriceLarge" placeholder="Cena (2. izm.) *" step="0.01" required />
+<input type="number" id="addProdPriceSmall" placeholder="Cena bez PVN *" step="0.01" required />
 <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Pievienot produktu</button>
 </form>
+
+<h3 style="margin-top:32px;margin-bottom:12px;color:#fff;"><i class="fas fa-truck" style="color:var(--eq-gold);"></i> Piegādes cenas</h3>
+<form class="admin-add-form" id="adminDeliveryForm">
+<input type="number" id="deliveryPakomats" placeholder="Pakomāts €" step="0.01" min="0" required />
+<input type="number" id="deliveryCourier" placeholder="Kurjers €" step="0.01" min="0" required />
+<input type="number" id="deliveryLongGoods" placeholder="Garizmēra preces €" step="0.01" min="0" required />
+<input type="number" id="deliveryEquitone" placeholder="EQUITONE līdz 29 loksnēm €" step="0.01" min="0" required />
+<div class="full-width" style="color:#aaa;font-size:.9rem;">EQUITONE no 30 loksnēm — piegāde bez maksas. Šeit mainītās cenas saglabājas serverī un uzreiz tiek izmantotas veikalā.</div>
+<button type="submit" class="btn btn-gold"><i class="fas fa-save"></i> Saglabāt piegādes cenas</button>
+</form>
+
 <h3 style="margin-top:32px;margin-bottom:12px;color:#fff;"><i class="fas fa-palette" style="color:var(--eq-gold);"></i> Pievienot krāsu variantu</h3>
 <form class="admin-add-form" id="adminAddVariantForm">
 <select id="variantProductId" required style="padding:12px 16px;border:1px solid rgba(255,255,255,0.10);border-radius:12px;font-size:1rem;grid-column:1/2;background:rgba(255,255,255,0.04);color:#fff;">
@@ -776,6 +786,7 @@ const SUBSTRUCTURE_SHIPPING = {
     adrese_kurjers: 9.90,
     garprofili: 39.90
 };
+let PANEL_SHIPPING_UNDER_30 = 150.00;
 
 function hasLongSubstructureGoods() {
     return cart.some(item => {
@@ -798,7 +809,7 @@ function getShippingPrice() {
 
     if (hasPanels) {
         const panelQty = getPanelSheetQty();
-        return panelQty >= 30 ? 0 : 150;
+        return panelQty >= 30 ? 0 : PANEL_SHIPPING_UNDER_30;
     }
 
     if (hasTiles) return null;
@@ -834,7 +845,7 @@ function getShippingSection() {
             <div class="shipping-info">
                 <label>Piegāde</label>
                 <p style="color:#ccc; margin-bottom:8px;">EQUITONE paneļu piegāde ar kravas transportu uz norādīto adresi.</p>
-                <p style="color:#ccc; margin-bottom:8px;"><strong>Līdz 29 loksnēm:</strong> piegāde 150,00 € &nbsp;•&nbsp; <strong>No 30 loksnēm:</strong> piegāde bez maksas.</p>
+                <p style="color:#ccc; margin-bottom:8px;"><strong>Līdz 29 loksnēm:</strong> piegāde ${money(PANEL_SHIPPING_UNDER_30)} &nbsp;•&nbsp; <strong>No 30 loksnēm:</strong> piegāde bez maksas.</p>
                 <p style="color:#aaa; margin-bottom:10px; font-size:.9rem;">Piegādes laiks: aptuveni 3–4 nedēļas.</p>
                 <input type="hidden" id="checkoutShipping" value="adrese_krava">
             </div>
@@ -855,7 +866,7 @@ function getShippingSection() {
             <div class="shipping-info">
                 <label>Piegādes veids</label>
                 <select id="checkoutShipping">
-                    <option value="garprofili">Garizmēra preču piegāde uz adresi — 39,90 €</option>
+                    <option value="garprofili">Garizmēra preču piegāde uz adresi — ${money(SUBSTRUCTURE_SHIPPING.garprofili)}</option>
                 </select>
                 <p style="color:#aaa; margin-top:8px; font-size:.9rem;">Gariem profiliem pakomāts nav pieejams. Piegāde tiek organizēta uz pasūtījumā norādīto adresi.</p>
                 <p style="color:#aaa; margin-top:6px; font-size:.9rem;">Piegādes laiks: aptuveni 1 nedēļa.</p>
@@ -867,8 +878,8 @@ function getShippingSection() {
         <div class="shipping-info">
             <label>Piegādes veids</label>
             <select id="checkoutShipping">
-                <option value="pakomats">Pakomāts — 4,90 €</option>
-                <option value="adrese_kurjers">Kurjers uz norādīto adresi — 9,90 €</option>
+                <option value="pakomats">Pakomāts — ${money(SUBSTRUCTURE_SHIPPING.pakomats)}</option>
+                <option value="adrese_kurjers">Kurjers uz norādīto adresi — ${money(SUBSTRUCTURE_SHIPPING.adrese_kurjers)}</option>
             </select>
             <div id="parcelLockerFields" style="margin-top:10px;">
                 <label for="checkoutParcelOperator">Pakomātu operators</label>
@@ -907,7 +918,66 @@ const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_j2K-1jR0sYjoDvN2k2SyoQ_J1lol_Zm
 const PRODUCT_OVERRIDES_API = 'https://dnpkkofglgkvnpxnqksw.supabase.co/rest/v1/product_overrides';
 const PRODUCT_IMAGE_UPLOAD_API = 'https://dnpkkofglgkvnpxnqksw.supabase.co/storage/v1/object/product-images';
 const PRODUCT_IMAGE_PUBLIC_BASE = 'https://dnpkkofglgkvnpxnqksw.supabase.co/storage/v1/object/public/product-images';
+const DELIVERY_SETTINGS_API = 'https://dnpkkofglgkvnpxnqksw.supabase.co/rest/v1/delivery_settings';
 const PAYMENT_API_URL = ''; // aktivizēsim pēc Swedbank e-komercijas pieslēguma
+
+function applyDeliverySettings(row) {
+    if (!row) return;
+    SUBSTRUCTURE_SHIPPING.pakomats = Number(row.parcel_locker ?? SUBSTRUCTURE_SHIPPING.pakomats);
+    SUBSTRUCTURE_SHIPPING.adrese_kurjers = Number(row.courier ?? SUBSTRUCTURE_SHIPPING.adrese_kurjers);
+    SUBSTRUCTURE_SHIPPING.garprofili = Number(row.long_goods ?? SUBSTRUCTURE_SHIPPING.garprofili);
+    PANEL_SHIPPING_UNDER_30 = Number(row.equitone_under_30 ?? PANEL_SHIPPING_UNDER_30);
+
+    const a = document.getElementById('deliveryPakomats');
+    const b = document.getElementById('deliveryCourier');
+    const c = document.getElementById('deliveryLongGoods');
+    const d = document.getElementById('deliveryEquitone');
+    if (a) a.value = SUBSTRUCTURE_SHIPPING.pakomats.toFixed(2);
+    if (b) b.value = SUBSTRUCTURE_SHIPPING.adrese_kurjers.toFixed(2);
+    if (c) c.value = SUBSTRUCTURE_SHIPPING.garprofili.toFixed(2);
+    if (d) d.value = PANEL_SHIPPING_UNDER_30.toFixed(2);
+}
+
+async function loadDeliverySettings() {
+    try {
+        const r = await fetch(`${DELIVERY_SETTINGS_API}?select=parcel_locker,courier,long_goods,equitone_under_30&id=eq.1`, {
+            headers: {
+                'apikey': SUPABASE_PUBLISHABLE_KEY,
+                'Authorization': `Bearer ${SUPABASE_PUBLISHABLE_KEY}`
+            },
+            cache: 'no-store'
+        });
+        if (!r.ok) throw new Error(`delivery_load_${r.status}`);
+        const rows = await r.json();
+        applyDeliverySettings(rows[0]);
+    } catch (e) {
+        console.error('Piegādes cenas neizdevās ielādēt:', e);
+    }
+}
+
+async function saveDeliverySettings() {
+    const settings = {
+        parcel_locker: Number(document.getElementById('deliveryPakomats').value),
+        courier: Number(document.getElementById('deliveryCourier').value),
+        long_goods: Number(document.getElementById('deliveryLongGoods').value),
+        equitone_under_30: Number(document.getElementById('deliveryEquitone').value)
+    };
+    if (!Object.values(settings).every(v => Number.isFinite(v) && v >= 0)) {
+        throw new Error('invalid_delivery_values');
+    }
+    const r = await fetch(ADMIN_ORDER_API_URL, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+            'x-admin-password': getAdminPassword()
+        },
+        body: JSON.stringify({action:'delivery_settings', settings})
+    });
+    if (!r.ok) throw new Error(`delivery_save_${r.status}`);
+    const data = await r.json();
+    applyDeliverySettings(data.deliverySettings);
+}
+
 
 function productApiHeaders(admin=false, extra={}) {
     const h = {
@@ -1418,7 +1488,6 @@ function renderAdminTable() {
             <td>${sizeLabels.join(' / ')}</td>
             <td>${p.variants ? p.variants.map(v => v.color).join(', ') : 'nav'}</td>
             <td>${first ? '€'+first.priceSmall.toFixed(2) : '—'}</td>
-            <td>${first ? '€'+first.priceLarge.toFixed(2) : '—'}</td>
             <td class="actions">
                 <button class="btn btn-primary btn-sm edit-product" data-id="${p.id}"><i class="fas fa-edit"></i></button>
                 <button class="btn btn-danger btn-sm delete-product" data-id="${p.id}"><i class="fas fa-trash"></i></button>
@@ -1440,7 +1509,6 @@ function renderAdminTable() {
             document.getElementById('addSize2').value = sizeLabels[1] || '';
             const first = product.variants && product.variants.length > 0 ? product.variants[0] : null;
             document.getElementById('addProdPriceSmall').value = first ? first.priceSmall : '';
-            document.getElementById('addProdPriceLarge').value = first ? first.priceLarge : '';
             const form = document.getElementById('adminAddProductForm');
             const submitBtn = form.querySelector('button[type="submit"]');
             submitBtn.innerHTML = '<i class="fas fa-save"></i> Saglabāt izmaiņas';
@@ -1450,7 +1518,7 @@ function renderAdminTable() {
                 e.preventDefault();
                 const editId = parseInt(submitBtn.dataset.editId);
                 const ps = parseFloat(document.getElementById('addProdPriceSmall').value);
-                const pl = parseFloat(document.getElementById('addProdPriceLarge').value);
+                const pl = ps;
                 const size1 = document.getElementById('addSize1').value.trim();
                 const size2 = document.getElementById('addSize2').value.trim();
                 if (isNaN(ps) || isNaN(pl) || !size1 || !size2) { showToast('Aizpildiet visus laukus!'); return; }
@@ -1525,8 +1593,7 @@ function renderVariantEditor(productId) {
                     ${hasImage ? `<img src="${v.image}" class="v-preview" alt="priekšskats" onerror="this.style.display='none';" />` : `<div class="v-preview" style="display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.04);color:#666;font-size:0.7rem;">nav bildes</div>`}
                     <span class="v-color-label" style="font-weight:600;font-size:0.9rem;color:#fff;">${v.color}</span>
                 </div>
-                <label style="font-size:0.75rem;color:#999;">1.izm.: <input type="number" step="0.01" class="v-price-small" value="${v.priceSmall}" style="width:80px;" /></label>
-                <label style="font-size:0.75rem;color:#999;">2.izm.: <input type="number" step="0.01" class="v-price-large" value="${v.priceLarge}" style="width:80px;" /></label>
+                <label style="font-size:0.75rem;color:#999;">Cena bez PVN: <input type="number" step="0.01" class="v-price-small" value="${v.priceSmall}" style="width:90px;" /></label>
                 <input type="text" class="v-image" value="${v.image || ''}" placeholder="Attēla URL" style="font-size:0.75rem;color:#fff;" />
                 <button class="btn btn-danger btn-xs remove-image-btn" data-product-id="${productId}" data-variant-index="${idx}" ${!hasImage ? 'disabled' : ''}><i class="fas fa-times"></i> Noņemt bildi</button>
                 <button class="btn btn-primary btn-xs save-variant-btn" data-product-id="${productId}" data-variant-index="${idx}"><i class="fas fa-save"></i> Saglabāt</button>
@@ -1540,7 +1607,7 @@ function renderVariantEditor(productId) {
             const vIdx = parseInt(this.dataset.variantIndex);
             const row = this.closest('.variant-edit-row');
             const ps = parseFloat(row.querySelector('.v-price-small').value);
-            const pl = parseFloat(row.querySelector('.v-price-large').value);
+            const pl = ps;
             const img = row.querySelector('.v-image').value.trim();
             if (isNaN(ps) || isNaN(pl)) { showToast('Ievadiet derīgas cenas!'); return; }
             const prod = allProducts.find(p => p.id === pId);
@@ -1587,7 +1654,7 @@ async function handleAddProduct(e) {
     const size1 = document.getElementById('addSize1').value.trim();
     const size2 = document.getElementById('addSize2').value.trim();
     const ps = parseFloat(document.getElementById('addProdPriceSmall').value);
-    const pl = parseFloat(document.getElementById('addProdPriceLarge').value);
+    const pl = ps;
     if (!name || !code || !size1 || !size2 || isNaN(ps) || isNaN(pl)) { showToast('Aizpildiet visus laukus!'); return; }
     const newId = allProducts.length > 0 ? Math.max(...allProducts.map(p => p.id)) + 1 : 1;
     const newProduct = { id: newId, category, name, code, desc, sizeLabels: [size1, size2], variants: [{ color: 'Noklusējums', image: '', code: code + '-DEFAULT', priceSmall: ps, priceLarge: pl }] };
@@ -1678,11 +1745,29 @@ document.getElementById('adminAddVariantForm').addEventListener('submit', async 
     showToast('✅ Krāsu variants saglabāts serverī!');
 });
 
-loadProductOverrides().finally(() => {
+document.getElementById('adminDeliveryForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    try {
+        await saveDeliverySettings();
+        showToast('✅ Piegādes cenas saglabātas serverī!');
+        updateCheckoutPriceSummary();
+    } catch (err) {
+        showToast('❌ Piegādes cenas neizdevās saglabāt.');
+        console.error(err);
+    }
+});
+
+Promise.all([loadProductOverrides(), loadDeliverySettings()]).finally(() => {
     products = allProducts.filter(p => p.category === currentCategory);
     renderProducts();
     renderAdminTable();
     populateVariantSelect();
+    applyDeliverySettings({
+        parcel_locker: SUBSTRUCTURE_SHIPPING.pakomats,
+        courier: SUBSTRUCTURE_SHIPPING.adrese_kurjers,
+        long_goods: SUBSTRUCTURE_SHIPPING.garprofili,
+        equitone_under_30: PANEL_SHIPPING_UNDER_30
+    });
 });
 updateCartUI();
 console.log('✅ O FASADES — pasūtījumu un produktu serveris pieslēgts.');
