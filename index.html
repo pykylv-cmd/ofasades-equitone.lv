@@ -586,10 +586,12 @@ function renderProducts() {
     const grid = document.getElementById('productGrid');
     const countEl = document.getElementById('productCount');
     const catName = currentCategory === 'paneli' ? 'Paneļi' : currentCategory === 'flizes' ? 'Flīzes' : 'Apakškonstrukcija';
-    countEl.textContent = `Kopā ${products.length} produkti (${catName})`;
     const displayProducts = currentCategory === 'paneli'
-        ? [...products].sort((a,b) => panelDisplayRank(a) - panelDisplayRank(b))
+        ? [...products]
+            .filter(p => !String((p.sizeLabels || [])[0] || '').toLowerCase().includes('10mm'))
+            .sort((a,b) => panelDisplayRank(a) - panelDisplayRank(b))
         : products;
+    countEl.textContent = `Kopā ${displayProducts.length} produkti (${catName})`;
     grid.innerHTML = displayProducts.map(p => {
         const first = p.variants && p.variants.length > 0 ? p.variants[0] : null;
         const imgSrc = first && first.image ? first.image : '';
