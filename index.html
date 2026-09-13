@@ -1413,7 +1413,8 @@ function updateCheckoutPriceSummary() {
     const goodsNet = cart.reduce((sum,item)=>sum+item.price*item.qty,0);
     const goodsVat = vatAmount(goodsNet);
     const goodsGross = grossAmount(goodsNet);
-    const shippingGross = getShippingPrice();
+    const shippingNet = getShippingPrice();
+    const shippingGross = shippingNet === null ? null : grossAmount(shippingNet);
     const weightInfo = cartWeightInfo();
     const weightLine = `<br>Kopējais preču svars: <strong>${formatWeightKg(weightInfo.totalKg)}</strong>${weightInfo.unknownQty > 0 ? `<br><small style="color:#d8b86a;">⚠ ${weightInfo.unknownQty} vien. nav norādīts svars.</small>` : ''}`;
 
@@ -1422,9 +1423,8 @@ function updateCheckoutPriceSummary() {
         return;
     }
 
-    const shippingNet = shippingGross / (1 + VAT_RATE);
-    const shippingVat = shippingGross - shippingNet;
-    box.innerHTML = `<strong>Pasūtījuma summa</strong><br>Preces bez PVN: ${money(goodsNet)}<br>Piegāde ar PVN: ${money(shippingGross)}<br>PVN 21% kopā: ${money(goodsVat + shippingVat)}<br><strong>Kopā ar piegādi: ${money(goodsGross + shippingGross)}</strong>${weightLine}`;
+    const shippingVat = vatAmount(shippingNet);
+    box.innerHTML = `<strong>Pasūtījuma summa</strong><br>Preces bez PVN: ${money(goodsNet)}<br>Piegāde bez PVN: ${money(shippingNet)}<br>PVN 21% kopā: ${money(goodsVat + shippingVat)}<br><strong>Kopā ar piegādi: ${money(goodsGross + shippingGross)}</strong>${weightLine}`;
 }
 
 function getShippingSection() {
@@ -1709,10 +1709,10 @@ function showTransferSuccess(order, localOnly=false, emailSent=false){
             <div class="bank-line"><span>Banka</span><span>Swedbank AS</span></div>
             <div class="bank-line"><span>IBAN</span><span><strong>LV55 HABA 0551 0437 0761 5</strong></span></div>
             <div class="bank-line"><span>SWIFT/BIC</span><span>HABALV22</span></div>
-            <div class="bank-line"><span>Preču summa bez PVN</span><span><strong>${money(order.subtotal - (order.shippingCost ? order.shippingCost / (1 + VAT_RATE) : 0))}</strong></span></div>
+            <div class="bank-line"><span>Preču summa bez PVN</span><span><strong>${money(order.subtotal - (order.shippingCost || 0))}</strong></span></div>
             ${order.shippingCost == null
     ? '<div class="bank-line"><span>Piegāde</span><span><strong>Tiks aprēķināta atsevišķi</strong></span></div>'
-    : `<div class="bank-line"><span>Piegāde</span><span><strong>${money(order.shippingCost)}</strong></span></div>`}
+    : `<div class="bank-line"><span>Piegāde bez PVN</span><span><strong>${money(order.shippingCost)}</strong></span></div>`}
             <div class="bank-line"><span>Kopā apmaksai ar PVN</span><span><strong>${money(order.total)}</strong></span></div>
             ${localOnly?'<div style="margin-top:8px;color:#d8bd70;">TESTA REŽĪMS: pasūtījums ir saglabāts tikai šajā pārlūkā.</div>':(emailSent?'<div style="margin-top:8px;color:#9ee7b8;">Pasūtījuma apstiprinājums nosūtīts uz klienta e-pastu. O FASADES ir saņēmis paziņojumu.</div>':'<div style="margin-top:8px;color:#d8bd70;">Pasūtījums ir veiksmīgi saglabāts. Pēc maksājuma saņemšanas nosūtīsim apstiprinājumu uz Jūsu e-pastu.</div>')}
         </div>
@@ -1809,14 +1809,16 @@ document.getElementById('checkoutForm').addEventListener('submit', async functio
     if (!document.getElementById('checkoutConsent').checked) { setCheckoutStatus('Lūdzu, apstipriniet datu izmantošanu pasūtījuma apstrādei.'); return; }
 
     const goodsSubtotal = cart.reduce((s,i)=>s+i.price*i.qty,0);
-    const shippingGross = getShippingPrice();
-    const shippingNet = shippingGross === null ? 0 : shippingGross / (1 + VAT_RATE);
+    const shippingNetRaw = getShippingPrice();
+    const shippingNet = shippingNetRaw === null ? 0 : shippingNetRaw;
+    const shippingVat = shippingNetRaw === null ? 0 : vatAmount(shippingNet);
+    const shippingGross = shippingNetRaw === null ? null : grossAmount(shippingNet);
     const subtotal = goodsSubtotal + shippingNet;
-    const vat = vatAmount(goodsSubtotal) + (shippingGross === null ? 0 : shippingGross - shippingNet);
+    const vat = vatAmount(goodsSubtotal) + shippingVat;
     const total = grossAmount(goodsSubtotal) + (shippingGross === null ? 0 : shippingGross);
     const shippingMap = {
-        adrese_krava: shippingGross === 0 ? 'EQUITONE paneļu piegāde — bez maksas (30+ loksnes), aptuveni 3–4 nedēļas' : `EQUITONE paneļu piegāde — ${money(shippingGross)} (līdz 29 loksnēm), aptuveni 3–4 nedēļas`,
-        adrese_kurjers: shippingGross === null ? 'Kurjers uz norādīto adresi' : `Kurjers uz norādīto adresi — ${money(shippingGross)}`,
+        adrese_krava: shippingGross === 0 ? 'EQUITONE paneļu piegāde — bez maksas (30+ loksnes), aptuveni 3–4 nedēļas' : `EQUITONE paneļu piegāde — ${money(shippingNet)} bez PVN (līdz 29 loksnēm), aptuveni 3–4 nedēļas`,
+        adrese_kurjers: shippingGross === null ? 'Kurjers uz norādīto adresi' : `Kurjers uz norādīto adresi — ${money(shippingNet)} bez PVN`,
         pakomats:`Pakomāts — ${parcelOperator}: ${parcelLocker} — ${money(shippingGross || 0)} — aptuveni 3 darba dienas`,
         garprofili:`Garizmēra preču piegāde uz norādīto adresi — ${money(shippingGross || 0)}`
     };
@@ -1829,7 +1831,7 @@ document.getElementById('checkoutForm').addEventListener('submit', async functio
             const unitWeightKg = productUnitWeightKg(i);
             return {productId:i.id,name:i.name,variant:i.variantColor||'',sapCode:i.variantCode||'',size:i.sizeLabel||'',qty:i.qty,unitPrice:i.price,lineTotal:Number((i.price*i.qty).toFixed(2)),unitWeightKg:Number(unitWeightKg.toFixed(4)),lineWeightKg:Number((unitWeightKg*i.qty).toFixed(3))};
         }),
-        subtotal:Number(subtotal.toFixed(2)), vatRate:VAT_RATE, vat:Number(vat.toFixed(2)), total:Number(total.toFixed(2)), shippingCost:shippingGross === null ? null : Number(shippingGross.toFixed(2)), currency:'EUR'
+        subtotal:Number(subtotal.toFixed(2)), vatRate:VAT_RATE, vat:Number(vat.toFixed(2)), total:Number(total.toFixed(2)), shippingCost:shippingNetRaw === null ? null : Number(shippingNet.toFixed(2)), shippingVat:Number(shippingVat.toFixed(2)), shippingGross:shippingGross === null ? null : Number(shippingGross.toFixed(2)), currency:'EUR'
     };
     const submit=document.getElementById('checkoutSubmitBtn'); submit.disabled=true; submit.innerHTML='<i class="fas fa-spinner fa-spin"></i> Nosūta...';
     try {
