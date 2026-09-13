@@ -416,7 +416,7 @@ SWIFT/BIC HABALV22
 <form class="admin-add-form" id="adminDeliveryForm">
 <input type="number" id="deliveryPakomats" placeholder="Pakomāts €" step="0.01" min="0" required />
 <input type="number" id="deliveryCourier" placeholder="Kurjers €" step="0.01" min="0" required />
-<input type="number" id="deliveryLongGoods" placeholder="Garizmēra preces €" step="0.01" min="0" required />
+<input type="number" id="deliveryLongGoods" placeholder="Smagās / garizmēra preces €" step="0.01" min="0" required />
 <input type="number" id="deliveryEquitone" placeholder="EQUITONE līdz 29 loksnēm €" step="0.01" min="0" required />
 <div class="full-width" style="color:#aaa;font-size:.9rem;">EQUITONE no 30 loksnēm — piegāde bez maksas. Šeit mainītās cenas saglabājas serverī un uzreiz tiek izmantotas veikalā.</div>
 <button type="submit" class="btn btn-gold"><i class="fas fa-save"></i> Saglabāt piegādes cenas</button>
@@ -1393,6 +1393,12 @@ function getPanelSheetQty() {
 }
 
 const PARCEL_LOCKER_MAX_KG = 30;
+const STANDARD_COURIER_MAX_KG = 30;
+
+function isHeavySubstructureOrder() {
+    const info = cartWeightInfo();
+    return info.unknownQty === 0 && info.totalKg > STANDARD_COURIER_MAX_KG;
+}
 
 function parcelLockerAllowedByWeight() {
     const info = cartWeightInfo();
@@ -1401,13 +1407,19 @@ function parcelLockerAllowedByWeight() {
 
 function enforceParcelLockerWeightLimit() {
     const shipping = document.getElementById('checkoutShipping');
-    if (!shipping) return false;
+    if (!shipping) return '';
     const info = cartWeightInfo();
+
+    if (info.unknownQty === 0 && info.totalKg > STANDARD_COURIER_MAX_KG) {
+        if (shipping.value !== 'garprofili') shipping.value = 'garprofili';
+        return 'heavy';
+    }
+
     if (shipping.value === 'pakomats' && (info.unknownQty > 0 || info.totalKg > PARCEL_LOCKER_MAX_KG)) {
         shipping.value = 'adrese_kurjers';
-        return true;
+        return 'courier';
     }
-    return false;
+    return '';
 }
 
 function getShippingPrice() {
@@ -1421,6 +1433,8 @@ function getShippingPrice() {
 
     if (hasTiles) return null;
 
+    if (isHeavySubstructureOrder()) return SUBSTRUCTURE_SHIPPING.garprofili;
+
     const shipping = document.getElementById('checkoutShipping')?.value;
     return Object.prototype.hasOwnProperty.call(SUBSTRUCTURE_SHIPPING, shipping) ? SUBSTRUCTURE_SHIPPING[shipping] : 0;
 }
@@ -1428,8 +1442,8 @@ function getShippingPrice() {
 function updateCheckoutPriceSummary() {
     const box = document.getElementById('checkoutPriceSummary');
     if (!box) return;
-    const switchedToCourier = enforceParcelLockerWeightLimit();
-    if (switchedToCourier) {
+    const shippingSwitch = enforceParcelLockerWeightLimit();
+    if (shippingSwitch) {
         const fields = document.getElementById('parcelLockerFields');
         const locker = document.getElementById('checkoutParcelLocker');
         if (fields) fields.style.display = 'none';
@@ -1441,7 +1455,7 @@ function updateCheckoutPriceSummary() {
     const shippingNet = getShippingPrice();
     const shippingGross = shippingNet === null ? null : grossAmount(shippingNet);
     const weightInfo = cartWeightInfo();
-    const weightLine = `<br>Kopējais preču svars: <strong>${formatWeightKg(weightInfo.totalKg)}</strong>${weightInfo.unknownQty > 0 ? `<br><small style="color:#d8b86a;">⚠ ${weightInfo.unknownQty} vien. nav norādīts svars — drošības dēļ pakomāts netiek piedāvāts.</small>` : ''}${switchedToCourier ? `<br><small style="color:#d8b86a;">⚠ Pakomāta limits ir ${PARCEL_LOCKER_MAX_KG} kg. Piegāde automātiski pārslēgta uz kurjeru.</small>` : ''}`;
+    const weightLine = `<br>Kopējais preču svars: <strong>${formatWeightKg(weightInfo.totalKg)}</strong>${weightInfo.unknownQty > 0 ? `<br><small style="color:#d8b86a;">⚠ ${weightInfo.unknownQty} vien. nav norādīts svars — drošības dēļ pakomāts netiek piedāvāts.</small>` : ''}${shippingSwitch === 'courier' ? `<br><small style="color:#d8b86a;">⚠ Pakomāta limits ir ${PARCEL_LOCKER_MAX_KG} kg. Piegāde automātiski pārslēgta uz kurjeru.</small>` : ''}${shippingSwitch === 'heavy' ? `<br><small style="color:#d8b86a;">⚠ Pasūtījums pārsniedz ${STANDARD_COURIER_MAX_KG} kg. Piegāde automātiski pārslēgta uz smago/kravas piegādi.</small>` : ''}`;
 
     if (shippingGross === null) {
         box.innerHTML = `<strong>Pasūtījuma summa</strong><br>Preces bez PVN: ${money(goodsNet)}<br>PVN 21%: ${money(goodsVat)}<br><strong>Kopā ar PVN: ${money(goodsGross)}</strong>${weightLine}<br><small>Piegādes cena: tiek saskaņota atsevišķi.</small>`;
@@ -1477,12 +1491,26 @@ function getShippingSection() {
         `;
     }
 
+    if (isHeavySubstructureOrder()) {
+        const info = cartWeightInfo();
+        return `
+            <div class="shipping-info">
+                <label>Piegādes veids</label>
+                <select id="checkoutShipping">
+                    <option value="garprofili">Smago preču piegāde uz adresi — ${money(SUBSTRUCTURE_SHIPPING.garprofili)} bez PVN</option>
+                </select>
+                <p style="color:#ccc; margin-top:8px;">Pasūtījuma kopējais svars ir <strong>${formatWeightKg(info.totalKg)}</strong>. Pasūtījumiem virs ${STANDARD_COURIER_MAX_KG} kg standarta kurjera cena €9.90 netiek piemērota.</p>
+                <p style="color:#aaa; margin-top:6px; font-size:.9rem;">Piegāde tiek organizēta ar smago/kravas transportu uz pasūtījumā norādīto adresi.</p>
+            </div>
+        `;
+    }
+
     if (hasLongSubstructureGoods()) {
         return `
             <div class="shipping-info">
                 <label>Piegādes veids</label>
                 <select id="checkoutShipping">
-                    <option value="garprofili">Garizmēra preču piegāde uz adresi — ${money(SUBSTRUCTURE_SHIPPING.garprofili)}</option>
+                    <option value="garprofili">Smago/garizmēra preču piegāde uz adresi — ${money(SUBSTRUCTURE_SHIPPING.garprofili)} bez PVN</option>
                 </select>
                 <p style="color:#aaa; margin-top:8px; font-size:.9rem;">Gariem profiliem pakomāts nav pieejams. Piegāde tiek organizēta uz pasūtījumā norādīto adresi.</p>
                 <p style="color:#aaa; margin-top:6px; font-size:.9rem;">Piegādes laiks: aptuveni 1 nedēļa.</p>
@@ -1495,7 +1523,7 @@ function getShippingSection() {
             <label>Piegādes veids</label>
             <select id="checkoutShipping">
                 <option value="pakomats">Pakomāts — ${money(SUBSTRUCTURE_SHIPPING.pakomats)}</option>
-                <option value="adrese_kurjers">Kurjers uz norādīto adresi — ${money(SUBSTRUCTURE_SHIPPING.adrese_kurjers)}</option>
+                <option value="adrese_kurjers">Kurjers uz norādīto adresi — ${money(SUBSTRUCTURE_SHIPPING.adrese_kurjers)} bez PVN (līdz 30 kg)</option>
             </select>
             <div id="parcelLockerFields" style="margin-top:10px;">
                 <label for="checkoutParcelOperator">Pakomātu operators</label>
@@ -1522,13 +1550,24 @@ function setupShippingControls() {
         const info = cartWeightInfo();
         const parcelOption = shipping.querySelector('option[value="pakomats"]');
         const parcelAllowed = info.unknownQty === 0 && info.totalKg <= PARCEL_LOCKER_MAX_KG;
+        const heavyOrder = info.unknownQty === 0 && info.totalKg > STANDARD_COURIER_MAX_KG;
+        if (heavyOrder && !shipping.querySelector('option[value="garprofili"]')) {
+            const opt = document.createElement('option');
+            opt.value = 'garprofili';
+            opt.textContent = `Smago preču piegāde — ${money(SUBSTRUCTURE_SHIPPING.garprofili)} bez PVN`;
+            shipping.appendChild(opt);
+        }
         if (parcelOption) {
             parcelOption.disabled = !parcelAllowed;
             parcelOption.textContent = parcelAllowed
                 ? `Pakomāts (līdz ${PARCEL_LOCKER_MAX_KG} kg)`
                 : `Pakomāts nav pieejams — virs ${PARCEL_LOCKER_MAX_KG} kg vai trūkst svara`;
         }
-        if (!parcelAllowed && shipping.value === 'pakomats') shipping.value = 'adrese_kurjers';
+        if (heavyOrder) {
+            shipping.value = 'garprofili';
+        } else if (!parcelAllowed && shipping.value === 'pakomats') {
+            shipping.value = 'adrese_kurjers';
+        }
         const isParcel = shipping.value === 'pakomats';
         if (fields) fields.style.display = isParcel ? 'block' : 'none';
         if (locker) locker.required = isParcel;
@@ -1858,7 +1897,7 @@ document.getElementById('checkoutForm').addEventListener('submit', async functio
         adrese_krava: shippingGross === 0 ? 'EQUITONE paneļu piegāde — bez maksas (30+ loksnes), aptuveni 3–4 nedēļas' : `EQUITONE paneļu piegāde — ${money(shippingNet)} bez PVN (līdz 29 loksnēm), aptuveni 3–4 nedēļas`,
         adrese_kurjers: shippingGross === null ? 'Kurjers uz norādīto adresi' : `Kurjers uz norādīto adresi — ${money(shippingNet)} bez PVN`,
         pakomats:`Pakomāts — ${parcelOperator}: ${parcelLocker} — ${money(shippingGross || 0)} — aptuveni 3 darba dienas`,
-        garprofili:`Garizmēra preču piegāde uz norādīto adresi — ${money(shippingGross || 0)}`
+        garprofili:`Smago/garizmēra preču piegāde uz norādīto adresi — ${money(shippingNet)} bez PVN`
     };
     const order = {
         orderNumber:createOrderNumber(), createdAt:new Date().toISOString(), status:(document.querySelector('input[name="payment"]:checked')?.value === 'card' ? 'Gaida apmaksu' : 'Gaida pārskaitījumu'),
