@@ -566,12 +566,31 @@ function vatAmount(net){ return Number(net||0) * VAT_RATE; }
 function grossAmount(net){ return Number(net||0) * (1 + VAT_RATE); }
 function money(v){ return `€${Number(v||0).toFixed(2)}`; }
 
+function panelDisplayRank(p) {
+    const name = String(p.name || '').toUpperCase();
+    const size = String((p.sizeLabels || [])[0] || '').toUpperCase();
+    if (name.includes('TECTIVA')) {
+        // Kalibrētā TECTIVA vispirms, 10 mm MTO / nekalibrētā uzreiz aiz tās.
+        return (name.includes('NEKALIBR') || size.includes('10MM') || size.includes('MTO')) ? 2 : 1;
+    }
+    if (name.includes('PICTURA')) return 3;
+    if (name.includes('NATURA')) return 4; // arī Natura PRO turas kopā ar Natura
+    if (name.includes('TEXTURA')) return 5;
+    if (name.includes('LINEA')) return 6;
+    if (name.includes('INSPIRIA')) return 7;
+    if (name.includes('LUNARA')) return 8;
+    return 99;
+}
+
 function renderProducts() {
     const grid = document.getElementById('productGrid');
     const countEl = document.getElementById('productCount');
     const catName = currentCategory === 'paneli' ? 'Paneļi' : currentCategory === 'flizes' ? 'Flīzes' : 'Apakškonstrukcija';
     countEl.textContent = `Kopā ${products.length} produkti (${catName})`;
-    grid.innerHTML = products.map(p => {
+    const displayProducts = currentCategory === 'paneli'
+        ? [...products].sort((a,b) => panelDisplayRank(a) - panelDisplayRank(b))
+        : products;
+    grid.innerHTML = displayProducts.map(p => {
         const first = p.variants && p.variants.length > 0 ? p.variants[0] : null;
         const imgSrc = first && first.image ? first.image : '';
         const sizeLabels = p.sizeLabels || ['Mazais', 'Lielais'];
