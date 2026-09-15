@@ -277,6 +277,25 @@ html { scroll-behavior:smooth; }
 }
 .qty-input[type=number]{-moz-appearance:textfield;}
 </style>
+<script>
+/* Local Preview protection: prevents repeated network-permission dialogs from dozens of third-party image hosts.
+   This runs only when the HTML is opened directly as a local file. On the real hosted shop, images load normally. */
+if (location.protocol === 'file:') {
+  document.addEventListener('DOMContentLoaded', function () {
+    const allowed = ['dnpkkofglgkvnpxnqksw.supabase.co'];
+    document.querySelectorAll('img[src^="http"]').forEach(function(img) {
+      try {
+        const u = new URL(img.src);
+        if (!allowed.includes(u.hostname)) {
+          img.dataset.remoteSrc = img.src;
+          img.removeAttribute('src');
+          img.style.display = 'none';
+        }
+      } catch (_) {}
+    });
+  });
+}
+</script>
 </head>
 <body>
 <header class="header">
@@ -978,8 +997,8 @@ function renderProducts() {
                             data-bracket-id="${item.id}">${label}</button>`;
             }).join('');
             return `
-            <div class="product-card bracket-group-card" data-group="${groupKey}" data-selected-bracket-id="${selected ? selected.id : ''}">
-                <div class="product-image"><span class="no-image">${isCokola ? '📐' : (isStainlessHook ? '🪝' : '🔩')}</span></div>
+            <div class="product-card bracket-group-card" data-group="${groupKey}" data-selected-bracket-id="${selected ? selected.id : ''}" data-selected-variant-index="0">
+                <div class="product-image bracket-group-image" onclick="openLightbox(this.querySelector('img') ? this.querySelector('img').src : '')">${isSoudalSpsGroup && firstVariant && firstVariant.image ? `<img src="${firstVariant.image}" alt="${firstVariant.color || groupTitle}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" /><span class="no-image" style="display:none;">🔩</span>` : `<span class="no-image">${isCokola ? '📐' : (isStainlessHook ? '🪝' : '🔩')}</span>`}</div>
                 <h3>${groupTitle}</h3>
                 <div class="product-code" id="bracket-group-code">${selected ? selected.code : ''}</div>
                 <div class="product-desc" id="bracket-group-desc">${selected ? selected.desc : ''}</div>
@@ -990,6 +1009,7 @@ function renderProducts() {
                         ${buttons}
                     </div>
                 </details>
+                ${isSoudalSpsGroup ? `<div class="color-variants soudal-variant-selector" style="${selected && selected.variants && selected.variants.length > 1 ? '' : 'display:none;'}"><span class="label">Varianti:</span>${selected && selected.variants ? selected.variants.map((v,vi)=>`<button type="button" class="color-btn soudal-variant-btn ${vi===0?'active':''}" data-variant-index="${vi}" title="${v.color || 'Variants'}" style="${v.image ? `background-image:url('${v.image}')` : ''}"><span class="tooltip">${v.color || 'Variants'}</span></button>`).join('') : ''}</div>` : ''}
                 <div class="product-bottom">
                     <span class="price" id="bracket-group-price">${firstVariant ? `${money(firstVariant.priceSmall)} <small>bez PVN</small><br><small>${money(grossAmount(firstVariant.priceSmall))} ar PVN / vienība</small>` : '—'}</span>
                     <button class="btn btn-primary btn-sm bracket-add-to-cart"><i class="fas fa-plus"></i> Pievienot</button>
@@ -1055,6 +1075,16 @@ function renderProducts() {
             this.classList.add('active');
             card.dataset.selectedBracketId = String(productId);
             const variant = product.variants && product.variants[0] ? product.variants[0] : null;
+            card.dataset.selectedVariantIndex = '0';
+            if (card.dataset.group === 'soudal-sps') {
+                const selector = card.querySelector('.soudal-variant-selector');
+                if (selector) {
+                    const vars = product.variants || [];
+                    selector.style.display = vars.length > 1 ? '' : 'none';
+                    selector.innerHTML = `<span class="label">Varianti:</span>` + vars.map((v,vi)=>`<button type="button" class="color-btn soudal-variant-btn ${vi===0?'active':''}" data-variant-index="${vi}" title="${v.color || 'Variants'}" style="${v.image ? `background-image:url('${v.image}')` : ''}"><span class="tooltip">${v.color || 'Variants'}</span></button>`).join('');
+                }
+                updateSoudalGroupImage(card, variant);
+            }
             const codeEl = card.querySelector('#bracket-group-code');
             const descEl = card.querySelector('#bracket-group-desc');
             const priceEl = card.querySelector('#bracket-group-price');
@@ -1069,6 +1099,38 @@ function renderProducts() {
         });
     });
 
+    function updateSoudalGroupImage(card, variant) {
+        const box = card.querySelector('.bracket-group-image');
+        if (!box) return;
+        const img = variant && variant.image ? String(variant.image).trim() : '';
+        box.innerHTML = img
+            ? `<img src="${img}" alt="${variant.color || 'SOUDAL'}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" /><span class="no-image" style="display:none;">🔩</span>`
+            : `<span class="no-image">🔩</span>`;
+        box.onclick = function() { openLightbox(this.querySelector('img') ? this.querySelector('img').src : ''); };
+    }
+
+    document.querySelectorAll('.soudal-variant-selector').forEach(selector => {
+        selector.addEventListener('click', function(e) {
+            const btn = e.target.closest('.soudal-variant-btn');
+            if (!btn) return;
+            e.preventDefault();
+            e.stopPropagation();
+            const card = this.closest('.bracket-group-card');
+            const productId = parseInt(card.dataset.selectedBracketId);
+            const product = allProducts.find(p => p.id === productId);
+            if (!product) return;
+            const idx = parseInt(btn.dataset.variantIndex);
+            const variant = product.variants && product.variants[idx];
+            if (!variant) return;
+            card.dataset.selectedVariantIndex = String(idx);
+            this.querySelectorAll('.soudal-variant-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            updateSoudalGroupImage(card, variant);
+            const priceEl = card.querySelector('#bracket-group-price');
+            if (priceEl) priceEl.innerHTML = `${money(variant.priceSmall)} <small>bez PVN</small><br><small>${money(grossAmount(variant.priceSmall))} ar PVN / vienība</small>`;
+        });
+    });
+
     document.querySelectorAll('.bracket-add-to-cart').forEach(btn => {
         btn.addEventListener('click', function(e) {
             e.stopPropagation();
@@ -1076,7 +1138,8 @@ function renderProducts() {
             const productId = parseInt(card.dataset.selectedBracketId);
             const product = allProducts.find(p => p.id === productId);
             if (!product) return;
-            const variant = product.variants && product.variants[0] ? product.variants[0] : null;
+            const selectedVariantIndex = card.dataset.group === 'soudal-sps' ? Number(card.dataset.selectedVariantIndex || 0) : 0;
+            const variant = product.variants && product.variants[selectedVariantIndex] ? product.variants[selectedVariantIndex] : (product.variants && product.variants[0] ? product.variants[0] : null);
             if (!variant) return;
             const price = Number(variant.priceSmall || 0);
             const sizeLabel = card.dataset.group === 'stainless-hooks'
@@ -1088,7 +1151,8 @@ function renderProducts() {
                     : (card.dataset.group === 't-profiles'
                         ? String(product.desc || '').replace(/·?\s*Svars:.*$/i, '').trim()
                         : String(product.desc || '').trim()));
-            const existing = cart.find(item => item.id === product.id && item.variantColor === 'Standarts');
+            const selectedColor = variant.color || 'Standarts';
+            const existing = cart.find(item => item.id === product.id && item.variantColor === selectedColor);
             if (existing) {
                 existing.qty += 1;
             } else {
@@ -1101,7 +1165,7 @@ function renderProducts() {
                     qty: 1,
                     size: 0,
                     sizeLabel: sizeLabel,
-                    variantColor: 'Standarts',
+                    variantColor: selectedColor,
                     variantCode: variant.code || product.code || ''
                 });
             }
@@ -2432,7 +2496,8 @@ document.getElementById('adminAddVariantForm').addEventListener('submit', async 
     this.reset();
     document.getElementById('variantPreview').style.display = 'none';
     populateVariantSelect();
-    showToast('✅ Krāsu variants saglabāts serverī!');
+    renderVariantEditor(productId);
+    showToast('✅ Krāsu variants saglabāts serverī un redzams produkta kartītē!');
 });
 
 document.getElementById('adminDeliveryForm').addEventListener('submit', async function(e) {
