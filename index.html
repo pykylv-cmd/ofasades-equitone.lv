@@ -378,7 +378,7 @@ SWIFT/BIC HABALV22
 <h2 class="section-title" style="margin-bottom:16px;">Distances līguma un pirkuma noteikumi</h2>
 <p><strong>Pārdevējs:</strong> SIA “O Fasādes”, Reģ. Nr. 40203075809, PVN Nr. LV40203075809, Rīga, Meža iela 4, LV-1048. Tālrunis +371 29117081, e-pasts omterum@inbox.lv.</p>
 <p><strong>Cenas:</strong> produktu pamatdati sistēmā tiek glabāti bez PVN. Pircējam pirms pasūtījuma apstiprināšanas tiek parādīta summa bez PVN, PVN 21% un kopējā summa ar PVN. Ja piegādes cena nav iepriekš aprēķināma, tā tiek saskaņota ar klientu pirms izpildes.</p>
-<p><strong>Apmaksa:</strong> bankas pārskaitījums vai, pēc Swedbank e-komercijas aktivizēšanas, droša kartes apmaksa. Kartes dati O FASADES vietnē netiek glabāti.</p>
+<p><strong>Apmaksa:</strong> bankas pārskaitījums vai kartes apmaksa EveryPay DEMO testa vidē. Kartes dati O FASADES vietnē netiek glabāti.</p>
 <p><strong>Piegāde:</strong> piegādes veids ir atkarīgs no preču kategorijas. Lielgabarīta paneļu piegāde tiek organizēta ar kravas transportu; konkrētais termiņš un izmaksas tiek apstiprinātas pasūtījumam.</p>
 <p><strong>Atteikuma tiesības patērētājiem:</strong> distances pirkumam parasti ir 14 dienu atteikuma tiesības no preces saņemšanas dienas. Normatīvajos aktos ir izņēmumi, tostarp individuāli izgatavotām vai nepārprotami personalizētām precēm. Atteikumu var paziņot rakstveidā uz omterum@inbox.lv.</p>
 <p style="color:#aaa;font-size:.9rem;">Pirms publiskas palaišanas šī sadaļa vēl jāsaskaņo ar gala piegādes kārtību un jāpapildina ar oficiālo atteikuma veidlapu.</p>
@@ -524,9 +524,9 @@ SWIFT/BIC HABALV22
 <div class="full" id="shippingSection"></div>
 <div class="full checkout-notice" id="checkoutPriceSummary" style="font-size:.95rem;line-height:1.75;"></div>
 <div class="full"><label>Apmaksas veids</label><div class="payment-options">
-<label style="opacity:.55;cursor:not-allowed;"><input type="radio" name="payment" value="card" disabled> <i class="fas fa-credit-card"></i> Karte (Visa / Mastercard) — drīzumā</label>
+<label><input type="radio" name="payment" value="card"> <i class="fas fa-credit-card"></i> Karte (Visa / Mastercard) — EveryPay DEMO</label>
 <label><input type="radio" name="payment" value="transfer" checked> <i class="fas fa-university"></i> Bankas pārskaitījums — darbojas</label>
-</div><div class="checkout-notice" id="cardPaymentInfo" style="margin-top:10px;">Kartes apmaksa tiks ieslēgta pēc Swedbank e-komercijas līguma aktivizēšanas. Bankas pārskaitījums darbojas jau tagad: pēc pasūtījuma izveides klients saņem O FASADES rekvizītus un unikālo pasūtījuma numuru maksājuma mērķim.</div></div>
+</div><div class="checkout-notice" id="cardPaymentInfo" style="margin-top:10px;">Kartes apmaksa: EveryPay DEMO testa vide. Izvēloties karti, pēc pasūtījuma saglabāšanas atvērsies EveryPay maksājuma lapa. Bankas pārskaitījums pieejams atsevišķi.</div></div>
 <div class="full"><label>Piezīmes</label><textarea id="checkoutNote" placeholder="Piegādes vai citas piezīmes..."></textarea></div>
 <div class="full checkout-notice">Piegādes veids un cena tiek parādīta atbilstoši izvēlētajai preču kategorijai. Ja piegādes cena nav norādīta, O FASADES to saskaņos atsevišķi.</div>
 <div class="full"><label style="display:flex;gap:10px;align-items:flex-start;"><input type="checkbox" id="checkoutConsent" required style="width:auto;margin-top:4px;"> <span>Esmu iepazinies ar <a href="#terms" style="color:var(--eq-gold);">Distances līguma noteikumiem</a> un <a href="#privacy" style="color:var(--eq-gold);">Privātuma informāciju</a>, un piekrītu manu datu izmantošanai pasūtījuma izpildei.</span></label></div>
@@ -1653,7 +1653,7 @@ const PRODUCT_OVERRIDES_API = 'https://dnpkkofglgkvnpxnqksw.supabase.co/rest/v1/
 const PRODUCT_IMAGE_UPLOAD_API = 'https://dnpkkofglgkvnpxnqksw.supabase.co/storage/v1/object/product-images';
 const PRODUCT_IMAGE_PUBLIC_BASE = 'https://dnpkkofglgkvnpxnqksw.supabase.co/storage/v1/object/public/product-images';
 const DELIVERY_SETTINGS_API = 'https://dnpkkofglgkvnpxnqksw.supabase.co/rest/v1/delivery_settings';
-const PAYMENT_API_URL = ''; // aktivizēsim pēc Swedbank e-komercijas pieslēguma
+const PAYMENT_API_URL = 'https://dnpkkofglgkvnpxnqksw.supabase.co/functions/v1/everypay-payment';
 
 function applyDeliverySettings(row) {
     if (!row) return;
@@ -1830,7 +1830,7 @@ function isLocalPreview() { return window.location.protocol === 'file:'; }
 function createOrderNumber() {
     const d = new Date();
     const stamp = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
-    const rnd = Math.floor(1000 + Math.random()*9000);
+    const rnd = Array.from(crypto.getRandomValues(new Uint8Array(4)), b => b.toString(16).padStart(2,'0')).join('').toUpperCase();
     return `OF-${stamp}-${rnd}`;
 }
 function setCheckoutStatus(message, type='error') {
@@ -1880,7 +1880,7 @@ async function sendOrder(order) {
     const row = {
         order_number: order.orderNumber,
         created_at: order.createdAt,
-        status: 'Gaida pārskaitījumu',
+        status: order.status,
         buyer: order.buyer,
         delivery: order.delivery,
         payment: order.payment,
@@ -1985,9 +1985,9 @@ document.getElementById('checkoutForm').addEventListener('submit', async functio
         if (result && result.order && result.order.orderNumber) { order.orderNumber = result.order.orderNumber; order.createdAt = result.order.createdAt || order.createdAt; order.status = result.order.status || order.status; }
         if (order.payment === 'Karte' && !result.localOnly) {
             setCheckoutStatus(`Pasūtījums ${order.orderNumber} izveidots. Savienojam ar drošo kartes apmaksu...`, 'ok');
-            const payResponse = await fetch(PAYMENT_API_URL, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({orderNumber:order.orderNumber})});
-            if (!payResponse.ok) throw new Error('Kartes maksājumu serviss nav pieejams');
-            const payData = await payResponse.json();
+            const payResponse = await fetch(PAYMENT_API_URL, {method:'POST', headers:{'Content-Type':'application/json','apikey':SUPABASE_PUBLISHABLE_KEY}, body:JSON.stringify({orderNumber:order.orderNumber})});
+            const payData = await payResponse.json().catch(()=>({}));
+            if (!payResponse.ok) throw new Error('EveryPay serveris: '+(payData.error||payResponse.status));
             if (!payData.paymentUrl) throw new Error('Nav saņemta maksājuma adrese');
             window.location.href = payData.paymentUrl;
             return;
@@ -1995,14 +1995,14 @@ document.getElementById('checkoutForm').addEventListener('submit', async functio
         if (order.payment === 'Pārskaitījums') {
             showTransferSuccess(order, !!result.localOnly, !!(result.email && result.email.customer && result.email.owner));
         } else if (result.localOnly) {
-            setCheckoutStatus(`TESTS: ${order.orderNumber} saglabāts šajā pārlūkā. Īsta kartes apmaksa sāks darboties pēc Swedbank tirgotāja pieslēguma saņemšanas.`, 'ok');
+            setCheckoutStatus(`TESTS: ${order.orderNumber} saglabāts tikai šajā pārlūkā. Lai pārbaudītu EveryPay, atveriet vietni https://ofasades.lv, nevis lokālu HTML failu.`, 'ok');
         } else {
             setCheckoutStatus(`Pasūtījums ${order.orderNumber} saņemts.`, 'ok');
         }
         cart=[]; updateCartUI();
         if (document.getElementById('adminPanel').classList.contains('visible')) loadOrders();
     } catch(err) {
-        setCheckoutStatus('Pasūtījumu neizdevās nosūtīt. Grozs nav izdzēsts. Lūdzu, mēģiniet vēlreiz vai sazinieties ar O FASADES.');
+        setCheckoutStatus('Pasūtījums vai maksājums neizdevās: '+(err?.message||'Nezināma kļūda')+'. Grozs nav izdzēsts.');
         console.error(err);
     } finally { submit.disabled=false; submit.innerHTML='<i class="fas fa-check"></i> Izveidot pasūtījumu'; }
 });
