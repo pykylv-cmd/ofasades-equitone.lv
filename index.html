@@ -1987,7 +1987,7 @@ document.getElementById('checkoutForm').addEventListener('submit', async functio
             setCheckoutStatus(`Pasūtījums ${order.orderNumber} izveidots. Savienojam ar drošo kartes apmaksu...`, 'ok');
             const payResponse = await fetch(PAYMENT_API_URL, {method:'POST', headers:{'Content-Type':'application/json','apikey':SUPABASE_PUBLISHABLE_KEY}, body:JSON.stringify({orderNumber:order.orderNumber})});
             const payData = await payResponse.json().catch(()=>({}));
-            if (!payResponse.ok) throw new Error('EveryPay serveris: '+(payData.error||payResponse.status));
+            if (!payResponse.ok) { const detail = payData.provider && typeof payData.provider === 'object' ? (payData.provider.error || payData.provider.message || payData.provider.error_description || JSON.stringify(payData.provider).slice(0,450)) : ''; throw new Error('EveryPay serveris: '+(payData.error||payResponse.status)+(payData.providerStatus?' (EveryPay HTTP '+payData.providerStatus+')':'')+(detail?' — '+String(detail).slice(0,450):'')); }
             if (!payData.paymentUrl) throw new Error('Nav saņemta maksājuma adrese');
             window.location.href = payData.paymentUrl;
             return;
