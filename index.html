@@ -737,6 +737,22 @@ function panelDisplayRank(p) {
     return 99;
 }
 
+/* Manuālas atlaides katram variantam; sākotnējā cena netiek pārrakstīta. */
+function discountRate(variant) {
+    const rate = Number(variant && variant.discountPercent);
+    return Number.isFinite(rate) && rate > 0 && rate < 100 ? rate : 0;
+}
+function discountedPrice(variant, basePrice) {
+    const base = Number(basePrice) || 0;
+    return Math.round(base * (100 - discountRate(variant))) / 100;
+}
+function discountPriceHTML(variant, basePrice) {
+    const base = Number(basePrice) || 0;
+    const actual = discountedPrice(variant, base);
+    const rate = discountRate(variant);
+    return (rate ? `<small style="text-decoration:line-through;color:#aaa">${money(base)}</small> <small style="color:#91e7b5">−${rate}%</small><br>` : '') +
+        `${money(actual)} <small>bez PVN</small><br><small>${money(grossAmount(actual))} ar PVN / vienība</small>`;
+}
 function renderProducts() {
     const grid = document.getElementById('productGrid');
     // Keep the selected item when admin saves a photo and redraws the catalogue.
@@ -1027,7 +1043,7 @@ function renderProducts() {
                 </details>
                 ${(() => { const groupImageVariants = items.flatMap((item,itemIndex)=>(item.variants || []).map((v,vi)=>({item,itemIndex,v,vi})).filter(({v})=>v.image && String(v.image).trim())); return groupImageVariants.length ? `<div class="color-variants group-variant-selector"><span class="label">Varianti:</span>${groupImageVariants.map(({item,itemIndex,v,vi})=>`<button type="button" class="color-btn group-variant-btn ${selected && String(item.id) === String(selected.id) && vi===selectedVariantIndex?'active':''}" data-product-id="${item.id}" data-variant-index="${vi}" title="${String(item.name || '').trim()}${v.color ? ' — ' + v.color : ''}" style="background-image:url('${v.image}')"><span class="tooltip">${String(item.name || '').trim()}${v.color ? ' — ' + v.color : ''}</span></button>`).join('')}</div>` : ''; })()}
                 <div class="product-bottom">
-                    <span class="price" id="bracket-group-price">${firstVariant ? `${money(firstVariant.priceSmall)} <small>bez PVN</small><br><small>${money(grossAmount(firstVariant.priceSmall))} ar PVN / vienība</small>` : '—'}</span>
+                    <span class="price" id="bracket-group-price">${firstVariant ? discountPriceHTML(firstVariant, firstVariant.priceSmall) : '—'}</span>
                     <button class="btn btn-primary btn-sm bracket-add-to-cart"><i class="fas fa-plus"></i> Pievienot</button>
                 </div>
             </div>`;
@@ -1073,7 +1089,7 @@ function renderProducts() {
                 ${hasColors ? colorItems : '<span style="font-size:0.8rem;color:#999;">nav pievienotas bildes</span>'}
             </div>`}
             <div class="product-bottom">
-                <span class="price" id="price-${p.id}">${first ? `${money(first.priceSmall)} <small>bez PVN</small><br><small>${money(grossAmount(first.priceSmall))} ar PVN / vienība</small>` : '—'}</span>
+                <span class="price" id="price-${p.id}">${first ? discountPriceHTML(first, first.priceSmall) : '—'}</span>
                 <button class="btn btn-primary btn-sm add-to-cart" data-id="${p.id}"><i class="fas fa-plus"></i> Pievienot</button>
             </div>
         </div>`;
@@ -1110,7 +1126,7 @@ function renderProducts() {
             if (priceEl) {
                 const price = variant ? Number(variant.priceSmall || 0) : 0;
                 priceEl.innerHTML = price
-                    ? `${money(price)} <small>bez PVN</small><br><small>${money(grossAmount(price))} ar PVN / vienība</small>`
+                    ? discountPriceHTML(variant, price)
                     : '—';
             }
         });
@@ -1150,7 +1166,7 @@ function renderProducts() {
             const priceEl = card.querySelector('#bracket-group-price');
             if (codeEl) codeEl.textContent = product.code || variant.code || '';
             if (descEl) descEl.textContent = product.desc || '';
-            if (priceEl) priceEl.innerHTML = `${money(variant.priceSmall)} <small>bez PVN</small><br><small>${money(grossAmount(variant.priceSmall))} ar PVN / vienība</small>`;
+            if (priceEl) priceEl.innerHTML = discountPriceHTML(variant, variant.priceSmall);
         });
     });
 
@@ -1164,7 +1180,7 @@ function renderProducts() {
             const selectedVariantIndex = Number(card.dataset.selectedVariantIndex || 0);
             const variant = product.variants && product.variants[selectedVariantIndex] ? product.variants[selectedVariantIndex] : (product.variants && product.variants[0] ? product.variants[0] : null);
             if (!variant) return;
-            const price = Number(variant.priceSmall || 0);
+            const price = discountedPrice(variant, variant.priceSmall);
             const sizeLabel = card.dataset.group === 'stainless-hooks'
                 ? String(product.desc || '').replace(/·?\s*Svars:.*$/i, '').trim()
                 : (card.dataset.group === 'anchor-dowels'
@@ -1224,7 +1240,7 @@ function renderProducts() {
                     ? Number(variant.priceSmall || 0) * 2
                     : (sizeIndex === 0 ? variant.priceSmall : variant.priceLarge));
             const priceEl = document.getElementById(`price-${productId}`);
-            if (priceEl) priceEl.innerHTML = price ? `${money(price)} <small>bez PVN</small><br><small>${money(grossAmount(price))} ar PVN / vienība</small>` : '—';
+            if (priceEl) priceEl.innerHTML = price ? discountPriceHTML(variant, price) : '—';
             this.closest('.product-card').dataset.selectedSize = sizeIndex;
         });
     });
@@ -1257,7 +1273,7 @@ function renderProducts() {
             const selectedSize = parseInt(card.dataset.selectedSize || '0');
             const price = selectedSize === 0 ? variant.priceSmall : variant.priceLarge;
             const priceEl = document.getElementById(`price-${productId}`);
-            if (priceEl) priceEl.innerHTML = price ? `${money(price)} <small>bez PVN</small><br><small>${money(grossAmount(price))} ar PVN / vienība</small>` : '—';
+            if (priceEl) priceEl.innerHTML = price ? discountPriceHTML(variant, price) : '—';
         });
     });
 
@@ -1285,11 +1301,12 @@ function addToCart(productId) {
         variant = product.variants[1];
     }
     if (!variant) return;
-    const price = (product.code === 'AP-258' || product.code === 'AP-259')
+    const basePrice = (product.code === 'AP-258' || product.code === 'AP-259')
         ? Number(variant.priceSmall || 0)
         : (selectedSize === 6
             ? Number(variant.priceSmall || 0) * 2
             : (selectedSize === 0 ? variant.priceSmall : variant.priceLarge));
+    const price = discountedPrice(variant, basePrice);
     const sizeLabel = selectedSize === 6
         ? '6 m'
         : (product.sizeLabels ? product.sizeLabels[selectedSize] : (selectedSize === 0 ? 'Mazais' : 'Lielais'));
@@ -2276,11 +2293,11 @@ function renderAdminTable() {
             <td>${catName}</td>
             <td>${sizeLabels.join(' / ')}</td>
             <td>${p.variants ? p.variants.map(v => v.color).join(', ') : 'nav'}</td>
-            <td>${first ? '€'+first.priceSmall.toFixed(2) : '—'}</td>
+            <td>${first ? '€'+Number(first.priceSmall).toFixed(2)+(discountRate(first) ? ' / akcija €'+discountedPrice(first,first.priceSmall).toFixed(2) : '') : '—'}</td>
             <td class="actions">
                 <button class="btn btn-primary btn-sm edit-product" data-id="${p.id}"><i class="fas fa-edit"></i></button>
                 <button class="btn btn-danger btn-sm delete-product" data-id="${p.id}"><i class="fas fa-trash"></i></button>
-                <button class="btn btn-gold btn-sm edit-variants" data-id="${p.id}"><i class="fas fa-palette"></i> Varianti</button>
+                <button class="btn btn-gold btn-sm edit-variants" data-id="${p.id}"><i class="fas fa-tags"></i> Varianti / atlaides</button>
             </td>
         </tr>`;
     }).join('');
@@ -2370,7 +2387,7 @@ function renderVariantEditor(productId) {
     const container = document.getElementById('variantEditContainer');
     let html = `
         <div class="variant-editor-header">
-            <h4><i class="fas fa-palette"></i> Labot variantus: ${product.name}</h4>
+            <h4><i class="fas fa-palette"></i> Labot variantus un atlaides: ${product.name}</h4>
             <button class="btn btn-outline btn-sm" id="closeVariantEditor">Aizvērt</button>
         </div>
     `;
@@ -2383,6 +2400,7 @@ function renderVariantEditor(productId) {
                     <span class="v-color-label" style="font-weight:600;font-size:0.9rem;color:#fff;">${v.color}</span>
                 </div>
                 <label style="font-size:0.75rem;color:#999;">Cena bez PVN: <input type="number" step="0.01" class="v-price-small" value="${v.priceSmall}" style="width:90px;" /></label>
+                <label style="font-size:0.75rem;color:#a7e6c3;">Atlaide % (0 = nav): <input type="number" min="0" max="99" step="0.01" class="v-discount" value="${discountRate(v)}" style="width:90px;padding:6px;background:#24352d;color:white;border:1px solid #65d9a2;border-radius:8px;" /></label>
                 <input type="text" class="v-image" value="${v.image || ''}" placeholder="Attēla URL" style="font-size:0.75rem;color:#fff;" />
                 <button class="btn btn-danger btn-xs remove-image-btn" data-product-id="${productId}" data-variant-index="${idx}" ${!hasImage ? 'disabled' : ''}><i class="fas fa-times"></i> Noņemt bildi</button>
                 <button class="btn btn-primary btn-xs save-variant-btn" data-product-id="${productId}" data-variant-index="${idx}"><i class="fas fa-save"></i> Saglabāt</button>
@@ -2398,11 +2416,17 @@ function renderVariantEditor(productId) {
             const ps = parseFloat(row.querySelector('.v-price-small').value);
             const pl = ps;
             const img = row.querySelector('.v-image').value.trim();
+            const discountInput = row.querySelector('.v-discount');
+            const discount = Number(discountInput.value);
+            if (discountInput.value.trim() === '' || !Number.isFinite(discount) || discount < 0 || discount >= 100) {
+                showToast('Atlaidei jābūt no 0 līdz 99,99%.'); return;
+            }
             if (isNaN(ps) || isNaN(pl)) { showToast('Ievadiet derīgas cenas!'); return; }
             const prod = allProducts.find(p => p.id === pId);
             if (!prod) return;
             prod.variants[vIdx].priceSmall = ps;
             prod.variants[vIdx].priceLarge = pl;
+            prod.variants[vIdx].discountPercent = discount;
             prod.variants[vIdx].image = img;
             try { await saveProductOverride(prod); }
             catch (err) { showToast('❌ Neizdevās saglabāt variantu serverī.'); console.error(err); return; }
@@ -2523,7 +2547,7 @@ document.getElementById('adminAddVariantForm').addEventListener('submit', async 
         return;
     }
     const base = product.variants && product.variants.length > 0 ? product.variants[0] : null;
-    product.variants.push({ color: colorName, image: image || '', code: code || '', priceSmall: base ? base.priceSmall : 0, priceLarge: base ? base.priceLarge : 0 });
+    product.variants.push({ color: colorName, image: image || '', code: code || '', priceSmall: base ? base.priceSmall : 0, priceLarge: base ? base.priceLarge : 0, discountPercent: 0 });
     product.variants.sort((a,b) => a.color.localeCompare(b.color));
     try { await saveProductOverride(product); }
     catch (err) { showToast('❌ Krāsu variantu neizdevās saglabāt serverī.'); console.error(err); return; }
