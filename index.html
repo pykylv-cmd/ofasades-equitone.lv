@@ -729,6 +729,8 @@ function panelDisplayRank(p) {
 
 function renderProducts() {
     const grid = document.getElementById('productGrid');
+    // Keep the selected item when admin saves a photo and redraws the catalogue.
+    const previousGroupSelection = new Map(Array.from(grid.querySelectorAll('.bracket-group-card')).map(card => [card.dataset.group, {id:card.dataset.selectedBracketId, variant:Number(card.dataset.selectedVariantIndex || 0)}]));
     const countEl = document.getElementById('productCount');
     const catName = currentCategory === 'paneli' ? 'Paneļi' : currentCategory === 'flizes' ? 'Flīzes' : 'Apakškonstrukcija';
     let displayProducts = currentCategory === 'paneli'
@@ -975,8 +977,12 @@ function renderProducts() {
                 const bv = parseInt(String(b.desc || '').split('x')[0]) || 0;
                 return av - bv;
             });
-            const selected = items[0];
-            const firstVariant = selected && selected.variants && selected.variants[0] ? selected.variants[0] : null;
+            const remembered = previousGroupSelection.get(String(groupKey));
+            const selected = items.find(item => String(item.id) === remembered?.id) || items[0];
+            const selectedVariantIndex = remembered && selected && String(selected.id) === remembered.id && selected.variants?.[remembered.variant] ? remembered.variant : Math.max(0, (selected?.variants || []).findIndex(v => String(v.image || "").trim()));
+            const firstVariant = selected?.variants?.[selectedVariantIndex] || null;
+            // Never show AP-210's photograph while AP-213 is selected.
+            const groupPhoto = String(firstVariant?.image || '').trim() || '';
             const buttons = items.map((item, idx) => {
                 const label = isSoudalSpsGroup
                     ? String(item.name || '').trim()
@@ -993,12 +999,12 @@ function renderProducts() {
                                 : (isTProfileGroup
                                     ? String(item.desc || '').replace(/·?\s*Svars:.*$/i, '').trim()
                                     : String(item.desc || '').trim())))));
-                return `<button type="button" class="size-btn bracket-size-btn ${idx===0 ? 'active' : ''}"
+                return `<button type="button" class="size-btn bracket-size-btn ${selected && String(item.id) === String(selected.id) ? 'active' : ''}"
                             data-bracket-id="${item.id}">${label}</button>`;
             }).join('');
             return `
-            <div class="product-card bracket-group-card" data-group="${groupKey}" data-selected-bracket-id="${selected ? selected.id : ''}" data-selected-variant-index="0">
-                <div class="product-image bracket-group-image" onclick="openLightbox(this.querySelector('img') ? this.querySelector('img').src : '')">${firstVariant && firstVariant.image ? `<img src="${firstVariant.image}" alt="${firstVariant.color || groupTitle}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" /><span class="no-image" style="display:none;">🔩</span>` : `<span class="no-image">${isCokola ? '📐' : (isStainlessHook ? '🪝' : '🔩')}</span>`}</div>
+            <div class="product-card bracket-group-card" data-group="${groupKey}" data-selected-bracket-id="${selected ? selected.id : ''}" data-selected-variant-index="${selectedVariantIndex}">
+                <div class="product-image bracket-group-image" onclick="openLightbox(this.querySelector('img') ? this.querySelector('img').src : '')">${groupPhoto ? `<img src="${groupPhoto}" alt="${groupTitle}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" /><span class="no-image" style="display:none;">🔩</span>` : `<span class="no-image">${isCokola ? '📐' : (isStainlessHook ? '🪝' : '🔩')}</span>`}</div>
                 <h3>${groupTitle}</h3>
                 <div class="product-code" id="bracket-group-code">${selected ? selected.code : ''}</div>
                 <div class="product-desc" id="bracket-group-desc">${selected ? selected.desc : ''}</div>
@@ -1009,7 +1015,7 @@ function renderProducts() {
                         ${buttons}
                     </div>
                 </details>
-                ${(() => { const groupImageVariants = items.flatMap((item,itemIndex)=>(item.variants || []).filter(v=>v.image && String(v.image).trim()).map((v,vi)=>({item,itemIndex,v,vi}))); return groupImageVariants.length ? `<div class="color-variants group-variant-selector"><span class="label">Varianti:</span>${groupImageVariants.map(({item,itemIndex,v,vi})=>`<button type="button" class="color-btn group-variant-btn ${itemIndex===0 && vi===0?'active':''}" data-product-id="${item.id}" data-variant-index="${vi}" title="${String(item.name || '').trim()}${v.color ? ' — ' + v.color : ''}" style="background-image:url('${v.image}')"><span class="tooltip">${String(item.name || '').trim()}${v.color ? ' — ' + v.color : ''}</span></button>`).join('')}</div>` : ''; })()}
+                ${(() => { const groupImageVariants = items.flatMap((item,itemIndex)=>(item.variants || []).map((v,vi)=>({item,itemIndex,v,vi})).filter(({v})=>v.image && String(v.image).trim())); return groupImageVariants.length ? `<div class="color-variants group-variant-selector"><span class="label">Varianti:</span>${groupImageVariants.map(({item,itemIndex,v,vi})=>`<button type="button" class="color-btn group-variant-btn ${selected && String(item.id) === String(selected.id) && vi===selectedVariantIndex?'active':''}" data-product-id="${item.id}" data-variant-index="${vi}" title="${String(item.name || '').trim()}${v.color ? ' — ' + v.color : ''}" style="background-image:url('${v.image}')"><span class="tooltip">${String(item.name || '').trim()}${v.color ? ' — ' + v.color : ''}</span></button>`).join('')}</div>` : ''; })()}
                 <div class="product-bottom">
                     <span class="price" id="bracket-group-price">${firstVariant ? `${money(firstVariant.priceSmall)} <small>bez PVN</small><br><small>${money(grossAmount(firstVariant.priceSmall))} ar PVN / vienība</small>` : '—'}</span>
                     <button class="btn btn-primary btn-sm bracket-add-to-cart"><i class="fas fa-plus"></i> Pievienot</button>
@@ -1068,19 +1074,20 @@ function renderProducts() {
             e.preventDefault();
             e.stopPropagation();
             const productId = parseInt(this.dataset.bracketId);
-            const product = products.find(p => p.id === productId);
+            const product = products.find(p => Number(p.id) === Number(productId));
             if (!product) return;
             const card = this.closest('.bracket-group-card');
             card.querySelectorAll('.bracket-size-btn').forEach(b => b.classList.remove('active'));
             this.classList.add('active');
             card.dataset.selectedBracketId = String(productId);
-            const variant = product.variants && product.variants[0] ? product.variants[0] : null;
-            card.dataset.selectedVariantIndex = '0';
+            const variantIndex = Math.max(0, (product.variants || []).findIndex(v => String(v.image || '').trim()));
+            const variant = product.variants && product.variants[variantIndex] ? product.variants[variantIndex] : null;
+            card.dataset.selectedVariantIndex = String(variantIndex);
             const selector = card.querySelector('.group-variant-selector');
             if (selector) {
                 selector.querySelectorAll('.group-variant-btn').forEach(b => {
                     const sameProduct = Number(b.dataset.productId) === productId;
-                    const sameVariant = Number(b.dataset.variantIndex || 0) === 0;
+                    const sameVariant = Number(b.dataset.variantIndex || 0) === variantIndex;
                     b.classList.toggle('active', sameProduct && sameVariant);
                 });
             }
@@ -1102,9 +1109,9 @@ function renderProducts() {
     function updateGroupImage(card, variant) {
         const box = card.querySelector('.bracket-group-image');
         if (!box) return;
-        const img = variant && variant.image ? String(variant.image).trim() : '';
+        const img = String(variant?.image || '').trim();
         box.innerHTML = img
-            ? `<img src="${img}" alt="${variant.color || 'Produkts'}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" /><span class="no-image" style="display:none;">🔩</span>`
+            ? `<img src="${img}" alt="${variant?.color || 'Produkts'}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" /><span class="no-image" style="display:none;">🔩</span>`
             : `<span class="no-image">🔩</span>`;
         box.onclick = function() { openLightbox(this.querySelector('img') ? this.querySelector('img').src : ''); };
     }
@@ -1117,7 +1124,7 @@ function renderProducts() {
             e.stopPropagation();
             const card = this.closest('.bracket-group-card');
             const productId = parseInt(btn.dataset.productId || card.dataset.selectedBracketId);
-            const product = allProducts.find(p => p.id === productId);
+            const product = allProducts.find(p => Number(p.id) === Number(productId));
             if (!product) return;
             const idx = parseInt(btn.dataset.variantIndex || 0);
             const variant = product.variants && product.variants[idx];
@@ -1142,7 +1149,7 @@ function renderProducts() {
             e.stopPropagation();
             const card = this.closest('.bracket-group-card');
             const productId = parseInt(card.dataset.selectedBracketId);
-            const product = allProducts.find(p => p.id === productId);
+            const product = allProducts.find(p => Number(p.id) === Number(productId));
             if (!product) return;
             const selectedVariantIndex = Number(card.dataset.selectedVariantIndex || 0);
             const variant = product.variants && product.variants[selectedVariantIndex] ? product.variants[selectedVariantIndex] : (product.variants && product.variants[0] ? product.variants[0] : null);
@@ -1176,6 +1183,9 @@ function renderProducts() {
                 });
             }
             updateCartUI();
+            document.getElementById('cartOverlay').classList.add('open');
+            document.getElementById('cartSidebar').classList.add('open');
+            document.body.style.overflow = 'hidden';
             showToast(`Pievienots grozam (${sizeLabel})!`);
         });
     });
@@ -1188,7 +1198,7 @@ function renderProducts() {
             const parent = this.closest('.size-selector');
             parent.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
             this.classList.add('active');
-            const product = products.find(p => p.id === productId);
+            const product = products.find(p => Number(p.id) === Number(productId));
             if (!product) return;
             const activeColorEl = this.closest('.product-card').querySelector('.color-btn.active');
             let variantIndex = 0;
@@ -1219,7 +1229,7 @@ function renderProducts() {
             const parent = this.closest('.color-variants');
             parent.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
             this.classList.add('active');
-            const product = products.find(p => p.id === productId);
+            const product = products.find(p => Number(p.id) === Number(productId));
             if (!product) return;
             const variant = product.variants[variantIndex];
             if (!variant) return;
@@ -1252,7 +1262,7 @@ function renderProducts() {
 }
 
 function addToCart(productId) {
-    const product = allProducts.find(p => p.id === productId);
+    const product = allProducts.find(p => Number(p.id) === Number(productId));
     if (!product) return;
     const card = document.querySelector(`.product-card[data-id="${productId}"]`);
     let selectedSize = 0;
@@ -1279,6 +1289,9 @@ function addToCart(productId) {
         cart.push({ id: product.id, name: product.name, category: product.category, price: price, image: variant.image || '', qty: 1, size: selectedSize, sizeLabel: sizeLabel, variantColor: variantColor, variantCode: variant.code || product.code || '' });
     }
     updateCartUI();
+    document.getElementById('cartOverlay').classList.add('open');
+    document.getElementById('cartSidebar').classList.add('open');
+    document.body.style.overflow = 'hidden';
     showToast(`Pievienots grozam (${sizeLabel})!`);
 }
 
@@ -2342,7 +2355,7 @@ function renderAdminTable() {
 }
 
 function renderVariantEditor(productId) {
-    const product = allProducts.find(p => p.id === productId);
+    const product = allProducts.find(p => Number(p.id) === Number(productId));
     if (!product) return;
     const container = document.getElementById('variantEditContainer');
     let html = `
@@ -2471,7 +2484,7 @@ document.getElementById('adminAddVariantForm').addEventListener('submit', async 
     const selectedFile = document.getElementById('variantFileInput').files[0] || null;
     const code = document.getElementById('variantCode').value.trim();
     if (!productId || !colorName) { showToast('Lūdzu, aizpildiet produktu un krāsas nosaukumu!'); return; }
-    const product = allProducts.find(p => p.id === productId);
+    const product = allProducts.find(p => Number(p.id) === Number(productId));
     if (!product) { showToast('Produkts nav atrasts!'); return; }
     if (selectedFile) {
         try {
@@ -2486,7 +2499,8 @@ document.getElementById('adminAddVariantForm').addEventListener('submit', async 
     const existing = product.variants.find(v => v.color === colorName);
     if (existing) {
         if (existing.image && existing.image.trim() !== '') { showToast(`⚠️ Krāsa "${colorName}" jau ir pievienota ar bildi!`); return; }
-        existing.image = image || '';
+        if (!image) { showToast('Lūdzu, pievienojiet bildi!'); return; }
+        existing.image = image;
         existing.code = code || existing.code || '';
         if (image && image.trim() !== '') {
             try { await saveProductOverride(product); }
