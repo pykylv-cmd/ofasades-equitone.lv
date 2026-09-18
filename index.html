@@ -276,6 +276,16 @@ html { scroll-behavior:smooth; }
     margin:0;
 }
 .qty-input[type=number]{-moz-appearance:textfield;}
+/* Publiskā kataloga trīs pogas: vienmēr zaļas, aktīvā izteiktākā tonī. */
+#shopCategoryTabs .category-tab { background:#65d9a2; border-color:#8be9bd; color:#123d2a; box-shadow:0 4px 16px rgba(0,107,62,.18); }
+#shopCategoryTabs .category-tab.active { background:#008a50; border-color:#3cc485; color:#fff; box-shadow:0 8px 26px rgba(0,138,80,.38); }
+#shopCategoryTabs .category-tab:hover:not(.active) { background:#82e5b5; border-color:#a3efca; }
+#shopCategoryTabs .category-tab:focus-visible { outline:3px solid #a7e6c3; outline-offset:3px; }
+/* Kategoriju secība: apakškonstrukcija augšā, paneļi un flīzes zemāk. Tikai publiskais katalogs. */
+#shopCategoryTabs { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; max-width:640px; margin:0 auto 32px; }
+#shopCategoryTabs .category-tab { width:100%; min-width:0; }
+#shopCategoryTabs .category-tab[data-category="apaks"] { grid-column:1 / -1; }
+@media(max-width:480px){ #shopCategoryTabs { gap:10px; } #shopCategoryTabs .category-tab { padding:12px 8px; font-size:1rem; } }
 </style>
 <script>
 /* Local Preview protection: prevents repeated network-permission dialogs from dozens of third-party image hosts.
@@ -337,10 +347,10 @@ if (location.protocol === 'file:') {
 </section>
 <section class="container" id="products">
 <h2 class="section-title"></h2>
-<div class="category-tabs">
-<button class="category-tab active" data-category="paneli">Paneļi</button>
+<div class="category-tabs" id="shopCategoryTabs">
+<button class="category-tab active" data-category="apaks">Apakškonstrukcija</button>
+<button class="category-tab" data-category="paneli">Paneļi</button>
 <button class="category-tab" data-category="flizes">Flīzes</button>
-<button class="category-tab" data-category="apaks">Apakškonstrukcija</button>
 </div>
 <p class="section-sub" id="productCount"></p>
 <div class="product-grid" id="productGrid"></div>
@@ -590,7 +600,7 @@ setInterval(changeBackground, 5000);
 // ============================================================
 //  VEIKALA FUNKCIJAS UN GROZS
 // ============================================================
-let currentCategory = 'paneli';
+let currentCategory = 'apaks';
 let products = allProducts.filter(p => p.category === currentCategory && String(p.code || '') !== 'AP-209');
 let cart = [];
 
