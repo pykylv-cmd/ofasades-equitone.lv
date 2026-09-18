@@ -503,6 +503,7 @@ SWIFT/BIC HABALV22
 <div class="cart-header"><h2><i class="fas fa-shopping-bag" style="color:var(--eq-gold);"></i> Grozs</h2><button class="cart-close" id="cartClose"><i class="fas fa-times"></i></button></div>
 <div class="cart-items" id="cartItems"><div class="cart-empty"><i class="fas fa-box-open"></i><p>Grozs ir tukšs</p></div></div>
 <div class="cart-total" style="display:block;line-height:1.7;">
+<div id="cartDiscountRow" style="display:none;justify-content:space-between;color:#91e7b5;"><span>Atlaide bez PVN:</span><strong id="cartDiscount">−€0.00</strong></div>
 <div style="display:flex;justify-content:space-between;"><span>Preces bez PVN:</span><span id="cartSubtotal">€0.00</span></div>
 <div style="display:flex;justify-content:space-between;color:#aaa;font-size:.92rem;"><span>PVN 21%:</span><span id="cartVat">€0.00</span></div>
 <div style="display:flex;justify-content:space-between;color:#ddd;font-size:.96rem;"><span>Kopējais preču svars:</span><strong id="cartWeight">0,00 kg</strong></div>
@@ -1312,8 +1313,8 @@ function addToCart(productId) {
         : (product.sizeLabels ? product.sizeLabels[selectedSize] : (selectedSize === 0 ? 'Mazais' : 'Lielais'));
     const variantColor = variant.color || '';
     const existing = cart.find(item => item.id === productId && item.size === selectedSize && item.variantColor === variantColor);
-    if (existing) { existing.qty += 1; } else {
-        cart.push({ id: product.id, name: product.name, category: product.category, price: price, image: variant.image || '', qty: 1, size: selectedSize, sizeLabel: sizeLabel, variantColor: variantColor, variantCode: variant.code || product.code || '' });
+    if (existing) { existing.qty += 1; existing.originalPrice = basePrice; existing.discountPercent = discountRate(variant); existing.price = price; } else {
+        cart.push({ originalPrice: basePrice, discountPercent: discountRate(variant), id: product.id, name: product.name, category: product.category, price: price, image: variant.image || '', qty: 1, size: selectedSize, sizeLabel: sizeLabel, variantColor: variantColor, variantCode: variant.code || product.code || '' });
     }
     updateCartUI();
     document.getElementById('cartOverlay').classList.add('open');
@@ -1391,9 +1392,12 @@ function updateCartUI() {
     const totalSpan = document.getElementById('cartTotal');
     const subtotalSpan = document.getElementById('cartSubtotal');
     const vatSpan = document.getElementById('cartVat');
+    const discountRow = document.getElementById('cartDiscountRow');
+    const discountSpan = document.getElementById('cartDiscount');
     if (cart.length === 0) {
         container.innerHTML = `<div class="cart-empty"><i class="fas fa-box-open"></i><p>Grozs ir tukšs</p></div>`;
         subtotalSpan.textContent = '€0.00'; vatSpan.textContent = '€0.00'; totalSpan.textContent = '€0.00';
+        if (discountRow) discountRow.style.display = 'none';
         const weightEl = document.getElementById('cartWeight');
         const weightNotice = document.getElementById('cartWeightNotice');
         if (weightEl) weightEl.textContent = '0,00 kg';
@@ -1407,6 +1411,7 @@ function updateCartUI() {
             </div>
             <div class="cart-item-info">
                 <h4>${item.name} ${item.variantColor ? '('+item.variantColor+')' : ''} <small style="font-weight:400;color:#888;">${item.sizeLabel}</small></h4>
+                ${Number(item.originalPrice) > Number(item.price) ? `<div style="font-size:.8rem;color:#a7e6c3;"><span style="text-decoration:line-through;color:#aaa;">${money(grossAmount(item.originalPrice))}</span> <strong>−${item.discountPercent}%</strong> · ietaupījums ${money((item.originalPrice-item.price)*item.qty)} bez PVN</div>` : ''}
                 <div class="item-price">${money(grossAmount(item.price))} <small style="color:#888;">ar PVN</small></div>
             </div>
             <div class="cart-item-qty">
@@ -1430,6 +1435,8 @@ function updateCartUI() {
     });
     document.querySelectorAll('.cart-item-remove').forEach(btn => { btn.addEventListener('click', function() { removeFromCart(parseInt(this.dataset.index)); }); });
     const netTotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
+    const savedTotal = cart.reduce((s, i) => s + Math.max(0, (Number(i.originalPrice) || i.price) - i.price) * i.qty, 0);
+    if (discountRow && discountSpan) { discountRow.style.display = savedTotal > 0.00001 ? 'flex' : 'none'; discountSpan.textContent = '−' + money(savedTotal); }
     subtotalSpan.textContent = money(netTotal);
     vatSpan.textContent = money(vatAmount(netTotal));
     totalSpan.textContent = money(grossAmount(netTotal));
