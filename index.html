@@ -1094,14 +1094,22 @@ function renderProducts() {
             </div>`;
         }
 
-        const first = p.variants && p.variants.length > 0 ? p.variants[0] : null;
-        const imgSrc = first && first.image ? first.image : '';
+        // Equitone 5.5x50 screw: the default "Standarts" variant may have no image,
+        // while another saved color has the photo. Select that actual variant on
+        // EVERY render (including a fresh reload after server overrides arrive).
+        // Keep all other products' initial selection unchanged.
+        const isEquitoneScrewPhotoFix = String(p.code || '').toUpperCase() === 'SKRUVE-5.5X50-K15-A2';
+        const firstPhotoIndex = isEquitoneScrewPhotoFix
+            ? (p.variants || []).findIndex(v => String(v?.image || '').trim()) : -1;
+        const initialVariantIndex = firstPhotoIndex >= 0 ? firstPhotoIndex : 0;
+        const first = p.variants && p.variants.length > 0 ? p.variants[initialVariantIndex] : null;
+        const imgSrc = String(first?.image || '').trim();
         const sizeLabels = p.sizeLabels || ['Mazais', 'Lielais'];
         const colorItems = p.variants
             .filter(v => v.image && v.image.trim() !== '')
             .map((v, vi) => {
                 const originalIndex = p.variants.indexOf(v);
-                return `<button class="color-btn ${originalIndex === 0 ? 'active' : ''}" 
+                return `<button class="color-btn ${originalIndex === initialVariantIndex ? 'active' : ''}" 
                         data-product-id="${p.id}" 
                         data-variant-index="${originalIndex}"
                         style="background-image: url('${v.image}');"
