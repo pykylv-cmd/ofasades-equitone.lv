@@ -286,8 +286,9 @@ html { scroll-behavior:smooth; }
 #shopCategoryTabs .category-tab { width:100%; min-width:0; }
 #shopCategoryTabs .category-tab[data-category="apaks"] { grid-column:1 / -1; }
 @media(max-width:480px){ #shopCategoryTabs { gap:10px; } #shopCategoryTabs .category-tab { padding:12px 8px; font-size:1rem; } }
-/* ONLY the 70 mm stainless-steel bracket group: a compact, independently scrollable size list. */
-.bracket-group-card[data-group="stainless-70-brackets"] .bracket-group-details .bracket-size-grid {
+/* Only 70 mm and 140 mm stainless bracket groups: compact independently scrollable size lists. */
+.bracket-group-card[data-group="stainless-70-brackets"] .bracket-group-details .bracket-size-grid,
+.bracket-group-card[data-group="stainless-140-brackets"] .bracket-group-details .bracket-size-grid {
     display:flex;
     flex-direction:column;
     flex-wrap:nowrap;
@@ -300,7 +301,8 @@ html { scroll-behavior:smooth; }
     scrollbar-width:thin;
     scrollbar-color:var(--eq-gold) rgba(255,255,255,.08);
 }
-.bracket-group-card[data-group="stainless-70-brackets"] .stainless70-summary {
+.bracket-group-card[data-group="stainless-70-brackets"] .stainless70-summary,
+.bracket-group-card[data-group="stainless-140-brackets"] .stainless70-summary {
     padding:4px 14px;
     border-radius:30px;
     border:1px solid var(--eq-gold);
@@ -310,7 +312,8 @@ html { scroll-behavior:smooth; }
     font-weight:600;
     cursor:pointer;
 }
-.bracket-group-card[data-group="stainless-70-brackets"] .bracket-size-grid .bracket-size-btn {
+.bracket-group-card[data-group="stainless-70-brackets"] .bracket-size-grid .bracket-size-btn,
+.bracket-group-card[data-group="stainless-140-brackets"] .bracket-size-grid .bracket-size-btn {
     width:100%;
     flex-shrink:0;
     white-space:normal;
@@ -1073,7 +1076,7 @@ function renderProducts() {
                 <div class="product-code" id="bracket-group-code">${selected ? selected.code : ''}</div>
                 <div class="product-desc" id="bracket-group-desc">${selected ? selected.desc : ''}</div>
                 <details class="bracket-group-details">
-                    <summary class="${isStainless70 ? 'stainless70-summary' : 'size-btn active'}">${isSoudalSpsGroup ? "Izvēlēties produktu" : "Izvēlēties izmēru"}</summary>
+                    <summary class="${(isStainless70 || isStainless140) ? 'stainless70-summary' : 'size-btn active'}">${isSoudalSpsGroup ? "Izvēlēties produktu" : "Izvēlēties izmēru"}</summary>
                     <div class="size-selector bracket-size-grid" style="margin-top:12px;">
                         <span class="label" style="width:100%;">${(isStainlessHook || isAnchorDowel) ? 'Veids:' : 'Izmērs:'}</span>
                         ${buttons}
@@ -1290,7 +1293,7 @@ function renderProducts() {
                     price: price,
                     originalPrice: basePrice,
                     discountPercent: discountRate(variant),
-                    image: card.dataset.group === 'stainless-70-brackets'
+                    image: (card.dataset.group === 'stainless-70-brackets' || card.dataset.group === 'stainless-140-brackets')
                         ? (card.querySelector('.bracket-group-image img')?.getAttribute('src') || variant.image || '')
                         : (variant.image || ''),
                     qty: 1,
