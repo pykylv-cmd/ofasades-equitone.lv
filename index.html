@@ -286,6 +286,38 @@ html { scroll-behavior:smooth; }
 #shopCategoryTabs .category-tab { width:100%; min-width:0; }
 #shopCategoryTabs .category-tab[data-category="apaks"] { grid-column:1 / -1; }
 @media(max-width:480px){ #shopCategoryTabs { gap:10px; } #shopCategoryTabs .category-tab { padding:12px 8px; font-size:1rem; } }
+/* ONLY the 70 mm stainless-steel bracket group: a compact, independently scrollable size list. */
+.bracket-group-card[data-group="stainless-70-brackets"] .bracket-group-details .bracket-size-grid {
+    display:flex;
+    flex-direction:column;
+    flex-wrap:nowrap;
+    align-items:stretch;
+    gap:7px;
+    max-height:260px;
+    overflow-y:auto;
+    overscroll-behavior:contain;
+    padding:6px 7px 8px 2px;
+    scrollbar-width:thin;
+    scrollbar-color:var(--eq-gold) rgba(255,255,255,.08);
+}
+.bracket-group-card[data-group="stainless-70-brackets"] .stainless70-summary {
+    padding:4px 14px;
+    border-radius:30px;
+    border:1px solid var(--eq-gold);
+    background:var(--eq-gold);
+    color:#1a1a1a;
+    font-size:.8rem;
+    font-weight:600;
+    cursor:pointer;
+}
+.bracket-group-card[data-group="stainless-70-brackets"] .bracket-size-grid .bracket-size-btn {
+    width:100%;
+    flex-shrink:0;
+    white-space:normal;
+    overflow-wrap:anywhere;
+    text-align:center;
+    min-height:32px;
+}
 </style>
 <script>
 /* Local Preview protection: prevents repeated network-permission dialogs from dozens of third-party image hosts.
@@ -1008,8 +1040,13 @@ function renderProducts() {
             const selected = items.find(item => String(item.id) === remembered?.id) || items[0];
             const selectedVariantIndex = remembered && selected && String(selected.id) === remembered.id && selected.variants?.[remembered.variant] ? remembered.variant : Math.max(0, (selected?.variants || []).findIndex(v => String(v.image || "").trim()));
             const firstVariant = selected?.variants?.[selectedVariantIndex] || null;
-            // Never show AP-210's photograph while AP-213 is selected.
-            const groupPhoto = String(firstVariant?.image || '').trim() || '';
+            // Only this group shares ONE catalogue photograph across all sizes.
+            // Keep every individual product/variant ID, weight and price unchanged.
+            // Other groups still show only their selected variant's photograph.
+            const groupPhoto = isStainless70
+                ? (items.flatMap(item => item.variants || [])
+                    .map(v => String(v.image || '').trim()).find(Boolean) || '')
+                : (String(firstVariant?.image || '').trim() || '');
             const buttons = items.map((item, idx) => {
                 const label = isSoudalSpsGroup
                     ? String(item.name || '').trim()
@@ -1036,7 +1073,7 @@ function renderProducts() {
                 <div class="product-code" id="bracket-group-code">${selected ? selected.code : ''}</div>
                 <div class="product-desc" id="bracket-group-desc">${selected ? selected.desc : ''}</div>
                 <details class="bracket-group-details">
-                    <summary class="size-btn active">${isSoudalSpsGroup ? "Izvēlēties produktu" : "Izvēlēties izmēru"}</summary>
+                    <summary class="${isStainless70 ? 'stainless70-summary' : 'size-btn active'}">${isSoudalSpsGroup ? "Izvēlēties produktu" : "Izvēlēties izmēru"}</summary>
                     <div class="size-selector bracket-size-grid" style="margin-top:12px;">
                         <span class="label" style="width:100%;">${(isStainlessHook || isAnchorDowel) ? 'Veids:' : 'Izmērs:'}</span>
                         ${buttons}
@@ -1047,7 +1084,9 @@ function renderProducts() {
                     <button type="button" class="size-btn ${remembered?.length === 6 ? '' : 'active'}" data-length="3">3 m</button>
                     <button type="button" class="size-btn ${remembered?.length === 6 ? 'active' : ''}" data-length="6">6 m</button>
                 </div>` : ''}
-                ${(() => { const groupImageVariants = items.flatMap((item,itemIndex)=>(item.variants || []).map((v,vi)=>({item,itemIndex,v,vi})).filter(({v})=>v.image && String(v.image).trim())); return groupImageVariants.length ? `<div class="color-variants group-variant-selector"><span class="label">Varianti:</span>${groupImageVariants.map(({item,itemIndex,v,vi})=>`<button type="button" class="color-btn group-variant-btn ${selected && String(item.id) === String(selected.id) && vi===selectedVariantIndex?'active':''}" data-product-id="${item.id}" data-variant-index="${vi}" title="${String(item.name || '').trim()}${v.color ? ' — ' + v.color : ''}" style="background-image:url('${v.image}')"><span class="tooltip">${String(item.name || '').trim()}${v.color ? ' — ' + v.color : ''}</span></button>`).join('')}</div>` : ''; })()}
+                ${isStainless70
+                    ? (groupPhoto ? `<div class="color-variants stainless70-single-variant"><span class="label">Varianti:</span><button type="button" class="color-btn stainless70-photo-dot active" aria-label="Atvērt kopīgo kronšteina attēlu" title="Kopīgais kronšteina attēls" style="background-image:url('${groupPhoto}')"></button></div>` : '')
+                    : (() => { const groupImageVariants = items.flatMap((item,itemIndex)=>(item.variants || []).map((v,vi)=>({item,itemIndex,v,vi})).filter(({v})=>v.image && String(v.image).trim())); return groupImageVariants.length ? `<div class="color-variants group-variant-selector"><span class="label">Varianti:</span>${groupImageVariants.map(({item,itemIndex,v,vi})=>`<button type="button" class="color-btn group-variant-btn ${selected && String(item.id) === String(selected.id) && vi===selectedVariantIndex?'active':''}" data-product-id="${item.id}" data-variant-index="${vi}" title="${String(item.name || '').trim()}${v.color ? ' — ' + v.color : ''}" style="background-image:url('${v.image}')"><span class="tooltip">${String(item.name || '').trim()}${v.color ? ' — ' + v.color : ''}</span></button>`).join('')}</div>` : ''; })()}
                 <div class="product-bottom">
                     <span class="price" id="bracket-group-price">${firstVariant ? discountPriceHTML(firstVariant, Number(firstVariant.priceSmall || 0) * (isTProfileGroup && remembered?.length === 6 ? 2 : 1)) : '—'}</span>
                     <button class="btn btn-primary btn-sm bracket-add-to-cart"><i class="fas fa-plus"></i> Pievienot</button>
@@ -1124,6 +1163,8 @@ function renderProducts() {
                 });
             }
             updateGroupImage(card, variant);
+            // Keep the 70 mm stainless bracket's scrollable size list open after
+            // selection. The selected SKU, weight and price still update below.
             const codeEl = card.querySelector('#bracket-group-code');
             const descEl = card.querySelector('#bracket-group-desc');
             const priceEl = card.querySelector('#bracket-group-price');
@@ -1139,6 +1180,8 @@ function renderProducts() {
     });
 
     function updateGroupImage(card, variant) {
+        // For this group the same already-rendered picture is deliberately fixed.
+        if (card.dataset.group === 'stainless-70-brackets') return;
         const box = card.querySelector('.bracket-group-image');
         if (!box) return;
         const img = String(variant?.image || '').trim();
@@ -1147,6 +1190,17 @@ function renderProducts() {
             : `<span class="no-image">🔩</span>`;
         box.onclick = function() { openLightbox(this.querySelector('img') ? this.querySelector('img').src : ''); };
     }
+
+    // The group's one round thumbnail opens the same shared picture without
+    // changing the selected product, its price or its cart SKU.
+    document.querySelectorAll('.stainless70-photo-dot').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const image = this.closest('.bracket-group-card')?.querySelector('.bracket-group-image img');
+            if (image) openLightbox(image.src);
+        });
+    });
 
     document.querySelectorAll('.group-variant-selector').forEach(selector => {
         selector.addEventListener('click', function(e) {
@@ -1228,7 +1282,9 @@ function renderProducts() {
                     price: price,
                     originalPrice: basePrice,
                     discountPercent: discountRate(variant),
-                    image: variant.image || '',
+                    image: card.dataset.group === 'stainless-70-brackets'
+                        ? (card.querySelector('.bracket-group-image img')?.getAttribute('src') || variant.image || '')
+                        : (variant.image || ''),
                     qty: 1,
                     size: tProfileLength || 0,
                     sizeLabel: sizeLabel,
