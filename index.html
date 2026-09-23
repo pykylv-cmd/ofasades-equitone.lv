@@ -806,7 +806,29 @@ function ensureEquitoneRivets() {
     if (currentCategory === 'paneli' && !products.includes(rivets)) products.push(rivets);
 }
 
+// Catalogue campaign: 5% for aluminium substructure products.
+function isAluminiumSubstructure(product) {
+    if (!product || product.category !== 'apaks') return false;
+    const code = String(product.code || '').toUpperCase();
+    const match = code.match(/^AP-(\d+)$/);
+    const n = match ? Number(match[1]) : 0;
+    // Profiles, brackets/extensions and aluminium base profiles in this catalogue.
+    if ((n >= 101 && n <= 116) || (n >= 149 && n <= 157) || (n >= 193 && n <= 208)) return true;
+    const name = String(product.name || '').toLowerCase();
+    return /(?:alumīn|alumin|aluminium|aluminum|\bal\b)/i.test(name)
+        && /(?:profil|kronštein|kronstein|pagarin)/i.test(name)
+        && !/(?:grunts|primer|līme|lime|tēraud|teraud)/i.test(name);
+}
+function applyAluminiumDiscount() {
+    allProducts.forEach(product => {
+        if (isAluminiumSubstructure(product)) {
+            (product.variants || []).forEach(variant => { variant.discountPercent = 5; });
+        }
+    });
+}
+
 function renderProducts() {
+    applyAluminiumDiscount();
     ensureEquitoneRivets();
     const grid = document.getElementById('productGrid');
     // Keep the selected item when admin saves a photo and redraws the catalogue.
@@ -1491,8 +1513,24 @@ function productUnitWeightKg(item) {
 
     const direct = desc.match(/Svars:\s*([\d.,]+)\s*kg(?!\s*\/\s*m²)/i);
     if (direct) {
-        let kg = parseWeightNumber(direct[1]);
-        if (Number(item.size) === 6 || String(item.sizeLabel || '').trim() === '6 m') kg *= 2;
+        const kg = parseWeightNumber(direct[1]);
+        // Profile catalogue weights are per running metre, not per 3 m piece.
+        const isLengthProfile = product.category === 'apaks'
+            && /profil/i.test(String(product.name || ''))
+            && (product.sizeLabels || []).some(label => /^\s*\d+(?:[.,]\d+)?\s*m\s*$/i.test(String(label)));
+        if (isLengthProfile) {
+            // Grouped T profiles store metres in size; ordinary cards store an index.
+            const label = String(item.sizeLabel || '').replace(/·?\s*Svars:.*$/i, '').trim();
+            const match = label.match(/(?:^|[\s(])(\d+(?:[.,]\d+)?)\s*m\s*\)?$/i);
+            const selectedLabel = String(product.sizeLabels?.[Number(item.size)] || '');
+            const selectedMatch = selectedLabel.match(/^\s*(\d+(?:[.,]\d+)?)\s*m\s*$/i);
+            const defaultMatch = String(product.sizeLabels?.[0] || '').match(/^\s*(\d+(?:[.,]\d+)?)\s*m\s*$/i);
+            const metres = match ? parseWeightNumber(match[1])
+                : Number(item.size) === 6 ? 6
+                : selectedMatch ? parseWeightNumber(selectedMatch[1])
+                : defaultMatch ? parseWeightNumber(defaultMatch[1]) : 0;
+            return Math.round(kg * metres * 1000000) / 1000000;
+        }
         return kg;
     }
 
