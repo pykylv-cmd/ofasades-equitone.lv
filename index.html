@@ -1192,7 +1192,7 @@ function renderProducts() {
             </div>
             ${p.code === 'AP-217' ? '' : `
             <div class="color-variants">
-                <span class="label">Krāsas:</span>
+                <span class="label">${p.category === 'apaks' ? 'Varianti:' : 'Krāsas:'}</span>
                 ${hasColors ? colorItems : '<span style="font-size:0.8rem;color:#999;">nav pievienotas bildes</span>'}
             </div>`}
             <div class="product-bottom">
