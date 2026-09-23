@@ -845,7 +845,22 @@ function applyAluminiumDiscount() {
     });
 }
 
+function isEquitoneSheet(product) {
+    if (!product || product.category !== 'paneli') return false;
+    const name = String(product.name || '');
+    const sheetSize = (product.sizeLabels || []).some(label => /\d{4}\s*[xх×]\s*\d{4}\s*[xх×]\s*\d/i.test(String(label)));
+    return sheetSize && /\b(?:EQUITONE|TECTIVA|PICTURA|NATURA|LINEA|LUNARA|TEXTURA)\b/i.test(name);
+}
+function applyEquitoneSheetDiscount() {
+    allProducts.forEach(product => {
+        if (isEquitoneSheet(product)) {
+            (product.variants || []).forEach(variant => { variant.discountPercent = 5; });
+        }
+    });
+}
+
 function renderProducts() {
+    applyEquitoneSheetDiscount();
     applyAluminiumDiscount();
     ensureEquitoneRivets();
     const grid = document.getElementById('productGrid');
