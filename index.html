@@ -1695,11 +1695,19 @@ let PANEL_SHIPPING_UNDER_30 = 150.00;
 
 function hasLongSubstructureGoods() {
     return cart.some(item => {
-        if (item.category !== 'apaks') return false;
-        const product = allProducts.find(p => p.id === item.id);
-        const source = `${product?.name || item.name || ''} ${product?.desc || ''}`.toLowerCase();
-        return /\((2|3|6)m\)|\b(2|3|6)m\b/.test(source);
+        const product = allProducts.find(p => Number(p.id) === Number(item.id));
+        if ((product?.category || item.category) !== 'apaks') return false;
+        // Read the selected length first; catalogue names may omit the length.
+        const sources = [item.sizeLabel, ...(product?.sizeLabels || []), product?.name, item.name, product?.desc];
+        return sources.some(value => {
+            const matches = String(value || '').matchAll(/(?:^|[^\p{L}\d])(\d+(?:[.,]\d+)?)\s*m(?![\p{L}\d²])/giu);
+            return Array.from(matches).some(match => Number(match[1].replace(',', '.')) >= 2);
+        });
     });
+}
+
+function requiresLongGoodsDelivery() {
+    return hasLongSubstructureGoods() && !cart.some(item => item.category === 'paneli' || item.category === 'flizes');
 }
 
 function getPanelSheetQty() {
@@ -1718,13 +1726,25 @@ function isHeavySubstructureOrder() {
 
 function parcelLockerAllowedByWeight() {
     const info = cartWeightInfo();
-    return info.unknownQty === 0 && info.totalKg <= PARCEL_LOCKER_MAX_KG;
+    return !hasLongSubstructureGoods() && info.unknownQty === 0 && info.totalKg <= PARCEL_LOCKER_MAX_KG;
 }
 
 function enforceParcelLockerWeightLimit() {
     const shipping = document.getElementById('checkoutShipping');
     if (!shipping) return '';
     const info = cartWeightInfo();
+    if (requiresLongGoodsDelivery()) {
+        if (!shipping.querySelector('option[value="garprofili"]')) {
+            const option = document.createElement('option');
+            option.value = 'garprofili';
+            option.textContent = `Smago/garizmēra preču piegāde uz adresi — ${money(SUBSTRUCTURE_SHIPPING.garprofili)} bez PVN`;
+            shipping.appendChild(option);
+        }
+        shipping.value = 'garprofili';
+        const parcel = shipping.querySelector('option[value="pakomats"]');
+        if (parcel) parcel.disabled = true;
+        return 'long';
+    }
 
     if (info.unknownQty === 0 && info.totalKg > STANDARD_COURIER_MAX_KG) {
         if (shipping.value !== 'garprofili') shipping.value = 'garprofili';
@@ -1749,7 +1769,7 @@ function getShippingPrice() {
 
     if (hasTiles) return null;
 
-    if (isHeavySubstructureOrder()) return SUBSTRUCTURE_SHIPPING.garprofili;
+    if (hasLongSubstructureGoods() || isHeavySubstructureOrder()) return SUBSTRUCTURE_SHIPPING.garprofili;
 
     const shipping = document.getElementById('checkoutShipping')?.value;
     return Object.prototype.hasOwnProperty.call(SUBSTRUCTURE_SHIPPING, shipping) ? SUBSTRUCTURE_SHIPPING[shipping] : 0;
@@ -1865,9 +1885,10 @@ function setupShippingControls() {
     const sync = () => {
         const info = cartWeightInfo();
         const parcelOption = shipping.querySelector('option[value="pakomats"]');
-        const parcelAllowed = info.unknownQty === 0 && info.totalKg <= PARCEL_LOCKER_MAX_KG;
+        const longGoods = requiresLongGoodsDelivery();
+        const parcelAllowed = !hasLongSubstructureGoods() && info.unknownQty === 0 && info.totalKg <= PARCEL_LOCKER_MAX_KG;
         const heavyOrder = info.unknownQty === 0 && info.totalKg > STANDARD_COURIER_MAX_KG;
-        if (heavyOrder && !shipping.querySelector('option[value="garprofili"]')) {
+        if ((heavyOrder || longGoods) && !shipping.querySelector('option[value="garprofili"]')) {
             const opt = document.createElement('option');
             opt.value = 'garprofili';
             opt.textContent = `Smago preču piegāde — ${money(SUBSTRUCTURE_SHIPPING.garprofili)} bez PVN`;
@@ -1879,7 +1900,7 @@ function setupShippingControls() {
                 ? `Pakomāts (līdz ${PARCEL_LOCKER_MAX_KG} kg)`
                 : `Pakomāts nav pieejams — virs ${PARCEL_LOCKER_MAX_KG} kg vai trūkst svara`;
         }
-        if (heavyOrder) {
+        if (heavyOrder || longGoods) {
             shipping.value = 'garprofili';
         } else if (!parcelAllowed && shipping.value === 'pakomats') {
             shipping.value = 'adrese_kurjers';
@@ -2215,7 +2236,8 @@ document.getElementById('checkoutForm').addEventListener('submit', async functio
     if (!name || !email || !phone || !city || !address || !zip || (buyerType==='company' && (!company || !regNo))) {
         setCheckoutStatus('Lūdzu, aizpildiet visus obligātos laukus.'); return;
     }
-    if (shipping === 'pakomats' && !parcelLocker) {
+    enforceParcelLockerWeightLimit();
+    if (document.getElementById('checkoutShipping')?.value === 'pakomats' && !parcelLocker) {
         setCheckoutStatus('Lūdzu, norādiet izvēlēto pakomātu.'); return;
     }
     if (!document.getElementById('checkoutConsent').checked) { setCheckoutStatus('Lūdzu, apstipriniet datu izmantošanu pasūtījuma apstrādei.'); return; }
