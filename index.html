@@ -324,6 +324,8 @@ html { scroll-behavior:smooth; }
     text-align:center;
     min-height:32px;
 }
+.screw-color-code { flex:1; min-width:120px; max-width:100%; padding:9px 14px; border:1px solid var(--eq-gold); border-radius:12px; background:#222; color:#fff; font:inherit; cursor:pointer; }
+.screw-color-code:focus { outline:2px solid var(--eq-gold); outline-offset:2px; }
 </style>
 <script>
 /* Local Preview protection: prevents repeated network-permission dialogs from dozens of third-party image hosts.
@@ -792,7 +794,20 @@ function discountPriceHTML(variant, basePrice) {
     return (rate ? `<small style="text-decoration:line-through;color:#aaa">${money(base)}</small> <small style="color:#91e7b5">−${rate}%</small><br>` : '') +
         `${money(actual)} <small>bez PVN</small><br><small>${money(grossAmount(actual))} ar PVN / vienība</small>`;
 }
+function ensureEquitoneRivets() {
+    let rivets = allProducts.find(p => p.code === 'UNI-RIVET-4X18-K15-AL');
+    if (!rivets) {
+        rivets = {"id": 260, "category": "paneli", "name": "EQUITONE oriģinālās kniedes", "code": "UNI-RIVET-4X18-K15-AL", "desc": "4x18 – K15 aluminium · 250 gab./iepakojumā", "sizeLabels": ["iepakojums (250 gab.)"], "variants": [{"color": "Standarts", "image": "", "code": "UNI-RIVET-4X18-K15-AL", "priceSmall": 92.0, "priceLarge": 92.0}]};
+        if (allProducts.some(p => Number(p.id) === Number(rivets.id))) rivets.id = Math.max(...allProducts.map(p => Number(p.id) || 0)) + 1;
+        allProducts.push(rivets);
+    }
+    rivets.name = 'EQUITONE oriģinālās kniedes';
+    rivets.category = 'paneli';
+    if (currentCategory === 'paneli' && !products.includes(rivets)) products.push(rivets);
+}
+
 function renderProducts() {
+    ensureEquitoneRivets();
     const grid = document.getElementById('productGrid');
     // Keep the selected item when admin saves a photo and redraws the catalogue.
     const previousGroupSelection = new Map(Array.from(grid.querySelectorAll('.bracket-group-card')).map(card => [card.dataset.group, {id:card.dataset.selectedBracketId, variant:Number(card.dataset.selectedVariantIndex || 0), length:Number(card.dataset.selectedLength || 3)}]));
@@ -807,6 +822,15 @@ function renderProducts() {
             })
             .sort((a,b) => panelDisplayRank(a) - panelDisplayRank(b))
         : [...products];
+
+    if (currentCategory === 'paneli') {
+        const rivetIndex = displayProducts.findIndex(p => p.code === 'UNI-RIVET-4X18-K15-AL');
+        if (rivetIndex >= 0) {
+            const [rivets] = displayProducts.splice(rivetIndex, 1);
+            const screwIndex = displayProducts.findIndex(p => p.code === 'SKRUVE-5.5X50-K15-A2');
+            displayProducts.splice(screwIndex >= 0 ? screwIndex + 1 : displayProducts.length, 0, rivets);
+        }
+    }
 
     if (currentCategory === 'apaks') {
         const brackets = displayProducts.filter(isSteelBracket);
@@ -1104,14 +1128,16 @@ function renderProducts() {
         // while another saved color has the photo. Select that actual variant on
         // EVERY render (including a fresh reload after server overrides arrive).
         // Keep all other products' initial selection unchanged.
-        const isEquitoneScrewPhotoFix = String(p.code || '').toUpperCase() === 'SKRUVE-5.5X50-K15-A2';
+        const isEquitoneScrewPhotoFix = ['SKRUVE-5.5X50-K15-A2', 'UNI-RIVET-4X18-K15-AL'].includes(String(p.code || '').toUpperCase());
         const firstPhotoIndex = isEquitoneScrewPhotoFix
             ? (p.variants || []).findIndex(v => String(v?.image || '').trim()) : -1;
         const initialVariantIndex = firstPhotoIndex >= 0 ? firstPhotoIndex : 0;
-        const first = p.variants && p.variants.length > 0 ? p.variants[initialVariantIndex] : null;
+        const first = isEquitoneScrewPhotoFix ? screwColorSelection(p, equitoneColorCodes()[0])?.variant : (p.variants && p.variants.length > 0 ? p.variants[initialVariantIndex] : null);
         const imgSrc = String(first?.image || '').trim();
         const sizeLabels = p.sizeLabels || ['Mazais', 'Lielais'];
-        const colorItems = p.variants
+        const colorItems = isEquitoneScrewPhotoFix
+            ? `<select class="screw-color-code" aria-label="${p.code === 'UNI-RIVET-4X18-K15-AL' ? 'Kniežu' : 'Skrūvju'} krāsas kods" data-product-id="${p.id}">${equitoneColorCodes().map(code => `<option value="${code}">${code}</option>`).join('')}</select>`
+            : p.variants
             .filter(v => v.image && v.image.trim() !== '')
             .map((v, vi) => {
                 const originalIndex = p.variants.indexOf(v);
@@ -1327,7 +1353,8 @@ function renderProducts() {
             const activeColorEl = this.closest('.product-card').querySelector('.color-btn.active');
             let variantIndex = 0;
             if (activeColorEl) variantIndex = parseInt(activeColorEl.dataset.variantIndex);
-            const selection = resolveProductSize(product, sizeIndex, variantIndex);
+            const screwSelect = this.closest('.product-card').querySelector('.screw-color-code');
+            const selection = screwSelect ? screwColorSelection(product, screwSelect.value) : resolveProductSize(product, sizeIndex, variantIndex);
             if (!selection) return;
             const { variant, basePrice: price } = selection;
             const priceEl = document.getElementById(`price-${productId}`);
@@ -1369,6 +1396,14 @@ function renderProducts() {
         });
     });
 
+    document.querySelectorAll('.screw-color-code').forEach(select => {
+        select.addEventListener('change', function() {
+            const product = allProducts.find(p => Number(p.id) === Number(this.dataset.productId));
+            const selection = product && screwColorSelection(product, this.value);
+            if (selection) document.getElementById(`price-${product.id}`).innerHTML = discountPriceHTML(selection.variant, selection.basePrice);
+        });
+    });
+
     document.querySelectorAll('.add-to-cart').forEach(btn => {
         btn.addEventListener('click', function(e) {
             e.stopPropagation();
@@ -1377,6 +1412,25 @@ function renderProducts() {
         });
     });
     updateCartUI();
+}
+
+function equitoneColorCodes() {
+    const codes = new Set();
+    allProducts.filter(p => /^(TECTIVA|PICTURA|NATURA|LINEA|LUNARA)$/i.test(String(p.name || '').trim()))
+        .forEach(p => (p.variants || []).forEach(v => {
+            const match = String(v.color || '').toUpperCase().match(/^(TE\d{2}|P[A-Z]\d{3}|N\d{3}|LT\d{2}|LA\d{2})(?=\b|\()/);
+            if (match) codes.add(match[1]);
+        }));
+    return [...codes].sort((a, b) => a.localeCompare(b, 'en', {numeric: true}));
+}
+
+function screwColorSelection(product, color) {
+    const variants = product.variants || [];
+    const photo = variants.find(v => String(v.image || '').trim()) || variants[0];
+    if (!photo || !equitoneColorCodes().includes(color)) return null;
+    const priced = variants.find(v => String(v.color || '').trim().toUpperCase() === color) || photo;
+    return { variant: {...priced, color, image: photo.image || '', code: priced.code || product.code},
+        basePrice: Number(priced.priceSmall || 0), sizeLabel: product.sizeLabels?.[0] || 'iepakojums (250 gab.)' };
 }
 
 // Resolve display and cart prices from the same selected length.
@@ -1408,7 +1462,8 @@ function addToCart(productId) {
     const activeColorEl = card ? card.querySelector('.color-btn.active') : null;
     let variantIndex = 0;
     if (activeColorEl) variantIndex = parseInt(activeColorEl.dataset.variantIndex);
-    const selection = resolveProductSize(product, selectedSize, variantIndex);
+    const colorSelect = card?.querySelector('.screw-color-code');
+    const selection = colorSelect ? screwColorSelection(product, colorSelect.value) : resolveProductSize(product, selectedSize, variantIndex);
     if (!selection) return;
     const { variant, basePrice, sizeLabel } = selection;
     const price = discountedPrice(variant, basePrice);
