@@ -1046,10 +1046,10 @@ function renderProducts() {
             const selected = items.find(item => String(item.id) === remembered?.id) || items[0];
             const selectedVariantIndex = remembered && selected && String(selected.id) === remembered.id && selected.variants?.[remembered.variant] ? remembered.variant : Math.max(0, (selected?.variants || []).findIndex(v => String(v.image || "").trim()));
             const firstVariant = selected?.variants?.[selectedVariantIndex] || null;
-            // Only these stainless groups share ONE catalogue photograph across all sizes.
+            // Stainless brackets and plain cokola profiles share one photograph across all sizes.
             // Keep every individual product/variant ID, weight and price unchanged.
             // Other groups still show only their selected variant's photograph.
-            const groupPhoto = (isStainless70 || isStainless140)
+            const groupPhoto = (isStainless70 || isStainless140 || isPlainCokola)
                 ? (items.flatMap(item => item.variants || [])
                     .map(v => String(v.image || '').trim()).find(Boolean) || '')
                 : (String(firstVariant?.image || '').trim() || '');
@@ -1090,8 +1090,8 @@ function renderProducts() {
                     <button type="button" class="size-btn ${remembered?.length === 6 ? '' : 'active'}" data-length="3">3 m</button>
                     <button type="button" class="size-btn ${remembered?.length === 6 ? 'active' : ''}" data-length="6">6 m</button>
                 </div>` : ''}
-                ${(isStainless70 || isStainless140)
-                    ? (groupPhoto ? `<div class="color-variants stainless70-single-variant"><span class="label">Varianti:</span><button type="button" class="color-btn stainless70-photo-dot active" aria-label="Atvērt kopīgo kronšteina attēlu" title="Kopīgais kronšteina attēls" style="background-image:url('${groupPhoto}')"></button></div>` : '')
+                ${(isStainless70 || isStainless140 || isPlainCokola)
+                    ? (groupPhoto ? `<div class="color-variants stainless70-single-variant"><span class="label">Varianti:</span><button type="button" class="color-btn stainless70-photo-dot active" aria-label="Atvērt kopīgo produkta attēlu" title="Kopīgais produkta attēls" style="background-image:url('${groupPhoto}')"></button></div>` : '')
                     : (() => { const groupImageVariants = items.flatMap((item,itemIndex)=>(item.variants || []).map((v,vi)=>({item,itemIndex,v,vi})).filter(({v})=>v.image && String(v.image).trim())); return groupImageVariants.length ? `<div class="color-variants group-variant-selector"><span class="label">Varianti:</span>${groupImageVariants.map(({item,itemIndex,v,vi})=>`<button type="button" class="color-btn group-variant-btn ${selected && String(item.id) === String(selected.id) && vi===selectedVariantIndex?'active':''}" data-product-id="${item.id}" data-variant-index="${vi}" title="${String(item.name || '').trim()}${v.color ? ' — ' + v.color : ''}" style="background-image:url('${v.image}')"><span class="tooltip">${String(item.name || '').trim()}${v.color ? ' — ' + v.color : ''}</span></button>`).join('')}</div>` : ''; })()}
                 <div class="product-bottom">
                     <span class="price" id="bracket-group-price">${firstVariant ? discountPriceHTML(firstVariant, Number(firstVariant.priceSmall || 0) * (isTProfileGroup && remembered?.length === 6 ? 2 : 1)) : '—'}</span>
@@ -1195,7 +1195,7 @@ function renderProducts() {
 
     function updateGroupImage(card, variant) {
         // For this group the same already-rendered picture is deliberately fixed.
-        if (card.dataset.group === 'stainless-70-brackets' || card.dataset.group === 'stainless-140-brackets') return;
+        if (card.dataset.group === 'stainless-70-brackets' || card.dataset.group === 'stainless-140-brackets' || card.dataset.group === 'plain-cokola-profiles') return;
         const box = card.querySelector('.bracket-group-image');
         if (!box) return;
         const img = String(variant?.image || '').trim();
