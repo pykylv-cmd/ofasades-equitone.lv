@@ -1327,16 +1327,9 @@ function renderProducts() {
             const activeColorEl = this.closest('.product-card').querySelector('.color-btn.active');
             let variantIndex = 0;
             if (activeColorEl) variantIndex = parseInt(activeColorEl.dataset.variantIndex);
-            let variant = product.variants[variantIndex];
-            if ((product.code === 'AP-258' || product.code === 'AP-259') && sizeIndex === 1) {
-                variant = product.variants[1];
-            }
-            if (!variant) return;
-            const price = (product.code === 'AP-258' || product.code === 'AP-259')
-                ? Number(variant.priceSmall || 0)
-                : (sizeIndex === 6
-                    ? Number(variant.priceSmall || 0) * 2
-                    : (sizeIndex === 0 ? variant.priceSmall : variant.priceLarge));
+            const selection = resolveProductSize(product, sizeIndex, variantIndex);
+            if (!selection) return;
+            const { variant, basePrice: price } = selection;
             const priceEl = document.getElementById(`price-${productId}`);
             if (priceEl) priceEl.innerHTML = price ? discountPriceHTML(variant, price) : '—';
             this.closest('.product-card').dataset.selectedSize = sizeIndex;
@@ -1369,9 +1362,10 @@ function renderProducts() {
             }
             const card = this.closest('.product-card');
             const selectedSize = parseInt(card.dataset.selectedSize || '0');
-            const price = selectedSize === 0 ? variant.priceSmall : variant.priceLarge;
+            const selection = resolveProductSize(product, selectedSize, variantIndex);
+            const price = selection ? selection.basePrice : 0;
             const priceEl = document.getElementById(`price-${productId}`);
-            if (priceEl) priceEl.innerHTML = price ? discountPriceHTML(variant, price) : '—';
+            if (priceEl) priceEl.innerHTML = price ? discountPriceHTML(selection.variant, price) : '—';
         });
     });
 
@@ -1385,6 +1379,26 @@ function renderProducts() {
     updateCartUI();
 }
 
+// Resolve display and cart prices from the same selected length.
+function resolveProductSize(product, sizeIndex, variantIndex = 0) {
+    const variants = product.variants || [];
+    const photoVariant = variants[variantIndex] || variants[0];
+    if (!photoVariant) return null;
+    if (product.code === 'AP-258' || product.code === 'AP-259') {
+        const metres = sizeIndex === 1 ? 4 : 3;
+        const lengthVariant = variants.find(v => String(v.code || '').toUpperCase() === product.code + '-' + metres + 'M');
+        const threeMetreVariant = variants.find(v => String(v.code || '').toUpperCase() === product.code + '-3M') || variants[0];
+        const variant = lengthVariant || photoVariant;
+        const basePrice = Math.round((lengthVariant
+            ? Number(lengthVariant.priceSmall || 0)
+            : Number(threeMetreVariant.priceSmall || 0) / 3 * metres) * 100) / 100;
+        return { variant: { ...variant, image: photoVariant.image || variant.image || '', code: product.code + '-' + metres + 'M' }, basePrice, sizeLabel: metres + ' m' };
+    }
+    return { variant: photoVariant,
+        basePrice: sizeIndex === 6 ? Number(photoVariant.priceSmall || 0) * 2 : Number(sizeIndex === 0 ? photoVariant.priceSmall : photoVariant.priceLarge),
+        sizeLabel: sizeIndex === 6 ? '6 m' : (product.sizeLabels?.[sizeIndex] || (sizeIndex === 0 ? 'Mazais' : 'Lielais')) };
+}
+
 function addToCart(productId) {
     const product = allProducts.find(p => Number(p.id) === Number(productId));
     if (!product) return;
@@ -1394,20 +1408,10 @@ function addToCart(productId) {
     const activeColorEl = card ? card.querySelector('.color-btn.active') : null;
     let variantIndex = 0;
     if (activeColorEl) variantIndex = parseInt(activeColorEl.dataset.variantIndex);
-    let variant = product.variants[variantIndex];
-    if ((product.code === 'AP-258' || product.code === 'AP-259') && selectedSize === 1) {
-        variant = product.variants[1];
-    }
-    if (!variant) return;
-    const basePrice = (product.code === 'AP-258' || product.code === 'AP-259')
-        ? Number(variant.priceSmall || 0)
-        : (selectedSize === 6
-            ? Number(variant.priceSmall || 0) * 2
-            : (selectedSize === 0 ? variant.priceSmall : variant.priceLarge));
+    const selection = resolveProductSize(product, selectedSize, variantIndex);
+    if (!selection) return;
+    const { variant, basePrice, sizeLabel } = selection;
     const price = discountedPrice(variant, basePrice);
-    const sizeLabel = selectedSize === 6
-        ? '6 m'
-        : (product.sizeLabels ? product.sizeLabels[selectedSize] : (selectedSize === 0 ? 'Mazais' : 'Lielais'));
     const variantColor = variant.color || '';
     const existing = cart.find(item => item.id === productId && item.size === selectedSize && item.variantColor === variantColor);
     if (existing) { existing.qty += 1; existing.originalPrice = basePrice; existing.discountPercent = discountRate(variant); existing.price = price; } else {
