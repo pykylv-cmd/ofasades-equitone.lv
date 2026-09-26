@@ -1904,9 +1904,27 @@ function parcelLockerAllowedByWeight() {
     return !cart.some(item => Number(allProducts.find(p => Number(p.id) === Number(item.id))?.areaM2) > 0) && !hasLongSubstructureGoods() && info.unknownQty === 0 && info.totalKg <= PARCEL_LOCKER_MAX_KG;
 }
 
+function tileDeliveryMode() {
+    const info = cartWeightInfo();
+    return info.unknownQty === 0 && info.totalKg <= STANDARD_COURIER_MAX_KG && !hasLongSubstructureGoods()
+        ? 'adrese_kurjers' : 'flizes_krava';
+}
+function tileDeliveryLabel() {
+    return tileDeliveryMode() === 'adrese_kurjers'
+        ? `Kurjers uz norādīto adresi — ${money(SUBSTRUCTURE_SHIPPING.adrese_kurjers)} bez PVN`
+        : `Flīžu piegāde ar kravas transportu — ${money(PANEL_SHIPPING_UNDER_30)} bez PVN`;
+}
+
 function enforceParcelLockerWeightLimit() {
     const shipping = document.getElementById('checkoutShipping');
     if (!shipping) return '';
+    if (cart.some(item => item.category === 'paneli')) return '';
+    if (cart.some(item => item.category === 'flizes')) {
+        shipping.value = tileDeliveryMode();
+        const label = document.getElementById('tileDeliveryLabel');
+        if (label) label.textContent = tileDeliveryLabel();
+        return '';
+    }
     const info = cartWeightInfo();
     if (requiresLongGoodsDelivery()) {
         if (!shipping.querySelector('option[value="garprofili"]')) {
@@ -1942,7 +1960,7 @@ function getShippingPrice() {
         return panelQty >= 30 ? 0 : PANEL_SHIPPING_UNDER_30;
     }
 
-    if (hasTiles) return null;
+    if (hasTiles) return tileDeliveryMode() === 'adrese_kurjers' ? SUBSTRUCTURE_SHIPPING.adrese_kurjers : PANEL_SHIPPING_UNDER_30;
 
     if (hasLongSubstructureGoods() || isHeavySubstructureOrder()) return SUBSTRUCTURE_SHIPPING.garprofili;
 
@@ -1996,8 +2014,9 @@ function getShippingSection() {
         return `
             <div class="shipping-info">
                 <label>Piegāde</label>
-                <p style="color:#ccc; margin-bottom:10px;">Flīžu piegāde uz augstāk norādīto adresi. Piegādes cenu O FASADES saskaņo atsevišķi.</p>
-                <input type="hidden" id="checkoutShipping" value="adrese_kurjers">
+                <p id="tileDeliveryLabel" style="color:#ccc; margin-bottom:10px;">${tileDeliveryLabel()}</p>
+                <p style="color:#aaa; margin-bottom:10px;">Līdz ${STANDARD_COURIER_MAX_KG} kg — kurjers. Virs ${STANDARD_COURIER_MAX_KG} kg vai kopā ar gariem profiliem — kravas transports. Pakomāta piegāde flīzēm nav pieejama.</p>
+                <input type="hidden" id="checkoutShipping" value="${tileDeliveryMode()}">
             </div>
         `;
     }
@@ -2464,6 +2483,7 @@ document.getElementById('checkoutForm').addEventListener('submit', async functio
     const vat = vatAmount(goodsSubtotal) + shippingVat;
     const total = grossAmount(goodsSubtotal) + (shippingGross === null ? 0 : shippingGross);
     const shippingMap = {
+        flizes_krava: `Flīžu piegāde ar kravas transportu — ${money(shippingNet)} bez PVN`,
         adrese_krava: shippingGross === 0 ? 'EQUITONE paneļu piegāde — bez maksas (30+ loksnes), aptuveni 3–4 nedēļas' : `EQUITONE paneļu piegāde — ${money(shippingNet)} bez PVN (līdz 29 loksnēm), aptuveni 3–4 nedēļas`,
         adrese_kurjers: shippingGross === null ? 'Kurjers uz norādīto adresi' : `Kurjers uz norādīto adresi — ${money(shippingNet)} bez PVN`,
         pakomats:`Pakomāts — ${parcelOperator}: ${parcelLocker} — ${money(shippingGross || 0)} — aptuveni 3 darba dienas`,
