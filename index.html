@@ -1935,6 +1935,112 @@ function getPanelSheetQty() {
 const PARCEL_LOCKER_MAX_KG = 30;
 const STANDARD_COURIER_MAX_KG = 30;
 
+// DPD 2026-10 piedāvājums: flīžu piegādes cena pēc svara un Latvijas zonas.
+// DPD gala pašizmaksa = bāzes cena + enerģijas piemaksa + darbaspēka piemaksa
+// + sezonālā piemaksa (oktobris-decembris) + O FASADES 5% drošības/peļņas rezerve.
+const DPD_ENERGY_SURCHARGE = 0.2318;
+const DPD_LABOUR_SURCHARGE = 0.1947;
+const DPD_SEASONAL_SURCHARGE = 0.025;
+const DPD_STORE_MARGIN = 0.05;
+
+const DPD_B2C_LATVIA_RATES = [
+    {kg:0.5, riga:3.30, major:3.30, other:4.90},
+    {kg:3, riga:3.40, major:3.50, other:5.00},
+    {kg:5, riga:3.70, major:4.40, other:5.50},
+    {kg:10, riga:4.10, major:4.95, other:6.60},
+    {kg:20, riga:4.90, major:6.70, other:8.00},
+    {kg:31.5, riga:6.00, major:9.00, other:11.00},
+    {kg:50, riga:12.00, major:13.50, other:16.00},
+    {kg:75, riga:16.00, major:20.00, other:24.00},
+    {kg:100, riga:18.00, major:23.00, other:26.00},
+    {kg:200, riga:25.00, major:33.00, other:43.00},
+    {kg:300, riga:33.00, major:48.00, other:58.00},
+    {kg:400, riga:38.00, major:55.00, other:68.00},
+    {kg:500, riga:43.00, major:76.00, other:86.00}
+];
+const DPD_B2C_NEXT_100 = {riga:7.00, major:16.00, other:16.00};
+
+const DPD_CLASSIC_LATVIA_RATES = [
+    {kg:0.5, riga:2.80, major:3.20, other:4.30},
+    {kg:3, riga:2.90, major:3.40, other:4.50},
+    {kg:5, riga:3.40, major:3.70, other:5.00},
+    {kg:10, riga:3.80, major:3.95, other:5.60},
+    {kg:20, riga:4.50, major:5.70, other:7.00},
+    {kg:31.5, riga:5.50, major:7.80, other:9.10},
+    {kg:50, riga:10.00, major:11.50, other:13.00},
+    {kg:75, riga:15.00, major:18.00, other:20.00},
+    {kg:100, riga:17.00, major:20.00, other:21.00},
+    {kg:200, riga:21.00, major:28.00, other:34.00},
+    {kg:300, riga:24.00, major:34.00, other:35.00},
+    {kg:400, riga:25.00, major:41.00, other:54.00},
+    {kg:500, riga:26.00, major:44.00, other:60.00},
+    {kg:600, riga:28.00, major:48.00, other:63.00},
+    {kg:700, riga:30.00, major:52.00, other:69.00},
+    {kg:800, riga:35.00, major:70.00, other:85.00},
+    {kg:900, riga:39.00, major:80.00, other:94.00},
+    {kg:1000, riga:45.00, major:89.00, other:103.00}
+];
+const DPD_CLASSIC_NEXT_100 = {riga:7.00, major:15.00, other:15.00};
+
+function normalizePlaceName(value) {
+    return String(value || '').trim().toLowerCase().normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, ' ')
+        .trim();
+}
+
+function dpdLatviaZone() {
+    const city = normalizePlaceName(document.getElementById('checkoutCity')?.value);
+    if (!city) return null;
+    if (city === 'riga' || city.startsWith('riga ')) return 'riga';
+
+    const majorPlaces = [
+        'aizkraukle','aluksne','balvi','bauska','cesis','daugavpils','dobele','gulbene',
+        'jelgava','jekabpils','jurmala','kraslava','kuldiga','liepaja','limbazi','ludza',
+        'madona','ogre','preili','rezekne','saldus','talsi','tukums','valka','valmiera','ventspils',
+        'adazi','adazu','babite','babites','baldone','baldones','carnikava','carnikavas',
+        'garkalne','garkalnes','krimulda','krimuldas','malpils','marupe','marupes','olaine','olaines',
+        'ropazi','ropazu','salaspils','saulkrasti','saulkrastu','sigulda','siguldas','stopini','stopinu',
+        'seja','sejas','kekava','kekavas'
+    ];
+    return majorPlaces.some(place => city === place || city.startsWith(place + ' ') || city.includes(' ' + place + ' '))
+        ? 'major' : 'other';
+}
+
+function dpdBasePriceForWeight(weightKg, buyerType, zone) {
+    if (!Number.isFinite(weightKg) || weightKg <= 0 || !zone) return null;
+    const company = buyerType === 'company';
+    const rates = company ? DPD_CLASSIC_LATVIA_RATES : DPD_B2C_LATVIA_RATES;
+    const extra = company ? DPD_CLASSIC_NEXT_100 : DPD_B2C_NEXT_100;
+    const last = rates[rates.length - 1];
+    const tier = rates.find(row => weightKg <= row.kg);
+    if (tier) return tier[zone];
+    const extraHundreds = Math.ceil((weightKg - last.kg) / 100);
+    return last[zone] + extraHundreds * extra[zone];
+}
+
+function dpdSeasonalFactor() {
+    const month = new Date().getMonth() + 1;
+    return (month === 10 || month === 11 || month === 12) ? (1 + DPD_SEASONAL_SURCHARGE) : 1;
+}
+
+function getDpdTileShippingPrice() {
+    const info = cartWeightInfo();
+    if (info.unknownQty > 0 || !Number.isFinite(info.totalKg) || info.totalKg <= 0) return null;
+    const zone = dpdLatviaZone();
+    if (!zone) return null;
+    const buyerType = document.getElementById('checkoutBuyerType')?.value || 'person';
+    const base = dpdBasePriceForWeight(info.totalKg, buyerType, zone);
+    if (base === null) return null;
+    const dpdCost = base * (1 + DPD_ENERGY_SURCHARGE + DPD_LABOUR_SURCHARGE) * dpdSeasonalFactor();
+    return Number((dpdCost * (1 + DPD_STORE_MARGIN)).toFixed(2));
+}
+
+function dpdZoneLabel() {
+    const zone = dpdLatviaZone();
+    return zone === 'riga' ? 'Rīga' : zone === 'major' ? 'lielākās pilsētas/novadi' : zone === 'other' ? 'pārējā Latvija' : '';
+}
+
 function isHeavySubstructureOrder() {
     const info = cartWeightInfo();
     return info.unknownQty === 0 && info.totalKg > STANDARD_COURIER_MAX_KG;
@@ -1951,9 +2057,17 @@ function tileDeliveryMode() {
         ? 'adrese_kurjers' : 'flizes_krava';
 }
 function tileDeliveryLabel() {
+    const price = getDpdTileShippingPrice();
+    if (price === null) return 'Ievadiet piegādes pilsētu — cena tiks aprēķināta uzreiz.';
     return tileDeliveryMode() === 'adrese_kurjers'
-        ? `Kurjers uz norādīto adresi — ${money(SUBSTRUCTURE_SHIPPING.adrese_kurjers)} bez PVN`
-        : `Flīžu piegāde ar kravas transportu — ${money(PANEL_SHIPPING_UNDER_30)} bez PVN`;
+        ? `Kurjers uz norādīto adresi — ${money(price)} bez PVN`
+        : `Flīžu piegāde uz norādīto adresi — ${money(price)} bez PVN`;
+}
+
+function refreshTileDeliveryPricing() {
+    const label = document.getElementById('tileDeliveryLabel');
+    if (label) label.textContent = tileDeliveryLabel();
+    updateCheckoutPriceSummary();
 }
 
 function enforceParcelLockerWeightLimit() {
@@ -2001,7 +2115,7 @@ function getShippingPrice() {
         return panelQty >= 30 ? 0 : PANEL_SHIPPING_UNDER_30;
     }
 
-    if (hasTiles) return tileDeliveryMode() === 'adrese_kurjers' ? SUBSTRUCTURE_SHIPPING.adrese_kurjers : PANEL_SHIPPING_UNDER_30;
+    if (hasTiles) return getDpdTileShippingPrice();
 
     if (hasLongSubstructureGoods() || isHeavySubstructureOrder()) return SUBSTRUCTURE_SHIPPING.garprofili;
 
@@ -2028,7 +2142,11 @@ function updateCheckoutPriceSummary() {
     const weightLine = `${cartTotalTileArea() > 0 ? "<br>Kopējā flīžu platība: <strong>" + formatTileArea(cartTotalTileArea()) + "</strong>" : ""}${cartTotalMetres() > 0 ? '<br>Kopējais profilu garums: <strong>' + formatMetres(cartTotalMetres()) + '</strong>' : ''}<br>Kopējais preču svars: <strong>${formatWeightKg(weightInfo.totalKg)}</strong>${weightInfo.unknownQty > 0 ? `<br><small style="color:#d8b86a;">⚠ ${weightInfo.unknownQty} vien. nav norādīts svars — drošības dēļ pakomāts netiek piedāvāts.</small>` : ''}${shippingSwitch === 'courier' ? `<br><small style="color:#d8b86a;">⚠ Pakomāta limits ir ${PARCEL_LOCKER_MAX_KG} kg. Piegāde automātiski pārslēgta uz kurjeru.</small>` : ''}${shippingSwitch === 'heavy' ? `<br><small style="color:#d8b86a;">⚠ Pasūtījums pārsniedz ${STANDARD_COURIER_MAX_KG} kg. Piegāde automātiski pārslēgta uz smago/kravas piegādi.</small>` : ''}`;
 
     if (shippingGross === null) {
-        box.innerHTML = `<strong>Pasūtījuma summa</strong><br>Preces bez PVN: ${money(goodsNet)}<br>PVN 21%: ${money(goodsVat)}<br><strong>Kopā ar PVN: ${money(goodsGross)}</strong>${weightLine}<br><small>Piegādes cena: tiek saskaņota atsevišķi.</small>`;
+        const hasTiles = cart.some(item => item.category === 'flizes');
+        const deliveryNote = hasTiles
+            ? 'Piegādes cena: ievadiet piegādes pilsētu — cena parādīsies uzreiz.'
+            : 'Piegādes cena: tiek saskaņota atsevišķi.';
+        box.innerHTML = `<strong>Pasūtījuma summa</strong><br>Preces bez PVN: ${money(goodsNet)}<br>PVN 21%: ${money(goodsVat)}<br><strong>Kopā ar PVN: ${money(goodsGross)}</strong>${weightLine}<br><small>${deliveryNote}</small>`;
         return;
     }
 
@@ -2056,7 +2174,7 @@ function getShippingSection() {
             <div class="shipping-info">
                 <label>Piegāde</label>
                 <p id="tileDeliveryLabel" style="color:#ccc; margin-bottom:10px;">${tileDeliveryLabel()}</p>
-                <p style="color:#aaa; margin-bottom:10px;">Līdz ${STANDARD_COURIER_MAX_KG} kg — kurjers. Virs ${STANDARD_COURIER_MAX_KG} kg vai kopā ar gariem profiliem — kravas transports. Pakomāta piegāde flīzēm nav pieejama.</p>
+                <p style="color:#aaa; margin-bottom:10px;">Piegādes cena tiek aprēķināta pēc kopējā svara un piegādes adreses. Pakomāta piegāde flīzēm nav pieejama.</p>
                 <input type="hidden" id="checkoutShipping" value="${tileDeliveryMode()}">
             </div>
         `;
@@ -2475,15 +2593,27 @@ document.getElementById('checkoutBuyerType').addEventListener('change', function
     document.getElementById('companyFields').hidden = !company;
     document.getElementById('checkoutCompany').required = company;
     document.getElementById('checkoutRegNo').required = company;
+    refreshTileDeliveryPricing();
+});
+
+['checkoutCity','checkoutZip'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    ['input','change','blur'].forEach(eventName => {
+        el.addEventListener(eventName, refreshTileDeliveryPricing);
+    });
 });
 
 document.getElementById('checkoutBtn').addEventListener('click', function() {
     if (cart.length === 0) { showToast('Grozs ir tukšs!'); return; }
     document.getElementById('shippingSection').innerHTML = getShippingSection();
     setupShippingControls();
-    updateCheckoutPriceSummary();
+    refreshTileDeliveryPricing();
     clearCheckoutStatus();
     document.getElementById('checkoutModal').classList.add('open');
+    // Pārlūka automātiskā adrešu aizpilde ne vienmēr izsauc input/change notikumu.
+    // Pārrēķinām vēl dažas reizes pēc loga atvēršanas, lai cena vienmēr parādītos.
+    [80, 300, 900, 1800].forEach(ms => setTimeout(refreshTileDeliveryPricing, ms));
 });
 document.getElementById('checkoutCancel').addEventListener('click', function() { document.getElementById('checkoutModal').classList.remove('open'); });
 document.getElementById('checkoutModal').addEventListener('click', function(e) { if (e.target === this) this.classList.remove('open'); });
@@ -2529,7 +2659,7 @@ document.getElementById('checkoutForm').addEventListener('submit', async functio
     const vat = vatAmount(goodsSubtotal) + shippingVat;
     const total = grossAmount(goodsSubtotal) + (shippingGross === null ? 0 : shippingGross);
     const shippingMap = {
-        flizes_krava: `Flīžu piegāde ar kravas transportu — ${money(shippingNet)} bez PVN`,
+        flizes_krava: `DPD flīžu piegāde uz adresi — ${money(shippingNet)} bez PVN`,
         adrese_krava: shippingGross === 0 ? 'EQUITONE paneļu piegāde — bez maksas (30+ loksnes), aptuveni 3–4 nedēļas' : `EQUITONE paneļu piegāde — ${money(shippingNet)} bez PVN (līdz 29 loksnēm), aptuveni 3–4 nedēļas`,
         adrese_kurjers: shippingGross === null ? 'Kurjers uz norādīto adresi' : `Kurjers uz norādīto adresi — ${money(shippingNet)} bez PVN`,
         pakomats:`Pakomāts — ${parcelOperator}: ${parcelLocker} — ${money(shippingGross || 0)} — aptuveni 3 darba dienas`,
